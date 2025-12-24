@@ -1,9 +1,9 @@
-import CustomButton from "@/components/CustomButton";
-import CustomInput from "@/components/CustomInput";
+import CustomButton from "@/components/Buttons/CustomButton";
+import CustomInput from "@/components/Buttons/CustomInput";
 import { useTheme } from "@/theme/themeContext";
 import { Link, router } from "expo-router";
 import { useState } from "react";
-import { Alert, Text, View, StyleSheet, ScrollView } from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 
 const SignUp = () => {
   const { colors } = useTheme();

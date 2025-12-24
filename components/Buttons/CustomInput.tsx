@@ -37,7 +37,7 @@ const CustomInput = ({
       
       <Text
         style={{ 
-          color: colors.primary,
+          color: colors.textSecondary,
           marginBottom: 4,
           marginLeft: 4,
           fontWeight: '600',

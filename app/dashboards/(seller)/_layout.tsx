@@ -1,7 +1,7 @@
 import { CustomTabLayout, TabConfig } from '@/components/Layout';
 import { Ionicons } from '@expo/vector-icons';
 
-const producerTabs: TabConfig[] = [
+const sellerTabs: TabConfig[] = [
   {
     name: 'index',
     label: 'Home',
@@ -17,7 +17,7 @@ const producerTabs: TabConfig[] = [
     iconNameFocused: 'stats-chart',
   },
   {
-    name: 'production',
+    name: 'sales',
     label: 'Record',
     icon: Ionicons,
     iconName: 'clipboard-outline',
@@ -33,5 +33,5 @@ const producerTabs: TabConfig[] = [
 ];
 
 export default function TabLayout() {
-  return <CustomTabLayout tabs={producerTabs} />;
+  return <CustomTabLayout tabs={sellerTabs} />;
 }

@@ -1,6 +1,7 @@
-import CustomButton from "@/components/CustomButton";
-import CustomInput from "@/components/CustomInput";
+import CustomButton from "@/components/Buttons/CustomButton";
+import CustomInput from "@/components/Buttons/CustomInput";
 import { useTheme } from "@/theme/themeContext";
+import { saveAuth } from "@/utils/auth";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -16,6 +17,36 @@ const SignIn = () => {
   const submit = async () => {
     const emailTrimmed = form.email.trim();
     const passwordTrimmed = form.password.trim();
+
+    if (!emailTrimmed || !passwordTrimmed) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const response = {
+        token: "fake_jwt_token",
+        user: {
+          role: "producer",
+        },
+      };
+      const {token, user} = response;
+      await saveAuth(token, user.role);
+
+      if (user.role === "producer") {
+        router.replace("./(producer)/dashboard");
+      }else if (user.role === "seller") {
+        router.replace("./(seller)/dashboard");
+      } else {
+        Alert.alert("Error", "Unknown user role");
+      }
+    }catch (error) {
+      Alert.alert("Error", " Invalid user role");
+    } finally {
+      setIsSubmitting(false);
+    }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailTrimmed)) {
@@ -68,18 +99,6 @@ const SignIn = () => {
           onPress={submit}
           style={{ marginTop: 20 }}
         />
-
-        <View style={styles.signInContainer}>
-          <Text style={[styles.signInText, { color: colors.textSecondary }]}>
-            Don't have an account?
-          </Text>
-          <Link
-            href="/sign-up"
-            style={[styles.signInLink, { color: colors.primary }]}
-          >
-            Sign Up
-          </Link>
-        </View>
       </ScrollView>
     </View>
   );
@@ -91,7 +110,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 50, // Give top/bottom spacing
+    paddingVertical: 50, 
   },
   title: {
     fontSize: 32,

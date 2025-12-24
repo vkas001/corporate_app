@@ -1,15 +1,15 @@
 import ProfileScreen from "@/components/profile/ProfileScreen";
 import React from "react";
 
-export default function ProducerProfile() {
+export default function SellerProfile() {
   return (
     <ProfileScreen
-      role="producer"
-      name="John Doe"
-      email="john.doe@example.com"
+      role="seller"
+      name="Jane Smith"
+      email="jane.smith@example.com"
       onAction={(action) => {
         console.log("Action:", action);
-        // Handle actions like: edit-profile, settings, billing, users, info, logout
+        // Handle actions like: edit-profile, settings, products, payouts, logout
       }}
       onEditAvatar={() => {
         console.log("Edit avatar");

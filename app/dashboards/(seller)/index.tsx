@@ -13,7 +13,7 @@ import { createDashboardStyles } from "../../../style/producer/dashboardStyleShe
 import { useTheme } from "../../../theme";
 import DashboardOverview from "@/components/Dashboard/DashboardOverview";
 
-export default function ProducerDashboard() {
+export default function SellerDashboard() {
   const { colors } = useTheme();
   const styles = createDashboardStyles(colors);
 
@@ -38,13 +38,13 @@ export default function ProducerDashboard() {
       </TouchableOpacity>
 
       <View style={styles.headerTextContainer}>
-        <Text style={styles.headerTitle}>Producer Dashboard</Text>
+        <Text style={styles.headerTitle}>Seller Dashboard</Text>
         <Text style={styles.headerDate}>{formatFullDate(new Date())}</Text>
       </View>
 
       <TouchableOpacity
         style={styles.iconBtn}
-        onPress={() => router.push('./production/notification')}
+        onPress={() => {}}
       >
         <Ionicons
           name="notifications-outline"
@@ -62,25 +62,21 @@ export default function ProducerDashboard() {
       <View style={styles.quickActionsContainer}>
         <TouchableOpacity
           style={styles.primaryAction}
-          onPress={() =>
-            router.push('./production/production-records')
-          }
+          onPress={() =>{}}
         >
           <Ionicons name="egg-outline" size={20} color={colors.textPrimary} />
           <Text style={styles.primaryActionText}>
-            Add Today’s Production
+            Add Today’s Sales
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.secondaryAction}
-          onPress={() =>
-            router.push('./production')
-          }
+          onPress={() =>{}}
         >
           <Ionicons name="time-outline" size={18} color={colors.textPrimary} />
           <Text style={styles.secondaryActionText}>
-            View Production History
+            View Sales History
           </Text>
         </TouchableOpacity>
       </View>
@@ -88,7 +84,7 @@ export default function ProducerDashboard() {
       <DashboardOverview
         title="Overview"
         dropdownLabel={selectedCategory}
-        categories={['Chicken', 'Eggs', 'Feed', 'Medicine']}
+        categories={['Chicken', 'Eggs', 'Medicine']}
         onCategorySelect={(category) => {
           setSelectedCategory(category);
           setOpen(false);
@@ -120,8 +116,7 @@ export default function ProducerDashboard() {
           },
         ]}
       />
-
-
+      
       <MarginByDayChart />
       <View style={{
         marginTop: 24,

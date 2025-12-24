@@ -1,0 +1,66 @@
+import RecordFormModal from '@/components/Forms/RecordFormModal';
+import RecordList from '@/components/Records/RecordList';
+import CustomHeader from '@/components/Screens/CustomHeader';
+import { useTheme } from '@/theme/themeContext';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+export default function FeedRecords() {
+  const { colors } = useTheme();
+  const [showModal, setShowModal] = useState(false);
+  const [records, setRecords] = useState<{
+    category: string;
+    unit: string;
+    quantity: number;
+  }[]>([]);
+
+  const categories = ['Nepali', 'Indian', 'Chinese'];
+  const unitMap: Record<string, string[]> = {
+    Nepali: ['1sac', '12sac', '50sac', '100sac'],
+    Indian: ['1', '12', '50', '100'],
+    Chinese: ['12', '25', '50', '100'],
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <CustomHeader title="Feed Records" />
+
+      <TouchableOpacity
+        onPress={() => setShowModal(true)}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 8,
+          gap: 8,
+          padding: 16,
+          backgroundColor: colors.primaryDark,
+        }}
+      >
+        <Ionicons name="add-circle-outline" size={22} color={colors.textPrimary} />
+        <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>
+          Add Feed Record
+        </Text>
+      </TouchableOpacity>
+
+      <RecordFormModal
+        visible={showModal}
+        title=" Add Feed Record"
+        categories={categories}
+        unitMap={unitMap}
+        onClose={() => setShowModal(false)}
+        onSubmit={(data) => setRecords((prev) => [...prev, data])}
+      />
+      <RecordList
+        records={records}
+        onDelete={
+          (index) => setRecords((prev) => prev.filter(
+            (_, i) => i !== index)
+          )}
+      />
+
+    </SafeAreaView>
+  );
+}
