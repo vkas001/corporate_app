@@ -24,23 +24,19 @@ export default function FeedRecords() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView className="flex-1"
+      style={{ backgroundColor: colors.background }}>
       <CustomHeader title="Feed Records" />
 
       <TouchableOpacity
         onPress={() => setShowModal(true)}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: 8,
-          gap: 8,
-          padding: 16,
-          backgroundColor: colors.primaryDark,
-        }}
+        className="flex-row items-center justify-center rounded-lg gap-2 p-4"
+        style={{ backgroundColor: colors.primaryDark }}
       >
-        <Ionicons name="add-circle-outline" size={22} color={colors.textPrimary} />
-        <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>
+        <Ionicons name="add-circle-outline"
+          size={22} color={colors.textPrimary} />
+        <Text className="font-semibold"
+          style={{ color: colors.textPrimary }}>
           Add Feed Record
         </Text>
       </TouchableOpacity>
@@ -51,7 +47,15 @@ export default function FeedRecords() {
         categories={categories}
         unitMap={unitMap}
         onClose={() => setShowModal(false)}
-        onSubmit={(data) => setRecords((prev) => [...prev, data])}
+        onSubmit={(data) => setRecords((prev) => {
+          const idx = prev.findIndex(r => r.category === data.category && r.unit === data.unit);
+          if (idx !== -1) {
+            const next = [...prev];
+            next[idx] = { ...next[idx], quantity: next[idx].quantity + data.quantity };
+            return next;
+          }
+          return [...prev, data];
+        })}
       />
       <RecordList
         records={records}

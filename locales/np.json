@@ -1,6 +1,38 @@
 {
-  "welcome": "स्वागत छ",
-  "login": "लगइन",
-  "logout": "लगआउट",
-  "home": "होम"
+  "home": {
+    "title": "प्रत्यक्ष बजार मूल्य",
+    "subtitle": "अण्डा बजारको प्रत्यक्ष दर",
+    "continue": "ड्यासबोर्डमा जानुहोस्",
+    "categoriesTitle": "बजार श्रेणीहरू",
+    "categoriesSubtitle": "श्रेणी अनुसार मूल्य हेर्नुहोस्"
+  },
+  "dashboard": {
+    "producerTitle": "उत्पादक ड्यासबोर्ड",
+    "sellerTitle": "विक्रेता ड्यासबोर्ड",
+    "overview": "सारांश",
+    "addProduction": "आजको उत्पादन थप्नुहोस्",
+    "addSales": "आजको बिक्री थप्नुहोस्",
+    "viewProductionHistory": "उत्पादन इतिहास हेर्नुहोस्",
+    "viewSalesHistory": "बिक्री इतिहास हेर्नुहोस्",
+    "periods": {
+      "today": "आज",
+      "week": "साता",
+      "month": "महिना"
+    },
+    "categories": {
+      "chicken": "कुखुरा",
+      "eggs": "अण्डा",
+      "feed": "खाद्य",
+      "medicine": "औषधि"
+    },
+    "stats": {
+      "revenue": "राजस्व",
+      "orders": "अर्डरहरू",
+      "netProfit": "शुद्ध नाफा",
+      "operatingProfit": "सञ्चालन नाफा",
+      "vsLastWeek": "गत हप्तासँग तुलना",
+      "aov": "औसत अर्डर मूल्य",
+      "margin": "मर्जिन"
+    }
+  }
 }

@@ -1,6 +1,7 @@
 import CustomButton from '@/components/Buttons/CustomButton';
 import NotificationItem, { NotificationItemProps } from '@/components/Notification/NotificaitonItem';
 import CustomHeader from '@/components/Screens/CustomHeader';
+import { notificationData } from '@/data/notifications';
 import { useTheme } from '@/theme/themeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useState } from 'react';
@@ -9,57 +10,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 type FilterKey = 'all' | 'payment' | 'alerts' | 'reminders';
 
-type NotificationEntry
-    = NotificationItemProps & { id: string };
-
 const filters: { key: FilterKey; label: string; types?: NotificationItemProps['type'][] }[] = [
     { key: 'all', label: 'All' },
     { key: 'payment', label: 'Payments', types: ['payment'] },
     { key: 'alerts', label: 'Alerts', types: ['lowStock'] },
     { key: 'reminders', label: 'Reminders', types: ['reminder', 'rateUpdate'] },
-];
-
-const notificationData: NotificationEntry[] = [
-    {
-        id: '1',
-        title: 'Payment received',
-        description: 'NPR 65,000 was released to your wallet for Batch B09.',
-        type: 'payment',
-        timestamp: 'Today - 10:30 AM',
-        status: 'new',
-        meta: '+ NPR 65,000',
-    },
-    {
-        id: '2',
-        title: 'Feed stock is low',
-        description: 'Layer feed will run out in about 2 days. Reorder soon to avoid shortages.',
-        type: 'lowStock',
-        timestamp: 'Today - 9:10 AM',
-        status: 'new',
-    },
-    {
-        id: '3',
-        title: 'Rate update',
-        description: 'Market rate increased by 3.5% this morning. Review your pricing.',
-        type: 'rateUpdate',
-        timestamp: 'Yesterday - 5:45 PM',
-        meta: '+3.5% change',
-    },
-    {
-        id: '4',
-        title: 'Weekly mortality reminder',
-        description: "Log this week's mortality for Batch A12 to keep reports accurate.",
-        type: 'reminder',
-        timestamp: 'Yesterday - 2:05 PM',
-    },
-    {
-        id: '5',
-        title: 'Payment released',
-        description: 'Settlement for Batch C14 is ready. Transfer to bank anytime.',
-        type: 'payment',
-        timestamp: '2 days ago',
-        meta: 'Settlement ready',
-    },
 ];
 
 export default function Notification() {

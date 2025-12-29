@@ -1,18 +1,17 @@
-import { Redirect, Slot } from "expo-router";
-import { Dimensions, Image, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { Slot } from "expo-router";
+import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 
 export default function AuthLayout() {
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
 
       <ScrollView>
-        
-
         <Slot />
-
       </ScrollView>
-
     </KeyboardAvoidingView>
   );
 }

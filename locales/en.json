@@ -1,6 +1,38 @@
 {
-  "welcome": "Welcome",
-  "login": "Login",
-  "logout": "Logout",
-  "home": "Home"
+  "home": {
+    "title": "Live Market Prices",
+    "subtitle": "Real-time egg market rates",
+    "continue": "Continue to Dashboard",
+    "categoriesTitle": "Market Categories",
+    "categoriesSubtitle": "Browse prices by category"
+  },
+  "dashboard": {
+    "producerTitle": "Producer Dashboard",
+    "sellerTitle": "Seller Dashboard",
+    "overview": "Overview",
+    "addProduction": "Add Today's Production",
+    "addSales": "Add Today's Sales",
+    "viewProductionHistory": "View Production History",
+    "viewSalesHistory": "View Sales History",
+    "periods": {
+      "today": "Today",
+      "week": "Week",
+      "month": "Month"
+    },
+    "categories": {
+      "chicken": "Chicken",
+      "eggs": "Eggs",
+      "feed": "Feed",
+      "medicine": "Medicine"
+    },
+    "stats": {
+      "revenue": "Revenue",
+      "orders": "Orders",
+      "netProfit": "Net Profit",
+      "operatingProfit": "Operating Profit",
+      "vsLastWeek": "vs last week",
+      "aov": "AOV",
+      "margin": "Margin"
+    }
+  }
 }

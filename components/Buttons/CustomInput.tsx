@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
 import { useTheme } from '@/theme/themeContext';
-
-const { colors } = useTheme();
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { Pressable, Text, TextInput, View } from 'react-native';
 
 interface CustomInputProps {
   placeholder?: string;
@@ -15,9 +13,12 @@ interface CustomInputProps {
   onSubmitEditing?: () => void;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
+  disabled?: boolean;
+  returnKeyType?: 'done' | 'go' | 'next' | 'search' | 'send' | 'default';
+  blurOnSubmit?: boolean;
 }
 
-const CustomInput = ({
+const CustomInput = forwardRef<TextInput, CustomInputProps>(({ 
   placeholder = "Enter text",
   value,
   label,
@@ -28,26 +29,33 @@ const CustomInput = ({
   secureTextEntry = false,
   autoCapitalize = "none",
   keyboardType = "default",
-}: CustomInputProps) => {
-
+  disabled = false,
+  returnKeyType = 'default',
+  blurOnSubmit,
+}, ref) => {
+  const { colors } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<TextInput>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+    blur: () => inputRef.current?.blur(),
+    clear: () => inputRef.current?.clear(),
+  }) as any);
 
   return (
-    <View className="w-11/12 self-center mt-6">
-      
-      <Text
-        style={{ 
-          color: colors.textSecondary,
-          marginBottom: 4,
-          marginLeft: 4,
-          fontWeight: '600',
-          fontSize: 16,
-        }}
-      >
-        {label}
-      </Text>
+    <View className="mt-6">
+      <Pressable onPress={() => inputRef.current?.focus()} hitSlop={8}>
+        <Text
+          className="font-semibold text-base mb-1 ml-1"
+          style={{ color: colors.textSecondary }}
+        >
+          {label}
+        </Text>
+      </Pressable>
 
       <TextInput
+        ref={inputRef}
         value={value}
         placeholder={placeholder}
         placeholderTextColor={colors.textSecondary}
@@ -56,23 +64,28 @@ const CustomInput = ({
         autoCapitalize={autoCapitalize}
         maxLength={maxLength}
         onSubmitEditing={onSubmitEditing}
+        returnKeyType={returnKeyType}
+        blurOnSubmit={blurOnSubmit}
         onChangeText={onChangeText}
+        editable={!disabled}
+        selectionColor={colors.primary}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
+        className={`px-4 py-3 rounded-2xl border text-base ${disabled ? 'opacity-60' : ''}`}
         style={{
-          width: "100%",
-          paddingHorizontal: 16,
-          paddingVertical: 14,
-          borderRadius: 16,
           backgroundColor: colors.surface,
-          borderWidth: 1,
-          borderColor: isFocused ? colors.primary : colors.border,
-          fontSize: 16,
+          color: colors.textPrimary,
+          borderColor: error ? '#EF4444' : (isFocused ? colors.primary : colors.border),
         }}
-        
       />
+
+      {error ? (
+        <Text className="mt-1 ml-1 text-xs font-medium text-red-500">
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
-};
+});
 
 export default CustomInput;

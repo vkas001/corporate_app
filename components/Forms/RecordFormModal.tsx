@@ -1,13 +1,18 @@
 import { useTheme } from '@/theme';
-import React, { useEffect, useState } from 'react';
+import { formatFullDate } from '@/utils/dateFormatter';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
+    KeyboardAvoidingView,
     Modal,
+    Platform,
     Pressable,
     Text,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomInput from '../Buttons/CustomInput';
+import CustomButton from '../Buttons/CustomButton';
 
 type Props = {
     visible: boolean;
@@ -20,6 +25,7 @@ type Props = {
         category: string;
         unit: string;
         quantity: number;
+        date?: string;
     }) => void;
 
     onClose: () => void;
@@ -34,17 +40,23 @@ export default function RecordFormModal({
     onClose,
 }: Props) {
     const { colors } = useTheme();
+    const insets = useSafeAreaInsets();
+
     const [category, setCategory] = useState(categories[0]);
     const [unit, setUnit] = useState(unitMap[categories[0]][0]);
     const [quantity, setQuantity] = useState('');
+    const [quantityError, setQuantityError] = useState<string | undefined>();
     const [isSaving, setIsSaving] = useState(false);
+    const [date] = useState<Date>(new Date());
+
+    const unitsForCategory = useMemo(() => unitMap[category] ?? [], [unitMap, category]);
 
     const handleCategoryChange = (newCategory: string) => {
         setCategory(newCategory);
     };
 
     useEffect(() => {
-        setUnit(unitMap[category][0]);
+        setUnit((unitMap[category] && unitMap[category][0]) || '');
     }, [category, unitMap]);
 
     const renderSegmented = (
@@ -52,12 +64,10 @@ export default function RecordFormModal({
         selected: string,
         onSelect: (value: string) => void
     ) => (
-        <View style={{
-            flexDirection: 'row',
-            backgroundColor: colors.primary,
-            borderRadius: 14,
-            padding: 4
-        }}>
+        <View
+            className="flex-row rounded-xl p-1"
+            style={{ backgroundColor: colors.primary }}
+        >
             {options.map((item) => {
                 const isActive = selected === item;
 
@@ -65,22 +75,16 @@ export default function RecordFormModal({
                     <TouchableOpacity
                         key={item}
                         onPress={() => onSelect(item)}
+                        className="flex-1 items-center rounded-lg py-2"
+                        activeOpacity={0.8}
                         style={{
-                            flex: 1,
-                            paddingVertical: 10,
-                            borderRadius: 10,
-                            alignItems: 'center',
-                            backgroundColor: isActive
-                                ? colors.primaryDark
-                                : 'transparent',
+                            backgroundColor: isActive ? colors.primaryDark : 'transparent',
                         }}
                     >
                         <Text
+                            className="font-semibold text-xs"
                             style={{
-                                fontWeight: '600',
-                                color: isActive
-                                    ? colors.textPrimary
-                                    : colors.background,
+                                color: isActive ? colors.textPrimary : colors.background,
                             }}
                         >
                             {item}
@@ -91,15 +95,31 @@ export default function RecordFormModal({
         </View>
     );
 
+    const validate = () => {
+        const n = Number(quantity);
+        if (!quantity || Number.isNaN(n)) {
+            setQuantityError('Enter a valid number');
+            return false;
+        }
+        if (n <= 0) {
+            setQuantityError('Quantity must be greater than 0');
+            return false;
+        }
+        setQuantityError(undefined);
+        return true;
+    };
+
     const handleSave = async () => {
-        if (!quantity) return;
+        if (!validate()) return;
         setIsSaving(true);
         try {
-            await onSubmit({
+            onSubmit({
                 category,
                 unit,
                 quantity: Number(quantity),
+                date: formatFullDate(date),
             });
+            setQuantity('');
             onClose();
         } catch (error) {
             console.error('Error saving record:', error);
@@ -109,126 +129,125 @@ export default function RecordFormModal({
     };
 
     return (
-        <Modal visible={visible} transparent animationType="slide">
-            <View
-                style={{
-                    flex: 1,
-                    justifyContent: 'flex-end',
-                }}
-            >
+        <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+            <View className="flex-1 justify-end">
+                {/* Dimmed backdrop that closes on tap */}
                 <Pressable
                     onPress={isSaving ? undefined : onClose}
-                    style={{ flex: 1 }}
+                    className="flex-1"
+                    style={{ backgroundColor: '#00000066' }}
                 />
-                <View
-                    style={{
-                        backgroundColor: colors.background,
-                        padding: 16,
-                        borderTopLeftRadius: 24,
-                        borderTopRightRadius: 24,
-                    }}
+
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 12 : 0}
                 >
-                    <Text
-                        style={{
-                            fontSize: 18,
-                            fontWeight: '600',
-                            marginBottom: 16,
-                            color: colors.textPrimary,
-                        }}
-                    >
-                        {title}
-                    </Text>
-
-                    <Text style={{ marginBottom: 8, color: colors.textSecondary }}>
-                        Category
-                    </Text>
-                    {renderSegmented(categories, category, handleCategoryChange)}
-
-                    <Text
-                        style={{
-                            marginVertical: 12,
-                            color: colors.textSecondary,
-                        }}
-                    >
-                        Unit
-                    </Text>
-
-                    <View style={{
-                        flexDirection: 'row',
-                        backgroundColor: colors.primary,
-                        borderRadius: 14,
-                        padding: 4
-                    }}>
-                        {unitMap[category].map((item) => {
-                            const isActive = unit === item;
-                            return (
-                                <TouchableOpacity
-                                    key={item}
-                                    onPress={() => setUnit(item)}
-                                    style={{
-                                        flex: 1,
-                                        paddingVertical: 10,
-                                        borderRadius: 10,
-                                        alignItems: 'center',
-                                        backgroundColor: isActive
-                                            ? colors.primaryDark
-                                            : 'transparent',
-                                    }}
-                                >
-                                    <Text style={{
-                                        fontWeight: '600',
-                                        color: isActive
-                                            ? colors.textPrimary
-                                            : colors.background,
-                                    }}>
-                                        {item}
-                                    </Text>
-                                </TouchableOpacity>
-                            );
-                        })}
-
-                    </View>
-
-                    <CustomInput
-                        placeholder="Enter quantity"
-                        value={quantity}
-                        onChangeText={(text) => setQuantity(text)}
-                        label="Quantity"
-                        keyboardType="numeric"
-                    />
-
+                    {/* Bottom sheet */}
                     <View
+                        className="rounded-t-3xl px-4 pb-4"
                         style={{
-                            flexDirection: 'row',
-                            justifyContent: 'flex-end',
-                            marginTop: 20,
-                            gap: 16,
+                            backgroundColor: colors.background,
+                            paddingTop: 6,
+                            paddingBottom: Math.max(12, insets.bottom || 0) + 8,
                         }}
                     >
-                        <TouchableOpacity
-                            onPress={onClose}
-                            disabled={isSaving}
-                        >
-                            <Text style={{ color: colors.textSecondary }}>
-                                Cancel
+                        {/* Handle + Header */}
+                        <View className="items-center">
+                            <View
+                                className="w-10 h-1.5 rounded-full my-2"
+                                style={{ backgroundColor: colors.border }}
+                            />
+                        </View>
+                        {/* Date */}
+                        <View className="items-center gap-2 mt-3 mb-4">
+                            <Text className="font-semibold" style={{ color: colors.textSecondary }}>
+                                {formatFullDate(date)}
                             </Text>
-                        </TouchableOpacity>
+                        </View>
 
-                        <TouchableOpacity
-                            onPress={handleSave}
-                            disabled={isSaving || !quantity}
-                        >
+                        <View className="flex-row items-center justify-between mb-2">
                             <Text
-                                style={{
-                                    color: colors.primary,
-                                    fontWeight: '600',
-                                }}
+                                className="text-lg font-semibold"
+                                style={{ color: colors.textSecondary }}
                             >
-                                {isSaving ? 'Saving...' : 'Save'}
+                                {title}
                             </Text>
-                        </TouchableOpacity>
-                    </View>
+
+                            <TouchableOpacity
+                                onPress={onClose}
+                                disabled={isSaving}
+                                className="px-3 py-1 -mr-2"
+                                style={{ opacity: isSaving ? 0.6 : 1 }}
+                            >
+                                <Text className="text-sm font-semibold" style={{ color: colors.textSecondary }}>
+                                    Close
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* Category */}
+                        <Text className="mb-2 text-sm" style={{ color: colors.textSecondary }}>
+                            Category
+                        </Text>
+                        {renderSegmented(categories, category, handleCategoryChange)}
+
+                        {/*  
+            {unitsForCategory.length > 1 ? (
+              <>
+                <Text className="mt-4 mb-2 text-sm" style={{ color: colors.textSecondary }}>
+                  Unit
+                </Text>
+                {renderSegmented(unitsForCategory, unit, setUnit)}
+              </>
+            ) : (
+              <View className="mt-4 mb-2">
+                <View
+                  className="self-start px-3 py-1.5 rounded-full"
+                  style={{ backgroundColor: `${colors.primary}14` }}
+                >
+                  <Text className="text-xs font-semibold" style={{ color: colors.textPrimary }}>
+                    Unit: {unit}
+                  </Text>
                 </View>
+              </View>
+            )}
+              */}
+
+                        {/* Quantity */}
+                        <CustomInput
+                            placeholder="Enter quantity"
+                            value={quantity}
+                            onChangeText={(text) => {
+                                setQuantity(text);
+                                if (quantityError) setQuantityError(undefined);
+                            }}
+                            label="Quantity"
+                            keyboardType='numeric'
+                            error={quantityError}
+                        />
+
+                        {/* Actions */}
+                        <View className="flex-row justify-end mt-10 gap-3">
+                            <TouchableOpacity
+                                onPress={onClose}
+                                disabled={isSaving}
+                                className="px-3 py-2 rounded-xl"
+                                style={{ opacity: isSaving ? 0.6 : 1 }}
+                            >
+                                <Text className="font-semibold" style={{ color: colors.textSecondary }}>
+                                    Cancel
+                                </Text>
+                            </TouchableOpacity>
+
+                            <CustomButton
+                                title={isSaving ? 'Saving...' : 'Save'}
+                                onPress={handleSave}
+                                isLoading={isSaving}
+                                size="small"
+                            />
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
             </View>
         </Modal>
     );

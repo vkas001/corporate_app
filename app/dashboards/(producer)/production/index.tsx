@@ -1,14 +1,13 @@
-import { router } from 'expo-router';
-import { createProductionStyles } from '@/style/production/productionStyleSheet';
+import CustomHeader from '@/components/Screens/CustomHeader';
 import { useTheme } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Production() {
   const { colors } = useTheme();
-  const styles = createProductionStyles(colors);
 
   type IonIconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -47,43 +46,40 @@ export default function Production() {
     {
       title: 'Notifications',
       icon: 'notifications-outline',
-      route: './production/notification',
+      route: '/dashboards/notification',
+    },
+    {
+      title: 'History',
+      icon: 'time-outline',
+      route: './production/history',
     }
   ];
 
   return (
-    <SafeAreaView style={styles.safearaContainer}>
-      <View style={styles.productionHeader}>
-        <Text style={styles.headerTitle}>Productions</Text>
-      </View>
+    <SafeAreaView className="flex-1"
+      style={{
+        backgroundColor: colors.background
 
-      <View style={{ paddingHorizontal: 16 }}>
+      }}>
+      <CustomHeader title="Records" />
+
+      <View className="px-4 mt-3">
         {records.map((item, index) => (
           <TouchableOpacity
             key={index}
             onPress={() => router.push(item.route as any)}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: 16,
-              marginBottom: 12, // spacing between cards
-              borderRadius: 12,
-              backgroundColor: colors.primaryDark,
-            }}
+            className="flex-row items-center justify-between p-6 mb-3 rounded-2xl"
+            style={{ backgroundColor: colors.primaryDark }}
+            activeOpacity={0.7}
           >
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 12
-            }}>
+            <View className="flex-row items-center gap-3">
               <Ionicons
                 name={item.icon}
                 size={24}
                 color={colors.textPrimary}
               />
-              <Text
-                style={styles.recordsTitle}>
+              <Text className="text-base font-semibold"
+                style={{ color: colors.textPrimary }}>
                 {item.title}
               </Text>
             </View>

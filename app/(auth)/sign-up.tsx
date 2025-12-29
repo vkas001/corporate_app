@@ -3,7 +3,7 @@ import CustomInput from "@/components/Buttons/CustomInput";
 import { useTheme } from "@/theme/themeContext";
 import { Link, router } from "expo-router";
 import { useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 
 const SignUp = () => {
   const { colors } = useTheme();
@@ -45,12 +45,12 @@ const SignUp = () => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View className="flex-1" style={{ backgroundColor: colors.background }}>
       <ScrollView
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerClassName="px-5 py-12"
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={[styles.title, { color: colors.primary }]}>Egg-Corporate</Text>
+        <Text className="text-4xl font-bold self-center mb-10" style={{ color: colors.primary }}>Egg-Corporate</Text>
 
         <CustomInput
           placeholder="Enter your name"
@@ -77,20 +77,22 @@ const SignUp = () => {
           secureTextEntry
         />
 
-        <CustomButton
-          title="Sign Up"
-          isLoading={isSubmitting}
-          onPress={submit}
-          style={{ marginTop: 20 }}
-        />
+        <View className="mt-5">
+          <CustomButton
+            title="Sign Up"
+            isLoading={isSubmitting}
+            onPress={submit}
+          />
+        </View>
 
-        <View style={styles.signInContainer}>
-          <Text style={[styles.signInText, { color: colors.textSecondary }]}>
+        <View className="flex-row justify-center mt-7">
+          <Text className="text-sm" style={{ color: colors.textSecondary }}>
             Already have an account?
           </Text>
           <Link
             href="/sign-in"
-            style={[styles.signInLink, { color: colors.primary }]}
+            className="text-sm font-bold ml-1.5"
+            style={{ color: colors.primary }}
           >
             Sign In
           </Link>
@@ -99,34 +101,5 @@ const SignUp = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1, 
-  },
-  scrollContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 50, // Give top/bottom spacing
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    alignSelf: "center",
-    marginBottom: 40,
-  },
-  signInContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 30,
-  },
-  signInText: {
-    fontSize: 14,
-  },
-  signInLink: {
-    fontSize: 14,
-    fontWeight: "bold",
-    marginLeft: 6,
-  },
-});
 
 export default SignUp;

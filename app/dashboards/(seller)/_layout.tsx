@@ -10,13 +10,6 @@ const sellerTabs: TabConfig[] = [
     iconNameFocused: 'home',
   },
   {
-    name: 'stocks',
-    label: 'Stock',
-    icon: Ionicons,
-    iconName: 'stats-chart-outline',
-    iconNameFocused: 'stats-chart',
-  },
-  {
     name: 'sales',
     label: 'Record',
     icon: Ionicons,

@@ -1,21 +1,21 @@
 import LanguageToggle from "@/components/Buttons/LanguageToggle";
 import MarginByDayChart from "@/components/Charts/MarginByDayChart";
 import FinanceOverview from "@/components/Finance/FinanceOverview";
-import { DASHBOARD_DATA } from "@/data/producer/dashboardData";
+import DashboardOverview from "@/components/Overview/DashboardOverview";
+import { DASHBOARD_DATA } from "@/data/dashboardData";
 import { Period } from "@/types/dashboard";
 import { formatFullDate } from "@/utils/dateFormatter";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { createDashboardStyles } from "../../../style/producer/dashboardStyleSheet";
 import { useTheme } from "../../../theme";
-import DashboardOverview from "@/components/Dashboard/DashboardOverview";
 
-export default function SellerDashboard() {
+export default function ProducerDashboard() {
   const { colors } = useTheme();
-  const styles = createDashboardStyles(colors);
+  const { t } = useTranslation();
 
   const [period, setPeriod] = React.useState<"Today" | "Week" | "Month">("Today");
 
@@ -25,11 +25,16 @@ export default function SellerDashboard() {
   const [open, setOpen] = useState(false);
 
   return <SafeAreaView
-    style={styles.container}
+    className="flex-1"
+    style={{ backgroundColor: colors.background }}
   >
-    <View style={styles.headerContainer}>
+    <View className="h-[56px] px-[16px] flex-row items-center justify-between"
+      style={{ backgroundColor: colors.surface }}
+    >
 
-      <TouchableOpacity style={styles.iconBtn}>
+      <TouchableOpacity
+        className="w-[40px] h-[40px] rounded-[20px] items-center justify-center"
+      >
         <Ionicons
           name="person-circle"
           size={28}
@@ -37,14 +42,20 @@ export default function SellerDashboard() {
         />
       </TouchableOpacity>
 
-      <View style={styles.headerTextContainer}>
-        <Text style={styles.headerTitle}>Seller Dashboard</Text>
-        <Text style={styles.headerDate}>{formatFullDate(new Date())}</Text>
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-[18px] font-[600] ml-[3px]"
+          style={{ color: colors.textPrimary }}
+        >
+          {t('dashboard.producerTitle')}</Text>
+        <Text className="text-[12px]"
+          style={{ color: colors.textSecondary }}
+        >
+          {formatFullDate(new Date())}</Text>
       </View>
 
       <TouchableOpacity
-        style={styles.iconBtn}
-        onPress={() => {}}
+        className="w-[40px] h-[40px] rounded-[20px] items-center justify-center"
+        onPress={() => router.push('./sales/notification')}
       >
         <Ionicons
           name="notifications-outline"
@@ -55,36 +66,46 @@ export default function SellerDashboard() {
     </View>
 
     <ScrollView
-      contentContainerStyle={styles.scrollContainer}
+      className="px-5 pt-2.5 pb-10"
+      
     >
       <LanguageToggle />
 
-      <View style={styles.quickActionsContainer}>
+      <View className="my-[16px] gap-[12px]">
         <TouchableOpacity
-          style={styles.primaryAction}
-          onPress={() =>{}}
+          className="p-[16px] rounded-[14px] flex-row items-center gap-[10px]"
+          style={{ backgroundColor: colors.primaryDark }}
+          onPress={() =>
+            router.push('./sales/sales-records')
+          }
         >
           <Ionicons name="egg-outline" size={20} color={colors.textPrimary} />
-          <Text style={styles.primaryActionText}>
-            Add Today’s Sales
+          <Text className="text-[16px] font-[600]"
+            style={{ color: colors.textPrimary }}
+          >
+            {t('dashboard.addSales')}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.secondaryAction}
-          onPress={() =>{}}
+          className="p-[14px] rounded-[14px] flex-row items-center gap-[8px]"
+          style={{ backgroundColor: colors.primaryDark }}
+          onPress={() =>
+            router.push('./sales/history')
+          }
         >
           <Ionicons name="time-outline" size={18} color={colors.textPrimary} />
-          <Text style={styles.secondaryActionText}>
-            View Sales History
+          <Text className="text-[14px] font-[500] "
+            style={{ color: colors.textPrimary }}>
+            {t('dashboard.viewSalesHistory')}
           </Text>
         </TouchableOpacity>
       </View>
 
       <DashboardOverview
-        title="Overview"
-        dropdownLabel={selectedCategory}
-        categories={['Chicken', 'Eggs', 'Medicine']}
+        title={t('dashboard.overview')}
+        dropdownLabel={t(`dashboard.categories.${selectedCategory.toLowerCase()}`)}
+        categories={['Chicken', 'Eggs', 'Feed', 'Medicine']}
         onCategorySelect={(category) => {
           setSelectedCategory(category);
           setOpen(false);
@@ -95,28 +116,28 @@ export default function SellerDashboard() {
         onPeriodChange={setPeriod}
         stats={[
           {
-            label: 'Revenue',
+            label: t('dashboard.stats.revenue'),
             value: dashboardData.revenue.value,
-            change: `${dashboardData.revenue.change} vs last week`,
+            change: `${dashboardData.revenue.change} ${t('dashboard.stats.vsLastWeek')}`,
             trend: 'up',
           },
           {
-            label: 'Orders',
+            label: t('dashboard.stats.orders'),
             value: dashboardData.orders.value,
-            subText: `AOV ${dashboardData.orders.aov}`,
+            subText: `${t('dashboard.stats.aov')} ${dashboardData.orders.aov}`,
           },
           {
-            label: 'Net Profit',
+            label: t('dashboard.stats.netProfit'),
             value: dashboardData.netProfit.value,
-            subText: `Margin ${dashboardData.netProfit.margin}`,
+            subText: `${t('dashboard.stats.margin')} ${dashboardData.netProfit.margin}`,
           },
           {
-            label: 'Operating Profit',
+            label: t('dashboard.stats.operatingProfit'),
             value: dashboardData.operatingProfit.value,
           },
         ]}
       />
-      
+
       <MarginByDayChart />
       <View style={{
         marginTop: 24,

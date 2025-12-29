@@ -10,6 +10,14 @@ type Props = {
 export default function CustomHeader({ title }: Props) {
     const { colors } = useTheme();
 
+    const onBackPress = () => {
+        if (router.canGoBack()) {
+            router.back();
+        } else {
+            router.replace('/dashboards/(producer)');
+        }
+    };
+
     return (
         <View
             style={{
@@ -24,8 +32,8 @@ export default function CustomHeader({ title }: Props) {
         >
 
             <TouchableOpacity
-                onPress={() => router.back()}
-                style={{ marginRight: 12 }}
+                className='mr-4'
+                onPress={onBackPress}
                 hitSlop={10}
             >
                 <Ionicons

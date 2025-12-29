@@ -10,13 +10,6 @@ const producerTabs: TabConfig[] = [
     iconNameFocused: 'home',
   },
   {
-    name: 'stocks',
-    label: 'Stock',
-    icon: Ionicons,
-    iconName: 'stats-chart-outline',
-    iconNameFocused: 'stats-chart',
-  },
-  {
     name: 'production',
     label: 'Record',
     icon: Ionicons,

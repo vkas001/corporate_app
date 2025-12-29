@@ -51,7 +51,15 @@ export default function FeedRecords() {
         categories={categories}
         unitMap={unitMap}
         onClose={() => setShowModal(false)}
-        onSubmit={(data) => setRecords((prev) => [...prev, data])}
+        onSubmit={(data) => setRecords((prev) => {
+          const idx = prev.findIndex(r => r.category === data.category && r.unit === data.unit);
+          if (idx !== -1) {
+            const next = [...prev];
+            next[idx] = { ...next[idx], quantity: next[idx].quantity + data.quantity };
+            return next;
+          }
+          return [...prev, data];
+        })}
       />
       <RecordList
         records={records}

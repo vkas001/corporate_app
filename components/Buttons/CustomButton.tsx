@@ -1,6 +1,14 @@
 import { useTheme } from "@/theme/themeContext";
 import React from "react";
-import { ActivityIndicator, StyleProp, Text, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native";
+import {
+  ActivityIndicator,
+  StyleProp,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
 
 type Buttonsize = "small" | "medium" | "large";
 
@@ -14,6 +22,18 @@ interface CustomButtonProps {
   size?: Buttonsize;
 }
 
+const sizeContainer: Record<Buttonsize, string> = {
+  small: "py-2 px-3 rounded-lg",
+  medium: "py-3 px-4 rounded-2xl",
+  large: "py-4 px-5 rounded-3xl",
+};
+
+const sizeText: Record<Buttonsize, string> = {
+  small: "text-sm",
+  medium: "text-base",
+  large: "text-lg",
+};
+
 const CustomButton = ({
   onPress,
   title = "Click Me",
@@ -24,40 +44,22 @@ const CustomButton = ({
   size = "medium",
 }: CustomButtonProps) => {
   const { colors } = useTheme();
-  const currentSize = sizeStyles[size];
 
   return (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.8}
-      style={[
-        {
-          backgroundColor: colors.primaryDark,
-          paddingVertical: currentSize.paddingVertical,
-          paddingHorizontal: currentSize.paddingHorizontal,
-          borderRadius: currentSize.borderRadius,
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "row",
-        },
-        style,
-      ]}
+      className={`flex-row items-center justify-center ${sizeContainer[size]}`}
+      style={[{ backgroundColor: colors.primaryDark }, style]}
     >
-      {leftIcon && <View style={{ marginRight: 8 }}>{leftIcon}</View>}
+      {leftIcon && <View className="mr-2">{leftIcon}</View>}
 
       {isLoading ? (
         <ActivityIndicator size="small" color={colors.textPrimary} />
       ) : (
         <Text
-          style={[
-            {
-              color: colors.textPrimary,
-              fontWeight: "600",
-              fontSize: currentSize.fontSize,
-              textAlign: "center",
-            },
-            textStyle,
-          ]}
+          className={`font-semibold text-center ${sizeText[size]}`}
+          style={[{ color: colors.textPrimary }, textStyle]}
         >
           {title}
         </Text>
@@ -66,26 +68,4 @@ const CustomButton = ({
   );
 };
 
-
 export default CustomButton;
-
-const sizeStyles = {
-  small: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    fontSize: 14,
-    borderRadius: 10,
-  },
-  medium: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    borderRadius: 16,
-  },
-  large: {
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-    fontSize: 18,
-    borderRadius: 20,
-  },
-};

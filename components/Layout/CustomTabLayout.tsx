@@ -28,12 +28,10 @@ export const CustomTabLayout = ({
       screenOptions={{
         headerShown,
         tabBarShowLabel: false,
-
         tabBarStyle: {
           position: "absolute",
           height: tabBarHeight,
           backgroundColor: colors.background,
-          elevation: 10,
           borderColor: colors.border,
         },
       }}
@@ -53,6 +51,15 @@ export const CustomTabLayout = ({
               />
             ),
           }}
+          listeners={({ navigation, route }) => ({
+            tabPress: (e) => {
+              if (route.name === 'production') {
+                e.preventDefault();
+                navigation.navigate('production', { screen: 'index' });
+              }
+            },
+          })}
+
         />
       ))}
     </Tabs>

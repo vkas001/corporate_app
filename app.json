@@ -15,12 +15,11 @@
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.vkas001.egg_corporate"
+      "package": "com.vkas001.eggcorporate"
     },
     "web": {
       "output": "static",
@@ -40,17 +39,18 @@
           }
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-web-browser"
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": true
     },
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "42fe767a-6ef1-41cf-93ee-1329e0d93335"
+        "projectId": "6e0fd199-fc45-4acc-b3ae-06f37079a61f"
       }
-    }
+    },
+    "owner": "vkas001"
   }
 }

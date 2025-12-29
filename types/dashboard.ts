@@ -1,7 +1,12 @@
+import { ReactNode } from "react";
+
 export type Period = "today" | "week" | "month";
 
 export interface FinanceOverview {
   cashFlow: {
+    inflowValue: any;
+    outflowValue: any;
+    net: ReactNode;
     inflow: string;
     outflow: string;
     freeCash: string;

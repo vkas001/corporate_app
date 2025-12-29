@@ -4,7 +4,14 @@ import { useTheme } from "@/theme/themeContext";
 import { saveAuth } from "@/utils/auth";
 import { Link, router } from "expo-router";
 import { useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const SignIn = () => {
   const { colors } = useTheme();
@@ -12,6 +19,7 @@ const SignIn = () => {
   const [form, setForm] = useState({
     email: "",
     password: "",
+    role: "producer",
   });
 
   const submit = async () => {
@@ -21,31 +29,6 @@ const SignIn = () => {
     if (!emailTrimmed || !passwordTrimmed) {
       Alert.alert("Error", "Please fill in all fields");
       return;
-    }
-
-    try {
-      setIsSubmitting(true);
-
-      const response = {
-        token: "fake_jwt_token",
-        user: {
-          role: "producer",
-        },
-      };
-      const {token, user} = response;
-      await saveAuth(token, user.role);
-
-      if (user.role === "producer") {
-        router.replace("./(producer)/dashboard");
-      }else if (user.role === "seller") {
-        router.replace("./(seller)/dashboard");
-      } else {
-        Alert.alert("Error", "Unknown user role");
-      }
-    }catch (error) {
-      Alert.alert("Error", " Invalid user role");
-    } finally {
-      setIsSubmitting(false);
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -59,22 +42,58 @@ const SignIn = () => {
       return;
     }
 
-    setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      setIsSubmitting(true);
+
+      const response = {
+        token: "fake_jwt_token",
+        user: {
+          role: form.role,
+        },
+      };
+      const { token, user } = response;
+      await saveAuth(token, user.role);
+
+      if (user.role === "producer") {
+        router.replace("/dashboards/(producer)");
+      } else if (user.role === "seller") {
+        router.replace("/dashboards/(seller)");
+      } else {
+        Alert.alert("Error", "Unknown user role");
+      }
+    } catch (error) {
+      Alert.alert("Error", " Invalid user role");
+    } finally {
       setIsSubmitting(false);
-      Alert.alert("Success", "Account created successfully", [
-        { text: "OK", onPress: () => router.replace("/sign-in") },
-      ]);
-    }, 1000);
+    }
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: colors.background }}
+    >
       <ScrollView
-        contentContainerStyle={styles.scrollContainer}
+        className="flex-1"
+        contentContainerClassName="px-4 py-8"
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <Text style={[styles.title, { color: colors.primary }]}>Egg-Corporate</Text>
+
+        <View className="mb-10">
+          <Text
+            className="text-4xl font-bold text-center mb-2"
+            style={{ color: colors.primary }}
+          >
+            Egg-Corporate
+          </Text>
+          <Text
+            className="text-center text-sm"
+            style={{ color: colors.textSecondary }}
+          >
+            Sign in to your account
+          </Text>
+        </View>
 
         <CustomInput
           placeholder="Enter your email"
@@ -93,44 +112,50 @@ const SignIn = () => {
           secureTextEntry
         />
 
+        <View className="mb-8 mt-8">
+          <Text
+            className="text-sm mb-3"
+            style={{ color: colors.textSecondary }}
+          >
+            Select role
+          </Text>
+          <View className="flex-row gap-3">
+            {["producer", "seller"].map((roleOption) => {
+              const isActive = form.role === roleOption;
+              return (
+                <Pressable
+                  key={roleOption}
+                  onPress={() => setForm((prev) => ({ ...prev, role: roleOption }))}
+                  className="flex-1 border rounded-lg py-3 items-center"
+                  style={{
+                    borderColor: isActive ? colors.primary : colors.border,
+                    backgroundColor: isActive
+                      ? colors.primary + "1A"
+                      : colors.surface,
+                  }}
+                >
+                  <Text
+                    className="text-base font-semibold"
+                    style={{
+                      color: isActive ? colors.primary : colors.textSecondary,
+                    }}
+                  >
+                    {roleOption.charAt(0).toUpperCase() + roleOption.slice(1)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
         <CustomButton
           title="Sign In"
           isLoading={isSubmitting}
           onPress={submit}
-          style={{ marginTop: 20 }}
         />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1, 
-  },
-  scrollContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 50, 
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    alignSelf: "center",
-    marginBottom: 40,
-  },
-  signInContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 30,
-  },
-  signInText: {
-    fontSize: 14,
-  },
-  signInLink: {
-    fontSize: 14,
-    fontWeight: "bold",
-    marginLeft: 6,
-  },
-});
 
 export default SignIn;

@@ -1,4 +1,4 @@
-import { MARGIN_BY_DAY_DATA } from "@/data/producer/dashboardChartData";
+import { MARGIN_BY_DAY_DATA } from "@/data/dashboardChartData";
 import { useTheme } from "@/theme";
 import React from "react";
 import { Dimensions, Text, View } from "react-native";
@@ -11,31 +11,25 @@ export default function MarginByDayChart() {
 
   return (
     <View
+      className="mt-5 rounded-[18px] border p-4"
       style={{
         backgroundColor: colors.surface,
-        borderRadius: 18,
-        paddingVertical: 16,
-        paddingHorizontal: 12,
-        marginTop: 20,
-        borderWidth: 1,
         borderColor: colors.border,
       }}
     >
       <View style={{ marginBottom: 12 }}>
         <Text
+          className="text-[15] font-semibold"
           style={{
-            fontSize: 15,
-            fontWeight: "600",
             color: colors.textPrimary,
           }}
         >
           Margin % by day
         </Text>
         <Text
+          className="mt-[2px] text-xs"
           style={{
-            fontSize: 12,
             color: colors.textSecondary,
-            marginTop: 2,
           }}
         >
           Weekly performance
