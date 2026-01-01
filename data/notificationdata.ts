@@ -1,4 +1,4 @@
-import { NotificationItemProps } from '@/components/Notification/NotificaitonItem';
+import { NotificationItemProps } from '@/components/notification/NotificaitonItem';
 
 export type NotificationEntry = NotificationItemProps & { id: string };
 

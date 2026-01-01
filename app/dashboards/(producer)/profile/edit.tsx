@@ -1,5 +1,5 @@
-import CustomButton from '@/components/Buttons/CustomButton';
-import CustomInput from '@/components/Buttons/CustomInput';
+import CustomButton from '@/components/ui/CustomButton';
+import CustomInput from '@/components/ui/CustomInput';
 import { useTheme } from '@/theme/themeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useRef, useState } from 'react';

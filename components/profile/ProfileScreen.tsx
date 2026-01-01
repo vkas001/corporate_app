@@ -5,7 +5,7 @@ import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileMenuItem from "./profileMenuItem";
-import { profileMenus } from "./profileMenus";
+import { profileMenus } from "../../config/profileMenus";
 
 type Props = {
   role: UserRole;

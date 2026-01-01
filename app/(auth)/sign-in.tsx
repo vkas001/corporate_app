@@ -1,15 +1,17 @@
-import CustomButton from "@/components/Buttons/CustomButton";
-import CustomInput from "@/components/Buttons/CustomInput";
+import CustomButton from "@/components/ui/CustomButton";
+import CustomInput from "@/components/ui/CustomInput";
 import { useTheme } from "@/theme/themeContext";
 import { saveAuth } from "@/utils/auth";
-import { Link, router } from "expo-router";
-import { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import React, { useState } from "react";
 import {
   Alert,
   Pressable,
   ScrollView,
   Text,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -69,92 +71,167 @@ const SignIn = () => {
   };
 
   return (
-    <SafeAreaView
-      className="flex-1"
-      style={{ backgroundColor: colors.background }}
-    >
-      <ScrollView
-        className="flex-1"
-        contentContainerClassName="px-4 py-8"
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <View className="flex-1 px-5 pt-5 "
+      style={{
+        backgroundColor: colors.background
+      }}>
+      <LinearGradient className="pt-8 pb-8"
+        colors={[colors.primary + "14", colors.surface]}
       >
-
-        <View className="mb-10">
-          <Text
-            className="text-4xl font-bold text-center mb-2"
-            style={{ color: colors.primary }}
-          >
-            Egg-Corporate
-          </Text>
-          <Text
-            className="text-center text-sm"
-            style={{ color: colors.textSecondary }}
-          >
-            Sign in to your account
-          </Text>
-        </View>
-
-        <CustomInput
-          placeholder="Enter your email"
-          value={form.email}
-          onChangeText={(text) => setForm((prev) => ({ ...prev, email: text }))}
-          label="Email"
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <CustomInput
-          placeholder="Enter your password"
-          value={form.password}
-          onChangeText={(text) => setForm((prev) => ({ ...prev, password: text }))}
-          label="Password"
-          secureTextEntry
-        />
-
-        <View className="mb-8 mt-8">
-          <Text
-            className="text-sm mb-3"
-            style={{ color: colors.textSecondary }}
-          >
-            Select role
-          </Text>
-          <View className="flex-row gap-3">
-            {["producer", "seller"].map((roleOption) => {
-              const isActive = form.role === roleOption;
-              return (
-                <Pressable
-                  key={roleOption}
-                  onPress={() => setForm((prev) => ({ ...prev, role: roleOption }))}
-                  className="flex-1 border rounded-lg py-3 items-center"
-                  style={{
-                    borderColor: isActive ? colors.primary : colors.border,
-                    backgroundColor: isActive
-                      ? colors.primary + "1A"
-                      : colors.surface,
-                  }}
-                >
-                  <Text
-                    className="text-base font-semibold"
-                    style={{
-                      color: isActive ? colors.primary : colors.textSecondary,
-                    }}
-                  >
-                    {roleOption.charAt(0).toUpperCase() + roleOption.slice(1)}
-                  </Text>
-                </Pressable>
-              );
-            })}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
+          <View className="mb-8 mt-4">
+            <Text
+              className="text-sm font-semibold tracking-widest text-center"
+              style={{ color: colors.textSecondary }}
+            >
+              WELCOME BACK
+            </Text>
+            <Text
+              className="text-3xl font-extrabold text-center mt-2"
+              style={{ color: colors.textPrimary }}
+            >
+              Sign in to Egg Corporate
+            </Text>
+            <Text
+              className="text-center text-sm mt-2"
+              style={{ color: colors.textSecondary }}
+            >
+              Monitor production, sales, and finances from one place.
+            </Text>
           </View>
-        </View>
 
-        <CustomButton
-          title="Sign In"
-          isLoading={isSubmitting}
-          onPress={submit}
-        />
-      </ScrollView>
-    </SafeAreaView>
+          <View
+            className="rounded-3xl p-5 mb-6"
+            style={{
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              borderWidth: 1
+            }}
+          >
+            <View className="flex-row justify-between mb-5">
+              <View>
+                <Text className="text-xs"
+                  style={{ color: colors.textSecondary }}
+                >
+                  Today
+                </Text>
+                <Text className="text-lg font-bold"
+                  style={{ color: colors.textPrimary }}
+                >
+                  Fresh insights ready.
+                </Text>
+              </View>
+              <View
+                className="w-10 h-10 rounded-2xl items-center justify-center"
+                style={{ backgroundColor: colors.primary + "1A" }}
+              >
+                <Ionicons name="lock-closed" size={18} color={colors.primary} />
+              </View>
+            </View>
+
+            <View className="mb-4">
+              <CustomInput
+                placeholder="name@company.com"
+                value={form.email}
+                onChangeText={(text) => setForm((prev) => ({ ...prev, email: text }))}
+                label="Email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+
+            <View className="mb-2">
+              <CustomInput
+                placeholder="••••••••"
+                value={form.password}
+                onChangeText={(text) => setForm((prev) => ({ ...prev, password: text }))}
+                label="Password"
+                secureTextEntry
+              />
+            </View>
+
+            <View className="flex-row justify-between items-center mt-2 mb-6">
+              <Text className="text-xs"
+                style={{ color: colors.textSecondary }}
+              >
+                Secure login with encrypted session
+              </Text>
+              <Pressable onPress={() => Alert.alert("Need help?",
+                "Contact support to reset your password.")}
+              >
+                <Text className="text-xs font-semibold"
+                  style={{ color: colors.primary }}
+                >
+                  Forgot?
+                </Text>
+              </Pressable>
+            </View>
+
+            <View className="mb-6">
+              <Text className="text-sm mb-3 font-semibold"
+                style={{ color: colors.textPrimary }}
+              >
+                Continue as
+              </Text>
+              <View className="flex-row gap-3">
+                {["producer", "seller"].map((roleOption) => {
+                  const isActive = form.role === roleOption;
+                  const icon = roleOption === "producer" ? "leaf-outline" : "cart-outline";
+                  return (
+                    <Pressable
+                      key={roleOption}
+                      onPress={() => setForm((prev) => ({ ...prev, role: roleOption }))}
+                      className="flex-1 border rounded-2xl py-3 px-3"
+                      style={{
+                        borderColor: isActive ? colors.primary : colors.border,
+                        backgroundColor: isActive ? colors.primary + "14" : colors.background,
+                      }}
+                    >
+                      <View className="flex-row items-center justify-center gap-2">
+                        <Ionicons
+                          name={icon as any}
+                          size={16}
+                          color={isActive ? colors.primary : colors.textSecondary}
+                        />
+                        <Text
+                          className="text-sm font-semibold"
+                          style={{ color: isActive ? colors.primary : colors.textSecondary }}
+                        >
+                          {roleOption === "producer" ? "Producer" : "Seller"}
+                        </Text>
+                      </View>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+
+            <CustomButton title="Sign In" isLoading={isSubmitting} onPress={submit} />
+          </View>
+
+          <View className="items-center mt-3">
+            <Text className="text-xs"
+              style={{ color: colors.textSecondary }}
+            >
+              By signing in you agree to our
+            </Text>
+            <View className="items-center mt-1">
+              <Pressable onPress={() => router.push("/dashboards/(modal)/privacy-policy")}>
+                <Text className="text-xs font-semibold"
+                  style={{ color: colors.primary }}
+                >
+                  Privacy Policy
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </ScrollView>
+      </LinearGradient>
+    </View>
   );
 };
 

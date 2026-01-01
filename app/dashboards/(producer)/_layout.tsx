@@ -1,4 +1,4 @@
-import { CustomTabLayout, TabConfig } from '@/components/Layout';
+import { CustomTabLayout, TabConfig } from '@/components/navigation/CustomTabLayout';
 import { Ionicons } from '@expo/vector-icons';
 
 const producerTabs: TabConfig[] = [

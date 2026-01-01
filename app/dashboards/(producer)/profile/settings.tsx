@@ -149,65 +149,6 @@ export default function SettingsScreen({ onClose }: Props) {
             </TouchableOpacity>
           </View>
         </View>
-
-        <View className="mt-6">
-          <Text className="text-base font-bold mb-2"
-            style={{ color: colors.textSecondary }}>Privacy
-          </Text>
-          <View className="rounded-2xl p-4 border"
-            style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
-            <SettingRow
-              icon="eye-outline"
-              title="Data Collection"
-              subtitle="Allow us to collect usage data"
-              value={settings.dataCollection}
-              onToggle={() => toggleSetting('dataCollection')}
-            />
-            <View className="h-px my-1"
-              style={{ backgroundColor: colors.border }} />
-            <TouchableOpacity activeOpacity={0.8}>
-              <SettingRow
-                icon="document-text-outline"
-                title="Privacy Policy"
-                subtitle="Read our privacy policy"
-              />
-            </TouchableOpacity>
-            <View className="h-px my-1"
-              style={{ backgroundColor: colors.border }} />
-            <TouchableOpacity activeOpacity={0.8}>
-              <SettingRow
-                icon="checkmark-done-outline"
-                title="Terms & Conditions"
-                subtitle="Read our terms"
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View className="mt-6 mb-6">
-          <Text className="text-base font-bold mb-2"
-            style={{ color: colors.textSecondary }}>Other
-          </Text>
-          <View className="rounded-2xl p-4 border"
-            style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
-            <TouchableOpacity activeOpacity={0.8}>
-              <SettingRow
-                icon="help-circle-outline"
-                title="Help & Support"
-                subtitle="Get help with your account"
-              />
-            </TouchableOpacity>
-            <View className="h-px my-1"
-              style={{ backgroundColor: colors.border }} />
-            <TouchableOpacity activeOpacity={0.8}>
-              <SettingRow
-                icon="information-circle-outline"
-                title="About App"
-                subtitle="Version 1.0.0"
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );

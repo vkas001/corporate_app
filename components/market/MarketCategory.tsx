@@ -1,4 +1,4 @@
-import { marketPrices } from "@/data/marketPrices";
+import { marketPrices } from "@/data/marketPriceData";
 import { useTheme } from "@/theme/themeContext";
 import { formatCurrency } from "@/utils/currencyFormatter";
 import { Ionicons } from "@expo/vector-icons";

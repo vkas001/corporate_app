@@ -1,4 +1,4 @@
-import CustomHeader from '@/components/Screens/CustomHeader';
+import CustomHeader from '@/components/ui/CustomHeader';
 import { useTheme } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -19,39 +19,25 @@ export default function Production() {
 
   const records: RecordItem[] = [
     {
-      title: 'Production Records',
+      title: 'Sales Records',
       icon: 'document-text-outline',
-      route: './production/production-records',
+      route: '/dashboards/sales/sales-records',
     },
     {
-      title: 'Mortality Records',
+      title: 'Purchase Records',
       icon: 'time-outline',
-      route: './production/mortality-records',
+      route: '/dashboards/sales/purchase-records',
     },
-    {
-      title: 'Batch Records',
-      icon: 'cube-outline',
-      route: './production/batch-records',
-    },
-    {
-      title: 'Feed Records',
-      icon: 'nutrition-outline',
-      route: './production/feed-records',
-    },
+  
     {
       title: 'Payment Records',
       icon: 'card-outline',
-      route: './production/payment-records',
-    },
-    {
-      title: 'Notifications',
-      icon: 'notifications-outline',
-      route: './production/notification',
+      route: '/dashboards/sales/payment-records',
     },
     {
       title: 'History',
       icon: 'time-outline',
-      route: './production/history',
+      route: '/dashboards/sales/history',
     }
   ];
 

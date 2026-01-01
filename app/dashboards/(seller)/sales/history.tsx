@@ -1,4 +1,4 @@
-import CustomHeader from '@/components/Screens/CustomHeader';
+import CustomHeader from '@/components/ui/CustomHeader';
 import { useTheme } from '@/theme/themeContext';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';

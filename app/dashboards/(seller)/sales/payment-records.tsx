@@ -1,4 +1,6 @@
-import CustomHeader from '@/components/Screens/CustomHeader';
+import PaymentCard from '@/components/payment/PaymentCard';
+import CustomHeader from '@/components/ui/CustomHeader';
+import { producerPayments } from '@/data/paymentData';
 import { useTheme } from '@/theme/themeContext';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,6 +11,12 @@ export default function PaymentRecords() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <CustomHeader title="Payment Records" />
+      { producerPayments.map(payment => (
+        <PaymentCard 
+          key={payment.id}
+          payment={payment}
+        />
+      ))}
     </SafeAreaView>
   )
 }

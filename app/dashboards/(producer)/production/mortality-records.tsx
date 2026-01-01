@@ -1,6 +1,6 @@
-import RecordFormModal from '@/components/Forms/RecordFormModal';
-import RecordList from '@/components/Records/RecordList';
-import CustomHeader from '@/components/Screens/CustomHeader';
+import RecordFormModal from '@/components/forms/RecordForm';
+import RecordList from '@/components/records/RecordList';
+import CustomHeader from '@/components/ui/CustomHeader';
 import { useTheme } from '@/theme/themeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';

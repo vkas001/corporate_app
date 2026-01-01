@@ -1,15 +1,16 @@
-import CustomHeader from "@/components/Screens/CustomHeader";
-import BillingScreen from "@/components/profile/BillingScreen";
-import EditProfileScreen from "@/components/profile/EditProfileScreen";
+import BillingScreen from "@/app/dashboards/(producer)/profile/billings";
+import EditProfileScreen from "@/app/dashboards/(producer)/profile/edit";
+import SettingsScreen from "@/app/dashboards/(producer)/profile/settings";
+import UserManagementScreen from "@/app/dashboards/(producer)/profile/users";
 import ProfileScreen from "@/components/profile/ProfileScreen";
-import SettingsScreen from "@/components/profile/SettingsScreen";
-import UserManagementScreen from "@/components/profile/UserManagementScreen";
+import CustomHeader from "@/components/ui/CustomHeader";
 import { useTheme } from '@/theme/themeContext';
 import { logout } from "@/utils/auth";
 import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import InfoScreen from "./info";
 
 type Screen = 'profile' | 'edit' | 'settings' | 'billing' | 'users' | 'info';
 
@@ -116,6 +117,9 @@ export default function ProducerProfile() {
 
       {currentScreen === 'users' && (
         <UserManagementScreen onClose={handleScreenClose} />
+      )}
+      {currentScreen === 'info' && (
+        <InfoScreen onClose={handleScreenClose} />
       )}
     </SafeAreaView>
   );

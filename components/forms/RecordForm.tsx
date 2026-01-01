@@ -11,8 +11,8 @@ import {
     View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import CustomInput from '../Buttons/CustomInput';
-import CustomButton from '../Buttons/CustomButton';
+import CustomButton from '../ui/CustomButton';
+import CustomInput from '../ui/CustomInput';
 
 type Props = {
     visible: boolean;

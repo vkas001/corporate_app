@@ -1,5 +1,5 @@
-import CustomButton from "@/components/Buttons/CustomButton";
-import LiveMarketCategory from "@/components/LivePrice/MarketCategory";
+import LiveMarketCategory from "@/components/market/MarketCategory";
+import CustomButton from "@/components/ui/CustomButton";
 import { useTheme } from "@/theme";
 import { getRole, getToken } from "@/utils/auth";
 import { formatFullDate } from "@/utils/dateFormatter";

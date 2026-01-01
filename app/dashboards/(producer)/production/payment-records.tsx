@@ -1,6 +1,6 @@
-import PaymentCard from '@/components/Payment/paymentCard';
-import CustomHeader from '@/components/Screens/CustomHeader';
-import { producerPayments } from '@/data/payments';
+import PaymentCard from '@/components/payment/PaymentCard';
+import CustomHeader from '@/components/ui/CustomHeader';
+import { producerPayments } from '@/data/paymentData';
 import { useTheme } from '@/theme/themeContext';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';

@@ -1,7 +1,7 @@
-import CustomButton from '@/components/Buttons/CustomButton';
-import NotificationItem, { NotificationItemProps } from '@/components/Notification/NotificaitonItem';
-import CustomHeader from '@/components/Screens/CustomHeader';
-import { notificationData } from '@/data/notifications';
+import NotificationItem, { NotificationItemProps } from '@/components/notification/NotificaitonItem';
+import CustomButton from '@/components/ui/CustomButton';
+import CustomHeader from '@/components/ui/CustomHeader';
+import { notificationData } from '@/data/notificationdata';
 import { useTheme } from '@/theme/themeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useState } from 'react';

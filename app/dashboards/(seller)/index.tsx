@@ -1,7 +1,7 @@
-import LanguageToggle from "@/components/Buttons/LanguageToggle";
-import MarginByDayChart from "@/components/Charts/MarginByDayChart";
-import FinanceOverview from "@/components/Finance/FinanceOverview";
-import DashboardOverview from "@/components/Overview/DashboardOverview";
+import MarginByDayChart from "@/components/charts/MarginByDayChart";
+import DashboardOverview from "@/components/dashboard/DashboardOverview";
+import FinanceOverview from "@/components/dashboard/FinanceOverview";
+import LanguageToggle from "@/components/ui/LanguageToggle";
 import { DASHBOARD_DATA } from "@/data/dashboardData";
 import { Period } from "@/types/dashboard";
 import { formatFullDate } from "@/utils/dateFormatter";
@@ -13,7 +13,7 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../../theme";
 
-export default function ProducerDashboard() {
+export default function SellerDashboard() {
   const { colors } = useTheme();
   const { t } = useTranslation();
 
@@ -24,8 +24,16 @@ export default function ProducerDashboard() {
   const [selectedCategory, setSelectedCategory] = useState('Chicken');
   const [open, setOpen] = useState(false);
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+    router.replace('/');
+  };
+
   return <SafeAreaView
-    className="flex-1"
+    className="flex-1 mb-8"
     style={{ backgroundColor: colors.background }}
   >
     <View className="h-[56px] px-[16px] flex-row items-center justify-between"
@@ -34,9 +42,10 @@ export default function ProducerDashboard() {
 
       <TouchableOpacity
         className="w-[40px] h-[40px] rounded-[20px] items-center justify-center"
+        onPress={handleBack}
       >
         <Ionicons
-          name="person-circle"
+          name="chevron-back-outline"
           size={28}
           color={colors.textPrimary}
         />
@@ -46,7 +55,7 @@ export default function ProducerDashboard() {
         <Text className="text-[18px] font-[600] ml-[3px]"
           style={{ color: colors.textPrimary }}
         >
-          {t('dashboard.producerTitle')}</Text>
+          {t('dashboard.sellerTitle')}</Text>
         <Text className="text-[12px]"
           style={{ color: colors.textSecondary }}
         >
@@ -55,7 +64,7 @@ export default function ProducerDashboard() {
 
       <TouchableOpacity
         className="w-[40px] h-[40px] rounded-[20px] items-center justify-center"
-        onPress={() => router.push('./sales/notification')}
+        onPress={() => router.push('/dashboards/notification')}
       >
         <Ionicons
           name="notifications-outline"

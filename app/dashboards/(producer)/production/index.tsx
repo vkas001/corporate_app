@@ -1,4 +1,4 @@
-import CustomHeader from '@/components/Screens/CustomHeader';
+import CustomHeader from '@/components/ui/CustomHeader';
 import { useTheme } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -21,37 +21,32 @@ export default function Production() {
     {
       title: 'Production Records',
       icon: 'document-text-outline',
-      route: './production/production-records',
+      route: '/dashboards/(producer)/production/production-records',
     },
     {
       title: 'Mortality Records',
       icon: 'time-outline',
-      route: './production/mortality-records',
+      route: '/dashboards/(producer)/production/mortality-records',
     },
     {
       title: 'Batch Records',
       icon: 'cube-outline',
-      route: './production/batch-records',
+      route: '/dashboards/(producer)/production/batch-records',
     },
     {
       title: 'Feed Records',
       icon: 'nutrition-outline',
-      route: './production/feed-records',
+      route: '/dashboards/(producer)/production/feed-records',
     },
     {
       title: 'Payment Records',
       icon: 'card-outline',
-      route: './production/payment-records',
-    },
-    {
-      title: 'Notifications',
-      icon: 'notifications-outline',
-      route: '/dashboards/notification',
+      route: '/dashboards/(producer)/production/payment-records',
     },
     {
       title: 'History',
       icon: 'time-outline',
-      route: './production/history',
+      route: '/dashboards/(producer)/production/history',
     }
   ];
 

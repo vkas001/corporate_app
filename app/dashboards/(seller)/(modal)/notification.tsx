@@ -1,7 +1,7 @@
-import CustomButton from '@/components/Buttons/CustomButton';
-import NotificationItem, { NotificationItemProps } from '@/components/Notification/NotificaitonItem';
-import CustomHeader from '@/components/Screens/CustomHeader';
-import { notificationData } from '@/data/notifications';
+import NotificationItem, { NotificationItemProps } from '@/components/notification/NotificaitonItem';
+import CustomButton from '@/components/ui/CustomButton';
+import CustomHeader from '@/components/ui/CustomHeader';
+import { notificationData } from '@/data/notificationdata';
 import { useTheme } from '@/theme/themeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useState } from 'react';
@@ -41,61 +41,63 @@ export default function Notification() {
     );
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+        <SafeAreaView className="flex-1"
+            style={{ backgroundColor: colors.background }}>
             <CustomHeader title="Notifications" />
             <ScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={{ padding: 16, paddingBottom: 32, paddingTop: -16 }}
+                className="flex-1"
+                contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 50, paddingTop: -16 }}
                 showsVerticalScrollIndicator={false}
             >
 
-                    <View style={{ marginTop: 16, flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={{ flex: 1 }}>
-                            <Text style={{ color: colors.textPrimary, fontSize: 16, fontWeight: '700' }}>
-                                Activities
-                            </Text>
+                <View className="mt-4 flex-row items-center">
+                    <View className="flex-1">
+                        <Text className="text-base font-bold"
+                            style={{ color: colors.textPrimary }}>
+                            Activities
+                        </Text>
 
-                        </View>
-                        <CustomButton
-                            title="Mark all as read"
-                            size='small'
-                            onPress={() => { }}
-                        />
                     </View>
+                    <CustomButton
+                        title="Mark all as read"
+                        size='small'
+                        onPress={() => { }}
+                    />
+                </View>
 
-                    <View style={{ flexDirection: 'row', marginTop: 14, paddingBottom: 8 }}>
-                        <StatPill
-                            label="Unread"
-                            value={`${unreadCount}`}
-                            helper="need review"
-                            icon="mail-unread-outline"
-                            color={colors.primary}
-                            textColor={colors.textPrimary}
-                            mutedTextColor={colors.textSecondary}
-                            style={{ marginRight: 10 }}
-                        />
-                        <StatPill
-                            label="Payments"
-                            value={`${paymentCount}`}
-                            helper="this week"
-                            icon="card-outline"
-                            color={colors.primary}
-                            textColor={colors.textPrimary}
-                            mutedTextColor={colors.textSecondary}
-                            style={{ marginRight: 8 }}
-                        />
-                        <StatPill
-                            label="Alerts"
-                            value={`${alertCount}`}
-                            helper="requires action"
-                            icon="alert-circle-outline"
-                            color="#D64545"
-                            textColor={colors.textPrimary}
-                            mutedTextColor={colors.textSecondary}
-                        />
-                    </View>
+                <View className="flex-row mt-3.5 pb-2">
+                    <StatPill
+                        label="Unread"
+                        value={`${unreadCount}`}
+                        helper="need review"
+                        icon="mail-unread-outline"
+                        color={colors.primary}
+                        textColor={colors.textPrimary}
+                        mutedTextColor={colors.textSecondary}
+                        style={{ marginRight: 10 }}
+                    />
+                    <StatPill
+                        label="Payments"
+                        value={`${paymentCount}`}
+                        helper="this week"
+                        icon="card-outline"
+                        color={colors.primary}
+                        textColor={colors.textPrimary}
+                        mutedTextColor={colors.textSecondary}
+                        style={{ marginRight: 8 }}
+                    />
+                    <StatPill
+                        label="Alerts"
+                        value={`${alertCount}`}
+                        helper="requires action"
+                        icon="alert-circle-outline"
+                        color="#D64545"
+                        textColor={colors.textPrimary}
+                        mutedTextColor={colors.textSecondary}
+                    />
+                </View>
 
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 8 }}>
+                <View className="flex-row flex-wrap mb-2">
                     {filters.map(filter => {
                         const isActive = filter.key === activeFilter;
                         return (
@@ -103,34 +105,28 @@ export default function Notification() {
                                 key={filter.key}
                                 activeOpacity={0.85}
                                 onPress={() => setActiveFilter(filter.key)}
+                                className="px-3 rounded-lg mr-2 mb-2 border-[0.5px] flex-row items-center"
                                 style={{
-                                    paddingHorizontal: 12,
-                                    borderRadius: 8,
-                                    marginRight: 8,
-                                    marginBottom: 8,
-                                    borderWidth: 0.5,
                                     borderColor: isActive ? colors.primary : colors.border,
                                     backgroundColor: isActive ? colors.primaryDark : colors.primary,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
                                 }}
                             >
                                 <Text
+                                    className="font-bold"
                                     style={{
                                         color: isActive ? colors.textPrimary : colors.background,
-                                        fontWeight: '700',
                                     }}
                                 >
                                     {filter.label}
                                 </Text>
                                 <View
+                                    className="ml-1.5 rounded-full"
                                     style={{
-                                        marginLeft: 6,
                                         backgroundColor: isActive ? colors.primaryDark : colors.primary,
-                                        borderRadius: 20,
                                     }}
                                 >
-                                    <Text style={{ color: isActive ? colors.textPrimary : colors.background, fontWeight: '500' }}>
+                                    <Text className="font-medium"
+                                        style={{ color: isActive ? colors.textPrimary : colors.background }}>
                                         {
                                             filter.types
                                                 ? notificationData.filter(item => filter.types?.includes(item.type)).length
@@ -175,23 +171,22 @@ const StatPill: React.FC<StatPillProps> = ({
     style,
 }) => (
     <View
+        className="flex-1 p-3 min-h-[96px] rounded-xl border"
         style={{
-            flex: 1,
-            padding: 12,
-            minHeight: 96,
             backgroundColor: withOpacity(color, 0.12),
-            borderRadius: 12,
-            borderWidth: 1,
             borderColor: withOpacity(color, 0.35),
             ...style,
         }}
     >
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+        <View className="flex-row items-center mb-1.5">
             <Ionicons name={icon} size={16} color={color} />
-            <Text style={{ marginLeft: 6, fontSize: 12, color: color, fontWeight: '700' }}>{label}</Text>
+            <Text className="ml-1.5 text-xs font-bold"
+                style={{ color }}>{label}</Text>
         </View>
-        <Text style={{ fontSize: 22, fontWeight: '800', color: textColor, lineHeight: 26 }}>{value}</Text>
-        <Text style={{ fontSize: 12, color: mutedTextColor, marginTop: 2 }}>{helper}</Text>
+        <Text className="text-[22px] font-extrabold leading-[26px]"
+            style={{ color: textColor }}>{value}</Text>
+        <Text className="text-xs mt-0.5"
+            style={{ color: mutedTextColor }}>{helper}</Text>
     </View>
 );
 

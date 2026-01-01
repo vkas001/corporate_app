@@ -1,6 +1,6 @@
-import BatchCard from '@/components/Batch/BatchCard';
-import CustomHeader from '@/components/Screens/CustomHeader';
-import { mockBatches } from '@/data/batch';
+import BatchCard from '@/components/batch/BatchCard';
+import CustomHeader from '@/components/ui/CustomHeader';
+import { mockBatches } from '@/data/batchData';
 import { useTheme } from '@/theme/themeContext';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
