@@ -1,3 +1,4 @@
+import Loading from "@/components/common/loading";
 import LiveMarketCategory from "@/components/market/MarketCategory";
 import CustomButton from "@/components/ui/CustomButton";
 import { useTheme } from "@/theme";
@@ -38,7 +39,7 @@ export default function LandingPage() {
   }, []);
 
   if (loading) {
-    return null; // or a loading spinner
+    return <Loading message="Checking your session..." />;
   }
 
   if (isAuthenticated === false) {

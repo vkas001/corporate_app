@@ -1,3 +1,4 @@
+import Loading from "@/components/common/loading";
 import CustomButton from "@/components/ui/CustomButton";
 import CustomInput from "@/components/ui/CustomInput";
 import { useTheme } from "@/theme/themeContext";
@@ -13,7 +14,6 @@ import {
   Text,
   View
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const SignIn = () => {
   const { colors } = useTheme();
@@ -71,9 +71,10 @@ const SignIn = () => {
   };
 
   return (
-    <View className="flex-1 px-5 pt-5 "
+    <View className="flex-1 px-5 pt-5"
       style={{
-        backgroundColor: colors.background
+        backgroundColor: colors.background,
+        position: "relative",
       }}>
       <LinearGradient className="pt-8 pb-8"
         colors={[colors.primary + "14", colors.surface]}
@@ -231,6 +232,15 @@ const SignIn = () => {
           </View>
         </ScrollView>
       </LinearGradient>
+
+      {isSubmitting && (
+        <View
+          className="absolute inset-0 items-center justify-center"
+          style={{ backgroundColor: colors.background + "E6" }}
+        >
+          <Loading message="Signing you in..." fullscreen={false} />
+        </View>
+      )}
     </View>
   );
 };

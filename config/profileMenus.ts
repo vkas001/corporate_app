@@ -18,8 +18,9 @@ export const profileMenus: Record<UserRole, ProfileMenuItem[]> = {
 
   seller: [
     { icon: "settings-outline", label: "Settings", action: "settings" },
-    { icon: "cube-outline", label: "My Products", action: "products" },
-    { icon: "wallet-outline", label: "Payouts", action: "payouts" },
+    { icon: "card-outline", label: "Billing", action: "billing" },
+    { icon: "people-outline", label: "Users", action: "users" },
+    { icon: "information-circle-outline", label: "Information", action: "info" },
     { icon: "log-out-outline", label: "Logout", action: "logout", danger: true },
   ],
 };

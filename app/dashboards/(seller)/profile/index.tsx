@@ -1,7 +1,7 @@
-import BillingScreen from "@/app/dashboards/(producer)/profile/billings";
-import EditProfileScreen from "@/app/dashboards/(producer)/profile/edit";
-import SettingsScreen from "@/app/dashboards/(producer)/profile/settings";
-import UserManagementScreen from "@/app/dashboards/(producer)/profile/users";
+import BillingScreen from "@/app/dashboards/(seller)/profile/billings";
+import EditProfileScreen from "@/app/dashboards/(seller)/profile/edit";
+import SettingsScreen from "@/app/dashboards/(seller)/profile/settings";
+import UserManagementScreen from "@/app/dashboards/(seller)/profile/users";
 import ProfileScreen from "@/components/profile/ProfileScreen";
 import CustomHeader from "@/components/ui/CustomHeader";
 import { useTheme } from '@/theme/themeContext';
@@ -9,12 +9,13 @@ import { logout } from "@/utils/auth";
 import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InfoScreen from "./info";
 
 type Screen = 'profile' | 'edit' | 'settings' | 'billing' | 'users' | 'info';
 
-export default function ProducerProfile() {
+export default function SellerProfile() {
   const { colors } = useTheme();
 
   const [avatar, setAvatar] = useState<string | null>(null);
@@ -35,7 +36,7 @@ export default function ProducerProfile() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
@@ -90,7 +91,7 @@ export default function ProducerProfile() {
         <>
           <CustomHeader title="Profile" />
           <ProfileScreen
-            role="producer"
+            role="seller"
             name={profileData.name}
             email={profileData.email}
             onAction={handleAction}

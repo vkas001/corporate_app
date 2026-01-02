@@ -11,11 +11,11 @@ export type HistoryItem = {
   description: any;
   id: string;
   type: HistoryType;
-  date: string; // YYYY-MM-DD
-  time: string; // HH:mm
+  date: string; 
+  time: string; 
   title: string;
   value: number;
   unit?: string;
-  amount?: number; // money
+  amount?: number; 
   meta?: Record<string, any>;
 };

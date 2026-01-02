@@ -14,12 +14,14 @@ interface CustomTabLayoutProps {
   tabs: TabConfig[];
   headerShown?: boolean;
   tabBarHeight?: number;
+  hiddenRoutes?: string[];
 }
 
 export const CustomTabLayout = ({
   tabs,
   headerShown = false,
   tabBarHeight = 70,
+  hiddenRoutes = ["(modal)"],
 }: CustomTabLayoutProps) => {
   const { colors } = useTheme();
 
@@ -36,6 +38,10 @@ export const CustomTabLayout = ({
         },
       }}
     >
+      {hiddenRoutes.map(routeName => (
+        <Tabs.Screen key={routeName} name={routeName} options={{ href: null }} />
+      ))}
+
       {tabs.map((tab) => (
         <Tabs.Screen
           key={tab.name}

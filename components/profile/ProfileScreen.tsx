@@ -2,7 +2,7 @@ import { useTheme } from "@/theme";
 import { UserRole } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileMenuItem from "./profileMenuItem";
 import { profileMenus } from "../../config/profileMenus";
@@ -11,6 +11,7 @@ type Props = {
   role: UserRole;
   name: string;
   email: string;
+  avatarUri?: string | null;
   onAction: (action: string) => void;
   onEditAvatar?: () => void;
 };
@@ -19,6 +20,7 @@ export default function ProfileScreen({
   role,
   name,
   email,
+  avatarUri,
   onAction,
   onEditAvatar,
 }: Props) {
@@ -31,7 +33,14 @@ export default function ProfileScreen({
       <View className="w-full max-w-md">
         <View className="items-center">
           <View className="relative mb-4">
-            <Ionicons name="person-circle" size={100} color={colors.primary} />
+            {avatarUri ? (
+              <Image
+                source={{ uri: avatarUri }}
+                className="w-24 h-24 rounded-full"
+              />
+            ) : (
+              <Ionicons name="person-circle" size={100} color={colors.primary} />
+            )}
             {onEditAvatar && (
               <TouchableOpacity
                 className="absolute bottom-0 right-0 w-8 h-8 rounded-full items-center justify-center"
