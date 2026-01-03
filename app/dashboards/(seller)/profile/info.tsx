@@ -1,5 +1,6 @@
 import { useTheme } from "@/theme/themeContext";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -51,7 +52,7 @@ export default function InfoScreen({ onClose }: Props) {
                 </TouchableOpacity>
                 <Text className="text-lg font-semibold"
                     style={{ color: colors.textPrimary }}>
-                    Billing Details
+                    About
                 </Text>
                 <View className="w-10" />
             </View>
@@ -185,6 +186,7 @@ export default function InfoScreen({ onClose }: Props) {
                         <TouchableOpacity
                             activeOpacity={0.8}
                             className="flex-row items-center gap-3"
+                            onPress={() => router.push('/dashboards/(modal)/privacy-policy')}
                         >
                             <Ionicons name="document-text-outline" size={16} color={colors.textPrimary} />
                             <Text style={{ color: colors.textPrimary }}>

@@ -26,5 +26,6 @@ const sellerTabs: TabConfig[] = [
 ];
 
 export default function TabLayout() {
-  return <CustomTabLayout tabs={sellerTabs} />;
+  // Reset tab to root (index) when pressed to avoid showing previously stacked shortcut
+  return <CustomTabLayout tabs={sellerTabs} hiddenRoutes={[]} resetOnTabPress />;
 }

@@ -18,6 +18,11 @@ type Screen = 'profile' | 'edit' | 'settings' | 'billing' | 'users' | 'info';
 export default function SellerProfile() {
   const { colors } = useTheme();
 
+  const handleBack = () => {
+    // From profile tab landing, always go back to dashboard
+    router.navigate('/dashboards/(seller)');
+  };
+
   const [avatar, setAvatar] = useState<string | null>(null);
   const [currentScreen, setCurrentScreen] = useState<Screen>('profile');
   const [profileData, setProfileData] = useState({
@@ -89,7 +94,7 @@ export default function SellerProfile() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       {currentScreen === 'profile' && (
         <>
-          <CustomHeader title="Profile" />
+          <CustomHeader title="Profile" onBackPress={handleBack} />
           <ProfileScreen
             role="seller"
             name={profileData.name}

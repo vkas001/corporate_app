@@ -1,22 +1,23 @@
-import { Text, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useTheme } from '@/theme';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 type Props = {
     title: string;
+    onBackPress?: () => void;
 };
 
-export default function CustomHeader({ title }: Props) {
+export default function CustomHeader({ title, onBackPress }: Props) {
     const { colors } = useTheme();
 
-    const onBackPress = () => {
+    const handleBack = onBackPress || (() => {
         if (router.canGoBack()) {
             router.back();
         } else {
             router.replace('/dashboards/(producer)');
         }
-    };
+    });
 
     return (
         <View
@@ -33,7 +34,7 @@ export default function CustomHeader({ title }: Props) {
 
             <TouchableOpacity
                 className='mr-4'
-                onPress={onBackPress}
+                onPress={handleBack}
                 hitSlop={10}
             >
                 <Ionicons

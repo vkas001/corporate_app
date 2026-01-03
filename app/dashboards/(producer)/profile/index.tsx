@@ -19,6 +19,11 @@ type Screen = 'profile' | 'edit' | 'settings' | 'billing' | 'users' | 'info';
 export default function ProducerProfile() {
   const { colors } = useTheme();
 
+  const handleBack = () => {
+    // From profile tab landing, always go back to dashboard
+    router.navigate('/dashboards/(producer)');
+  };
+
   const [isLoading, setIsLoading] = useState(false);
   const [avatar, setAvatar] = useState<string | null>(null);
   const [currentScreen, setCurrentScreen] = useState<Screen>('profile');
@@ -99,7 +104,7 @@ export default function ProducerProfile() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, position: "relative" }}>
       {currentScreen === 'profile' && (
         <>
-          <CustomHeader title="Profile" />
+          <CustomHeader title="Profile" onBackPress={handleBack} />
           <ProfileScreen
             role="producer"
             name={profileData.name}

@@ -3,13 +3,25 @@ import RecordList from '@/components/records/RecordList';
 import CustomHeader from '@/components/ui/CustomHeader';
 import { useTheme } from '@/theme/themeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProductionRecords() {
   const { colors } = useTheme();
+  const router = useRouter();
+  const { fromDashboard } = useLocalSearchParams<{ fromDashboard?: string }>();
   const [showModal, setShowModal] = useState(false);
+
+  const handleBack = () => {
+    if (fromDashboard === 'true') {
+      // Navigate directly to dashboard index
+      router.navigate('/dashboards/(seller)');
+    } else {
+      router.back();
+    }
+  };
   const [records, setRecords] = useState<{
     category: string;
     unit: string;
@@ -25,7 +37,7 @@ export default function ProductionRecords() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <CustomHeader title="Sales Records" />
+      <CustomHeader title="Sales Records" onBackPress={handleBack} />
 
       <TouchableOpacity
         onPress={() => setShowModal(true)}

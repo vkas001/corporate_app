@@ -9,6 +9,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function Production() {
   const { colors } = useTheme();
 
+  const handleBack = () => {
+    // From production tab landing, always go back to dashboard
+    router.navigate('/dashboards/(producer)');
+  };
+
   type IonIconName = React.ComponentProps<typeof Ionicons>['name'];
 
   type RecordItem = {
@@ -56,7 +61,7 @@ export default function Production() {
         backgroundColor: colors.background
 
       }}>
-      <CustomHeader title="Records" />
+      <CustomHeader title="Records" onBackPress={handleBack} />
 
       <View className="px-4 mt-3">
         {records.map((item, index) => (

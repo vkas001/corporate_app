@@ -15,13 +15,15 @@ interface CustomTabLayoutProps {
   headerShown?: boolean;
   tabBarHeight?: number;
   hiddenRoutes?: string[];
+  resetOnTabPress?: boolean;
 }
 
 export const CustomTabLayout = ({
   tabs,
   headerShown = false,
   tabBarHeight = 70,
-  hiddenRoutes = ["(modal)"],
+  hiddenRoutes = [],
+  resetOnTabPress = false,
 }: CustomTabLayoutProps) => {
   const { colors } = useTheme();
 
@@ -59,13 +61,17 @@ export const CustomTabLayout = ({
           }}
           listeners={({ navigation, route }) => ({
             tabPress: (e) => {
-              if (route.name === 'production') {
+              if (resetOnTabPress) {
                 e.preventDefault();
-                navigation.navigate('production', { screen: 'index' });
+                // Always navigate to the tab root (index) to avoid showing a previously stacked screen
+                navigation.navigate({
+                  name: route.name,
+                  params: { screen: 'index' },
+                  merge: true,
+                } as any);
               }
             },
           })}
-
         />
       ))}
     </Tabs>

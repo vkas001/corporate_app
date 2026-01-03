@@ -4,6 +4,7 @@ import { useHistory } from "@/hooks/useHistory";
 import { useTheme } from "@/theme/themeContext";
 import { groupByDate } from "@/utils/groupbyDate";
 import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,12 +22,23 @@ const CATEGORIES: { label: string; value: Category; icon: string }[] = [
 
 export default function HistoryScreen() {
   const { colors } = useTheme();
+  const router = useRouter();
+  const { fromDashboard } = useLocalSearchParams<{ fromDashboard?: string }>();
   const role: "producer" | "seller" = "producer";
   const { history } = useHistory(role);
   
   const [selectedCategory, setSelectedCategory] = useState<Category>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('');
+
+  const handleBack = () => {
+    if (fromDashboard === 'true') {
+      // Navigate directly to dashboard index
+      router.navigate('/dashboards/(producer)');
+    } else {
+      router.back();
+    }
+  };
 
   const filteredHistory = useMemo(() => {
     return history.filter(item => {
@@ -46,7 +58,7 @@ export default function HistoryScreen() {
     <SafeAreaView className="flex-1" 
       style={{ backgroundColor: colors.background }}
     >
-      <CustomHeader title="History" />
+      <CustomHeader title="History" onBackPress={handleBack} />
       
       <View className="px-4">
         {/* Search Bar */}

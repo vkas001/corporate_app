@@ -52,7 +52,7 @@ export default function InfoScreen({ onClose }: Props) {
                 </TouchableOpacity>
                 <Text className="text-lg font-semibold"
                     style={{ color: colors.textPrimary }}>
-                    Billing Details
+                    About
                 </Text>
                 <View className="w-10" />
             </View>

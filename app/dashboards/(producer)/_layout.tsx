@@ -26,5 +26,6 @@ const producerTabs: TabConfig[] = [
 ];
 
 export default function TabLayout() {
-  return <CustomTabLayout tabs={producerTabs} />;
+  // No (modal) group under producer; keep hiddenRoutes empty
+  return <CustomTabLayout tabs={producerTabs} hiddenRoutes={[]} resetOnTabPress />;
 }

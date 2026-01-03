@@ -86,7 +86,7 @@ export default function ProducerDashboard() {
           className="p-[16px] rounded-[14px] flex-row items-center gap-[10px]"
           style={{ backgroundColor: colors.primaryDark }}
           onPress={() =>
-            router.push('./production/production-records')
+            router.push('./production/production-records?fromDashboard=true')
           }
         >
           <Ionicons name="egg-outline" size={20} color={colors.textPrimary} />
@@ -101,7 +101,7 @@ export default function ProducerDashboard() {
           className="p-[14px] rounded-[14px] flex-row items-center gap-[8px]"
           style={{ backgroundColor: colors.primaryDark }}
           onPress={() =>
-            router.push('./production/history')
+            router.push('./production/history?fromDashboard=true')
           }
         >
           <Ionicons name="time-outline" size={18} color={colors.textPrimary} />

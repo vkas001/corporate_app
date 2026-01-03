@@ -55,11 +55,13 @@ export default function SellerDashboard() {
         <Text className="text-[18px] font-[600] ml-[3px]"
           style={{ color: colors.textPrimary }}
         >
-          {t('dashboard.sellerTitle')}</Text>
+          {t('dashboard.sellerTitle')}
+          </Text>
         <Text className="text-[12px]"
           style={{ color: colors.textSecondary }}
         >
-          {formatFullDate(new Date())}</Text>
+          {formatFullDate(new Date())}
+          </Text>
       </View>
 
       <TouchableOpacity
@@ -85,7 +87,7 @@ export default function SellerDashboard() {
           className="p-[16px] rounded-[14px] flex-row items-center gap-[10px]"
           style={{ backgroundColor: colors.primaryDark }}
           onPress={() =>
-            router.push('./sales/sales-records')
+            router.push('./sales/sales-records?fromDashboard=true')
           }
         >
           <Ionicons name="egg-outline" size={20} color={colors.textPrimary} />
@@ -100,7 +102,7 @@ export default function SellerDashboard() {
           className="p-[14px] rounded-[14px] flex-row items-center gap-[8px]"
           style={{ backgroundColor: colors.primaryDark }}
           onPress={() =>
-            router.push('./sales/history')
+            router.push('./sales/history?fromDashboard=true')
           }
         >
           <Ionicons name="time-outline" size={18} color={colors.textPrimary} />

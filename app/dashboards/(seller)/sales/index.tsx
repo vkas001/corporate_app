@@ -6,8 +6,13 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function Production() {
+export default function Sales() {
   const { colors } = useTheme();
+
+  const handleBack = () => {
+    // From sales tab landing, always go back to dashboard
+    router.navigate('/dashboards/(seller)');
+  };
 
   type IonIconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -21,23 +26,23 @@ export default function Production() {
     {
       title: 'Sales Records',
       icon: 'document-text-outline',
-      route: '/dashboards/sales/sales-records',
+      route: '/dashboards/(seller)/sales/sales-records',
     },
     {
       title: 'Purchase Records',
       icon: 'time-outline',
-      route: '/dashboards/sales/purchase-records',
+      route: '/dashboards/(seller)/sales/purchase-records',
     },
   
     {
       title: 'Payment Records',
       icon: 'card-outline',
-      route: '/dashboards/sales/payment-records',
+      route: '/dashboards/(seller)/sales/payment-records',
     },
     {
       title: 'History',
       icon: 'time-outline',
-      route: '/dashboards/sales/history',
+      route: '/dashboards/(seller)/sales/history',
     }
   ];
 
@@ -47,7 +52,7 @@ export default function Production() {
         backgroundColor: colors.background
 
       }}>
-      <CustomHeader title="Records" />
+      <CustomHeader title="Records" onBackPress={handleBack} />
 
       <View className="px-4 mt-3">
         {records.map((item, index) => (
