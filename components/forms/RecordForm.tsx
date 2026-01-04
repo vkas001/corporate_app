@@ -191,28 +191,6 @@ export default function RecordFormModal({
                         </Text>
                         {renderSegmented(categories, category, handleCategoryChange)}
 
-                        {/*  
-            {unitsForCategory.length > 1 ? (
-              <>
-                <Text className="mt-4 mb-2 text-sm" style={{ color: colors.textSecondary }}>
-                  Unit
-                </Text>
-                {renderSegmented(unitsForCategory, unit, setUnit)}
-              </>
-            ) : (
-              <View className="mt-4 mb-2">
-                <View
-                  className="self-start px-3 py-1.5 rounded-full"
-                  style={{ backgroundColor: `${colors.primary}14` }}
-                >
-                  <Text className="text-xs font-semibold" style={{ color: colors.textPrimary }}>
-                    Unit: {unit}
-                  </Text>
-                </View>
-              </View>
-            )}
-              */}
-
                         {/* Quantity */}
                         <CustomInput
                             placeholder="Enter quantity"

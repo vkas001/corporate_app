@@ -2,7 +2,7 @@ import Loading from "@/components/common/loading";
 import LiveMarketCategory from "@/components/market/MarketCategory";
 import CustomButton from "@/components/ui/CustomButton";
 import { useTheme } from "@/theme";
-import { getRole, getToken } from "@/utils/auth";
+import { getAuth } from "@/utils/auth";
 import { formatFullDate } from "@/utils/dateFormatter";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, router } from "expo-router";
@@ -22,10 +22,11 @@ export default function LandingPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = await getToken();
-      const saveRole = await getRole();
+      const auth = await getAuth();
+      const token = auth?.token;
+      const saveRole = auth?.roles?.[0] ?? null;
 
-      if (!token || !saveRole) {
+      if (!token || !saveRole ) {
         setIsAuthenticated(false);
         setLoading(false);
         return;
@@ -49,8 +50,9 @@ export default function LandingPage() {
   const submit = async () => {
     setIsSubmitting(true);
 
-    const token = await getToken();
-    const role = await getRole();
+    const auth = await getAuth();
+    const token = auth?.token;
+    const role = auth?.roles?.[0] ?? null;
 
     if (!token || !role) {
       router.replace("/(auth)/sign-in");
@@ -58,10 +60,14 @@ export default function LandingPage() {
       return;
     }
 
-    if (role === "producer") {
+    const roleLower = role.toLowerCase();
+
+    if (roleLower === "producer") {
       router.replace("/dashboards/(producer)");
-    } else if (role === "seller") {
+    } else if (roleLower === "seller") {
       router.replace("/dashboards/(seller)");
+    } else if (roleLower === "super admin") {
+      router.replace("/");
     } else {
       router.replace("/(auth)/sign-in");
     }

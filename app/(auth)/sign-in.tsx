@@ -21,50 +21,76 @@ const SignIn = () => {
   const [form, setForm] = useState({
     email: "",
     password: "",
-    role: "producer",
   });
 
   const submit = async () => {
+    console.log("🔓 Sign In button pressed");
     const emailTrimmed = form.email.trim();
     const passwordTrimmed = form.password.trim();
+    console.log("📧 Email:", emailTrimmed);
 
     if (!emailTrimmed || !passwordTrimmed) {
+      console.log("❌ Validation failed: Empty fields");
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailTrimmed)) {
+      console.log("❌ Validation failed: Invalid email format");
       Alert.alert("Error", "Please enter a valid email address");
       return;
     }
 
     if (passwordTrimmed.length < 6) {
+      console.log("❌ Validation failed: Password too short");
       Alert.alert("Error", "Password must be at least 6 characters long");
       return;
     }
 
     try {
       setIsSubmitting(true);
-
-      const response = {
-        token: "fake_jwt_token",
-        user: {
-          role: form.role,
+      console.log("⏳ Sending login request...");
+      const res = await fetch("https://eggadmin.aanshtech.com.np/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      };
-      const { token, user } = response;
-      await saveAuth(token, user.role);
+        body: JSON.stringify({
+          email: emailTrimmed,
+          password: passwordTrimmed,
+        }),
+      });
 
-      if (user.role === "producer") {
-        router.replace("/dashboards/(producer)");
-      } else if (user.role === "seller") {
-        router.replace("/dashboards/(seller)");
-      } else {
-        Alert.alert("Error", "Unknown user role");
+      console.log("📡 Response status:", res.status);
+      const data = await res.json();
+      console.log("📦 Response data:", data);
+
+      if (!res.ok) {
+        throw new Error(data.message || "Login failed");
       }
-    } catch (error) {
-      Alert.alert("Error", " Invalid user role");
+
+      const { token, roles, permissions, user } = data;
+      console.log("✅ Login successful");
+      console.log("👤 User:", user);
+      console.log("🔑 Roles:", roles);
+
+      await saveAuth(token, roles, permissions, user);
+      console.log("💾 Auth saved to storage");
+
+      if (roles.includes("Super Admin")) {
+        console.log("🔀 Redirecting to Super Admin dashboard");
+        router.replace("/");
+      } else if (roles.includes("Producer")) {
+        console.log("🔀 Redirecting to Producer dashboard");
+        router.replace("/dashboards/(producer)");
+      } else {
+        console.log("🔀 Redirecting to Seller dashboard");
+        router.replace("/dashboards/(seller)");
+      }
+    } catch (error: any) {
+      console.error("❌ Login error:", error);
+      Alert.alert("Login Failed", error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -147,9 +173,10 @@ const SignIn = () => {
 
             <View className="mb-2">
               <CustomInput
-                placeholder="••••••••"
+                placeholder="Enter your password"
                 value={form.password}
-                onChangeText={(text) => setForm((prev) => ({ ...prev, password: text }))}
+                onChangeText={(text) => setForm((prev) =>
+                  ({ ...prev, password: text }))}
                 label="Password"
                 secureTextEntry
               />
@@ -172,45 +199,6 @@ const SignIn = () => {
               </Pressable>
             </View>
 
-            <View className="mb-6">
-              <Text className="text-sm mb-3 font-semibold"
-                style={{ color: colors.textPrimary }}
-              >
-                Continue as
-              </Text>
-              <View className="flex-row gap-3">
-                {["producer", "seller"].map((roleOption) => {
-                  const isActive = form.role === roleOption;
-                  const icon = roleOption === "producer" ? "leaf-outline" : "cart-outline";
-                  return (
-                    <Pressable
-                      key={roleOption}
-                      onPress={() => setForm((prev) => ({ ...prev, role: roleOption }))}
-                      className="flex-1 border rounded-2xl py-3 px-3"
-                      style={{
-                        borderColor: isActive ? colors.primary : colors.border,
-                        backgroundColor: isActive ? colors.primary + "14" : colors.background,
-                      }}
-                    >
-                      <View className="flex-row items-center justify-center gap-2">
-                        <Ionicons
-                          name={icon as any}
-                          size={16}
-                          color={isActive ? colors.primary : colors.textSecondary}
-                        />
-                        <Text
-                          className="text-sm font-semibold"
-                          style={{ color: isActive ? colors.primary : colors.textSecondary }}
-                        >
-                          {roleOption === "producer" ? "Producer" : "Seller"}
-                        </Text>
-                      </View>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
-
             <CustomButton title="Sign In" isLoading={isSubmitting} onPress={submit} />
           </View>
 
@@ -221,7 +209,7 @@ const SignIn = () => {
               By signing in you agree to our
             </Text>
             <View className="items-center mt-1">
-              <Pressable onPress={() => router.push("/dashboards/(modal)/privacy-policy")}>
+              <Pressable onPress={() => router.push("/dashboards/legal/privacy-policy")}>
                 <Text className="text-xs font-semibold"
                   style={{ color: colors.primary }}
                 >
