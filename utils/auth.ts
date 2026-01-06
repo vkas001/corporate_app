@@ -28,6 +28,3 @@ export const clearAuth = async () => {
   await AsyncStorage.removeItem(AUTH_KEY);
 };
 
-export const logout = async () => {
-  await clearAuth();
-};

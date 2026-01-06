@@ -5,7 +5,7 @@ import UserManagementScreen from "@/app/dashboards/(seller)/profile/users";
 import ProfileScreen from "@/components/profile/ProfileScreen";
 import CustomHeader from "@/components/ui/CustomHeader";
 import { useTheme } from '@/theme/themeContext';
-import { logout } from "@/utils/auth";
+import { logout } from "@/services/authService";
 import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -54,8 +54,30 @@ export default function SellerProfile() {
 
   const handleAction = async (action: string) => {
     if (action === "logout") {
-      await logout();
-      router.replace("/(auth)/sign-in");
+      Alert.alert(
+        "Confirm Logout",
+        "Are you sure you want to logout?",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Logout",
+            style: "destructive",
+            onPress: async () => {
+              try {
+                await logout();
+                Alert.alert("Success", "Logout successful", [
+                  {
+                    text: "OK", onPress: () =>
+                      router.replace("/(auth)/sign-in"),
+                  }
+                ]);
+              } catch (err: any) {
+                Alert.alert("Error", err.message || "Logout failed");
+              }
+            }
+          }
+        ]
+      );
       return;
     }
 
