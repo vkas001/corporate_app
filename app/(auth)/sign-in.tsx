@@ -67,7 +67,8 @@ const SignIn = () => {
       console.log("📦 Response data:", data);
 
       if (!res.ok) {
-        throw new Error(data.message || "Login failed");
+        Alert.alert("Login Failed", data.message || "Unauthorized");
+        return;
       }
 
       const { token, roles, permissions, user } = data;
@@ -78,34 +79,29 @@ const SignIn = () => {
       await saveAuth(token, roles, permissions, user);
       console.log("💾 Auth saved to storage");
 
-      if (roles.includes("Super Admin")) {
-        console.log("🔀 Redirecting to Super Admin dashboard");
-        router.replace("/");
-      } else if (roles.includes("Producer")) {
+      if (roles.includes("Producer")) {
         console.log("🔀 Redirecting to Producer dashboard");
         router.replace("/dashboards/(producer)");
-      } else {
+      } else if (roles.includes("Seller")) {
         console.log("🔀 Redirecting to Seller dashboard");
         router.replace("/dashboards/(seller)");
+      }else {
+        console.log("🔀 Redirecting to Auth");
+        router.replace("/(auth)/sign-in");
       }
-    } catch (error: any) {
-      console.error("❌ Login error:", error);
-      Alert.alert("Login Failed", error.message);
+    } catch (err: any) {
+      console.error("❌ Login error:", err);
+      Alert.alert("Login Failed", err.message || "Unauthorized");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <View className="flex-1 px-5 pt-5"
-      style={{
-        backgroundColor: colors.background,
-        position: "relative",
-      }}>
-      <LinearGradient className="pt-8 pb-8"
-        colors={[colors.primary + "14", colors.surface]}
-      >
+    <>
         <ScrollView
+          className="flex-1 px-6 pt-12"
+          style={{ backgroundColor: colors.background }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ flexGrow: 1 }}
@@ -219,7 +215,6 @@ const SignIn = () => {
             </View>
           </View>
         </ScrollView>
-      </LinearGradient>
 
       {isSubmitting && (
         <View
@@ -229,7 +224,7 @@ const SignIn = () => {
           <Loading message="Signing you in..." fullscreen={false} />
         </View>
       )}
-    </View>
+    </>
   );
 };
 

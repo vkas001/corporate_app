@@ -10,7 +10,6 @@ import React, { useMemo, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-
 const filters: {
     key: FilterKey;
     label: string;
