@@ -12,10 +12,17 @@ import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../../theme";
+import { useRoleGuard } from "@/hooks/roleGuard";
+import Loading from "@/components/common/loading";
 
 export default function ProducerDashboard() {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const isChecking = useRoleGuard(['Producer']);
+
+  if (isChecking) {
+    return <Loading message ="Checking access..." />;
+  }
 
   const [period, setPeriod] = React.useState<"Today" | "Week" | "Month">("Today");
 

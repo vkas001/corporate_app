@@ -12,17 +12,22 @@ import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../../theme";
+import Loading from "@/components/common/loading";
+import { useRoleGuard } from "@/hooks/roleGuard";
 
 export default function SellerDashboard() {
   const { colors } = useTheme();
   const { t } = useTranslation();
-
-  const [period, setPeriod] = React.useState<"Today" | "Week" | "Month">("Today");
-
-  const dashboardData = DASHBOARD_DATA[period.toLowerCase() as Period];
-
+  const isChecking = useRoleGuard(['Seller']);
+  const [period, setPeriod] = useState<"Today" | "Week" | "Month">("Today");
   const [selectedCategory, setSelectedCategory] = useState('Chicken');
   const [open, setOpen] = useState(false);
+
+  if (isChecking) {
+    return <Loading message="Checking access..." />;
+  }
+
+  const dashboardData = DASHBOARD_DATA[period.toLowerCase() as Period];
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -31,7 +36,6 @@ export default function SellerDashboard() {
     }
     router.replace('/');
   };
-
   return <SafeAreaView
     className="flex-1 mb-8"
     style={{ backgroundColor: colors.background }}
@@ -56,12 +60,12 @@ export default function SellerDashboard() {
           style={{ color: colors.textPrimary }}
         >
           {t('dashboard.sellerTitle')}
-          </Text>
+        </Text>
         <Text className="text-[12px]"
           style={{ color: colors.textSecondary }}
         >
           {formatFullDate(new Date())}
-          </Text>
+        </Text>
       </View>
 
       <TouchableOpacity
@@ -78,7 +82,7 @@ export default function SellerDashboard() {
 
     <ScrollView
       className="px-5 pt-2.5 pb-10"
-      
+
     >
       <LanguageToggle />
 

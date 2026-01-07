@@ -24,7 +24,20 @@ export const getToken = async () => {
   return auth?.token || null;
 };
 
+export const getRoles = async () => {
+  const auth = await getAuth();
+  return auth?.roles ?? [];
+};
+
+export const getPermissions = async () => {
+  const auth = await getAuth();
+  return auth?.permissions ?? [];
+};
+
 export const clearAuth = async () => {
   await AsyncStorage.removeItem(AUTH_KEY);
 };
+
+// Convenience alias to match imports expecting `logout`
+export const logout = clearAuth;
 

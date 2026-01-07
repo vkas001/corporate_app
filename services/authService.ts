@@ -1,6 +1,5 @@
 import api from "@/services/api";
 import { clearAuth, saveAuth } from "@/utils/auth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const signIn = async (email: string, password: string) => {
   const res = await api.post("/login", { email, password });
@@ -13,37 +12,17 @@ export const signIn = async (email: string, password: string) => {
 };
 
 export const logout = async () => {
+  console.log("🔓 Logout initiated");
   try {
-    console.log("🔓 Logout initiated");
-    const token = await AsyncStorage.getItem("authToken");
-    console.log("🔑 Token retrieved from storage");
-
     console.log("⏳ Sending logout request...");
-    const res = await fetch("https://eggadmin.aanshtech.com.np/api/logout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-    });
-
-    console.log("📡 Response status:", res.status);
-
-    if (!res.ok) {
-      console.log("❌ Logout request failed");
-      throw new Error("Logout failed");
-    }
-
-    const data = await res.json();
-    console.log("📦 Response data:", data);
-
-    // Clear local storage
-    console.log("🗑️ Clearing authentication data from storage");
-   await clearAuth();
-   
-    console.log("✅ Logout successful");
+    const res = await api.post("/api/logout");
+    console.log("📡 Logout response status:", res.status);
+    console.log("📦 Response data:", res.data);
   } catch (err: any) {
-    console.error("❌ Logout error:", err);
-    throw err;
+    console.warn("❌ Logout request failed:", err?.message || err);
+  } finally {
+    console.log("🗑️ Clearing authentication data from storage");
+    await clearAuth();
+    console.log("✅ Logout complete");
   }
 };

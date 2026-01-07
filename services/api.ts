@@ -2,7 +2,8 @@ import { clearAuth, getAuth } from "@/utils/auth";
 import axios from "axios";
 import { router } from "expo-router";
 
-const API_BASE_URL = "process.env.EXPO_PUBLIC_API_BASE_URL";
+// Read Expo public env directly (do not wrap in quotes)
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL as string | undefined;
 
 const api = axios.create({
   baseURL: API_BASE_URL,

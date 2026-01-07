@@ -5,14 +5,14 @@ import UserManagementScreen from "@/app/dashboards/(producer)/profile/users";
 import Loading from "@/components/common/loading";
 import ProfileScreen from "@/components/profile/ProfileScreen";
 import CustomHeader from "@/components/ui/CustomHeader";
+import { logout } from "@/services/authService";
 import { useTheme } from '@/theme/themeContext';
-import { logout } from "@/utils/auth";
 import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InfoScreen from "./info";
-import { View } from "react-native";
 
 type Screen = 'profile' | 'edit' | 'settings' | 'billing' | 'users' | 'info';
 
