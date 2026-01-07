@@ -24,5 +24,6 @@ export const logout = async () => {
     console.log("🗑️ Clearing authentication data from storage");
     await clearAuth();
     console.log("✅ Logout complete");
+
   }
 };

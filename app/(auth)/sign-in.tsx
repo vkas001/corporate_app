@@ -24,33 +24,33 @@ const SignIn = () => {
   });
 
   const submit = async () => {
-    console.log("🔓 Sign In button pressed");
+    console.log(" Sign In button pressed");
     const emailTrimmed = form.email.trim();
     const passwordTrimmed = form.password.trim();
-    console.log("📧 Email:", emailTrimmed);
+    console.log(" Email:", emailTrimmed);
 
     if (!emailTrimmed || !passwordTrimmed) {
-      console.log("❌ Validation failed: Empty fields");
+      console.log(" Validation failed: Empty fields");
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailTrimmed)) {
-      console.log("❌ Validation failed: Invalid email format");
+      console.log(" Validation failed: Invalid email format");
       Alert.alert("Error", "Please enter a valid email address");
       return;
     }
 
     if (passwordTrimmed.length < 6) {
-      console.log("❌ Validation failed: Password too short");
+      console.log(" Validation failed: Password too short");
       Alert.alert("Error", "Password must be at least 6 characters long");
       return;
     }
 
     try {
       setIsSubmitting(true);
-      console.log("⏳ Sending login request...");
+      console.log(" Sending login request...");
       const res = await fetch("https://eggadmin.aanshtech.com.np/api/login", {
         method: "POST",
         headers: {
@@ -62,9 +62,9 @@ const SignIn = () => {
         }),
       });
 
-      console.log("📡 Response status:", res.status);
+      console.log(" Response status:", res.status);
       const data = await res.json();
-      console.log("📦 Response data:", data);
+      console.log(" Response data:", data);
 
       if (!res.ok) {
         Alert.alert("Login Failed", data.message || "Unauthorized");
@@ -72,25 +72,25 @@ const SignIn = () => {
       }
 
       const { token, roles, permissions, user } = data;
-      console.log("✅ Login successful");
-      console.log("👤 User:", user);
-      console.log("🔑 Roles:", roles);
+      console.log(" Login successful");
+      console.log(" User:", user);
+      console.log(" Roles:", roles);
 
       await saveAuth(token, roles, permissions, user);
-      console.log("💾 Auth saved to storage");
+      console.log(" Auth saved to storage");
 
       if (roles.includes("Producer")) {
-        console.log("🔀 Redirecting to Producer dashboard");
+        console.log(" Redirecting to Producer dashboard");
         router.replace("/dashboards/(producer)");
       } else if (roles.includes("Seller")) {
-        console.log("🔀 Redirecting to Seller dashboard");
+        console.log(" Redirecting to Seller dashboard");
         router.replace("/dashboards/(seller)");
       }else {
-        console.log("🔀 Redirecting to Auth");
+        console.log(" Redirecting to Auth");
         router.replace("/(auth)/sign-in");
       }
     } catch (err: any) {
-      console.error("❌ Login error:", err);
+      console.error(" Login error:", err);
       Alert.alert("Login Failed", err.message || "Unauthorized");
     } finally {
       setIsSubmitting(false);

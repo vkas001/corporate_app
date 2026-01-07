@@ -41,3 +41,37 @@ export const clearAuth = async () => {
 // Convenience alias to match imports expecting `logout`
 export const logout = clearAuth;
 
+export const validateToken = async () => {
+  try {
+    console.log("🔐 Validating token...");
+    const token = await getToken();
+
+    if (!token) {
+      console.log(" No token found");
+      return false;
+    }
+
+    const res = await fetch("https://eggadmin.aanshtech.com.np/api/validate-token", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    console.log("📡 Validation response status:", res.status);
+
+    if (!res.ok) {
+      console.log(" Token is invalid or expired");
+      await clearAuth();
+      return false;
+    }
+
+    console.log(" Token is valid");
+    return true;
+  } catch (err: any) {
+    console.error(" Token validation error:", err);
+    await clearAuth();
+    return false;
+  }
+};

@@ -31,7 +31,7 @@ api.interceptors.request.use(
 );
 
 /**
- * Global response & error handler (Laravel friendly)
+ * Global response & error handler 
  */
 api.interceptors.response.use(
   (response) => response,
