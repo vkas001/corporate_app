@@ -1,8 +1,10 @@
 import MarginByDayChart from "@/components/charts/MarginByDayChart";
+import Loading from "@/components/common/loading";
 import DashboardOverview from "@/components/dashboard/DashboardOverview";
 import FinanceOverview from "@/components/dashboard/FinanceOverview";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { DASHBOARD_DATA } from "@/data/dashboardData";
+import { useRoleGuard } from "@/hooks/roleGuard";
 import { Period } from "@/types/dashboard";
 import { formatFullDate } from "@/utils/dateFormatter";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,24 +14,20 @@ import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../../theme";
-import { useRoleGuard } from "@/hooks/roleGuard";
-import Loading from "@/components/common/loading";
 
 export default function ProducerDashboard() {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const isChecking = useRoleGuard(['Producer']);
+  const [period, setPeriod] = React.useState<"Today" | "Week" | "Month">("Today");
+  const [selectedCategory, setSelectedCategory] = useState('Chicken');
+  const [open, setOpen] = useState(false);
 
   if (isChecking) {
     return <Loading message ="Checking access..." />;
   }
 
-  const [period, setPeriod] = React.useState<"Today" | "Week" | "Month">("Today");
-
   const dashboardData = DASHBOARD_DATA[period.toLowerCase() as Period];
-
-  const [selectedCategory, setSelectedCategory] = useState('Chicken');
-  const [open, setOpen] = useState(false);
 
   const handleBack = () => {
     if (router.canGoBack()) {

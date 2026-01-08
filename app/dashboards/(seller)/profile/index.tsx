@@ -4,12 +4,14 @@ import SettingsScreen from "@/app/dashboards/(seller)/profile/settings";
 import UserManagementScreen from "@/app/dashboards/(seller)/profile/users";
 import ProfileScreen from "@/components/profile/ProfileScreen";
 import CustomHeader from "@/components/ui/CustomHeader";
-import { useTheme } from '@/theme/themeContext';
+import { useUser } from "@/hooks/useUser";
+import { updateUserAvatar } from "@/services/userService";
 import { logout } from "@/services/authService";
+import { useTheme } from '@/theme/themeContext';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert } from "react-native";
+import { ActivityIndicator, Alert, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InfoScreen from "./info";
 
@@ -17,19 +19,20 @@ type Screen = 'profile' | 'edit' | 'settings' | 'billing' | 'users' | 'info';
 
 export default function SellerProfile() {
   const { colors } = useTheme();
+  const { user, loading, error } = useUser();
 
   const handleBack = () => {
     // From profile tab landing, always go back to dashboard
     router.navigate('/dashboards/(seller)');
   };
 
-  const [avatar, setAvatar] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<string | null>(user?.avatar || null);
   const [currentScreen, setCurrentScreen] = useState<Screen>('profile');
   const [profileData, setProfileData] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    address: '123 Main St, New York, NY 10001',
+    name: user?.name || 'User',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    address: user?.address || '',
     company: 'Egg Corporate',
   });
 
@@ -48,7 +51,17 @@ export default function SellerProfile() {
     });
 
     if (!result.canceled) {
-      setAvatar(result.assets[0].uri);
+      try {
+        const imagePath = result.assets[0].uri;
+        setAvatar(imagePath);
+        
+        // Upload to backend
+        const updatedUser = await updateUserAvatar(imagePath);
+        Alert.alert("Success", "Avatar updated successfully");
+      } catch (err: any) {
+        Alert.alert("Error", err.message || "Failed to update avatar");
+        setAvatar(user?.avatar || null); // Revert to previous avatar
+      }
     }
   };
 
@@ -114,40 +127,52 @@ export default function SellerProfile() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      {currentScreen === 'profile' && (
-        <>
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : error ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <CustomHeader title="Profile" onBackPress={handleBack} />
-          <ProfileScreen
-            role="seller"
-            name={profileData.name}
-            email={profileData.email}
-            onAction={handleAction}
-            onEditAvatar={handleEditAvatar}
-          />
+        </View>
+      ) : (
+        <>
+          {currentScreen === 'profile' && (
+            <>
+              <CustomHeader title="Profile" onBackPress={handleBack} />
+              <ProfileScreen
+                role={user?.role || "seller"}
+                name={user?.name || 'User'}
+                email={user?.email || ''}
+                onAction={handleAction}
+                onEditAvatar={handleEditAvatar}
+              />
+           </>
+          )}
+
+          {currentScreen === 'edit' && (
+            <EditProfileScreen
+              initialData={profileData}
+              onSave={handleSaveProfile}
+              onCancel={handleScreenClose}
+            />
+          )}
+
+          {currentScreen === 'settings' && (
+            <SettingsScreen onClose={handleScreenClose} />
+          )}
+
+          {currentScreen === 'billing' && (
+            <BillingScreen onClose={handleScreenClose} />
+          )}
+
+          {currentScreen === 'users' && (
+            <UserManagementScreen onClose={handleScreenClose} />
+          )}
+          {currentScreen === 'info' && (
+            <InfoScreen onClose={handleScreenClose} />
+          )}
         </>
-      )}
-
-      {currentScreen === 'edit' && (
-        <EditProfileScreen
-          initialData={profileData}
-          onSave={handleSaveProfile}
-          onCancel={handleScreenClose}
-        />
-      )}
-
-      {currentScreen === 'settings' && (
-        <SettingsScreen onClose={handleScreenClose} />
-      )}
-
-      {currentScreen === 'billing' && (
-        <BillingScreen onClose={handleScreenClose} />
-      )}
-
-      {currentScreen === 'users' && (
-        <UserManagementScreen onClose={handleScreenClose} />
-      )}
-      {currentScreen === 'info' && (
-        <InfoScreen onClose={handleScreenClose} />
       )}
     </SafeAreaView>
   );

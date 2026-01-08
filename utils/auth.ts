@@ -38,9 +38,6 @@ export const clearAuth = async () => {
   await AsyncStorage.removeItem(AUTH_KEY);
 };
 
-// Convenience alias to match imports expecting `logout`
-export const logout = clearAuth;
-
 export const validateToken = async () => {
   try {
     console.log("🔐 Validating token...");

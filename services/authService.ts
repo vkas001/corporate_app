@@ -15,7 +15,7 @@ export const logout = async () => {
   console.log("🔓 Logout initiated");
   try {
     console.log("⏳ Sending logout request...");
-    const res = await api.post("/api/logout");
+    const res = await api.post("/logout");
     console.log("📡 Logout response status:", res.status);
     console.log("📦 Response data:", res.data);
   } catch (err: any) {
