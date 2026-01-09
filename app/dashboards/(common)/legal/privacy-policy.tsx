@@ -26,16 +26,20 @@ export default function PrivacyPolicy() {
   );
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.background }}>
+    <SafeAreaView className="flex-1"
+      style={{ backgroundColor: colors.background }}
+    >
       <View className="flex-row items-center justify-between px-4 py-3">
         <TouchableOpacity
           className="w-10 h-10 rounded-full items-center justify-center border"
           style={{ backgroundColor: colors.surface, borderColor: colors.border }}
           onPress={() => router.back()}
         >
-          <Ionicons name="close" size={22} color={colors.textPrimary} />
+          <Ionicons name="chevron-back" size={22} color={colors.textPrimary} />
         </TouchableOpacity>
-        <Text className="text-lg font-semibold" style={{ color: colors.textPrimary }}>
+        <Text className="text-lg font-semibold"
+          style={{ color: colors.textPrimary }}
+        >
           Privacy Policy
         </Text>
         <View style={{ width: 40 }} />
@@ -43,7 +47,9 @@ export default function PrivacyPolicy() {
 
       <ScrollView className="px-4" showsVerticalScrollIndicator={false}>
         <Section title="OVERVIEW">
-          <Text className="leading-6" style={{ color: colors.textPrimary }}>
+          <Text className="leading-6"
+            style={{ color: colors.textPrimary }}
+          >
             We collect and process data to operate Egg Corporate, provide services to
             producers and sellers, and maintain cooperative transparency. This policy
             explains what we collect, why we collect it, and how you can control it.

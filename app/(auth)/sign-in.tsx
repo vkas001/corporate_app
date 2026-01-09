@@ -4,15 +4,14 @@ import CustomInput from "@/components/ui/CustomInput";
 import { useTheme } from "@/theme/themeContext";
 import { saveAuth } from "@/utils/auth";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
-  Pressable,
-  ScrollView,
-  Text,
-  View
+    Alert,
+    Pressable,
+    ScrollView,
+    Text,
+    View
 } from "react-native";
 
 const SignIn = () => {
@@ -205,7 +204,7 @@ const SignIn = () => {
               By signing in you agree to our
             </Text>
             <View className="items-center mt-1">
-              <Pressable onPress={() => router.push("/dashboards/legal/privacy-policy")}>
+                <Pressable onPress={() => router.push("/dashboards/legal/privacy-policy")}>
                 <Text className="text-xs font-semibold"
                   style={{ color: colors.primary }}
                 >
