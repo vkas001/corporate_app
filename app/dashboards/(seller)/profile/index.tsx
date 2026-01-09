@@ -4,13 +4,13 @@ import SettingsScreen from "@/app/dashboards/(seller)/profile/settings";
 import UserManagementScreen from "@/app/dashboards/(seller)/profile/users";
 import ProfileScreen from "@/components/profile/ProfileScreen";
 import CustomHeader from "@/components/ui/CustomHeader";
+import { useLogout } from "@/hooks/useLogout";
 import { useUser } from "@/hooks/useUser";
 import { updateUserAvatar } from "@/services/userService";
-import { logout } from "@/services/authService";
 import { useTheme } from '@/theme/themeContext';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InfoScreen from "./info";
@@ -20,14 +20,23 @@ type Screen = 'profile' | 'edit' | 'settings' | 'billing' | 'users' | 'info';
 export default function SellerProfile() {
   const { colors } = useTheme();
   const { user, loading, error } = useUser();
+  const { handleLogout, showModal, handleConfirm, handleCancel, isLoggingOut, LogoutModal } = useLogout();
 
   const handleBack = () => {
     // From profile tab landing, always go back to dashboard
     router.navigate('/dashboards/(seller)');
   };
 
-  const [avatar, setAvatar] = useState<string | null>(user?.avatar || null);
+  const [avatar, setAvatar] = useState<string | null>(
+    user?.photo && user.photo.trim() !== '' ? user.photo : null
+  );
   const [currentScreen, setCurrentScreen] = useState<Screen>('profile');
+
+  useEffect(() => {
+    if (user?.photo) {
+      setAvatar(user.photo.trim() !== '' ? user.photo : null);
+    }
+  }, [user]);
   const [profileData, setProfileData] = useState({
     name: user?.name || 'User',
     email: user?.email || '',
@@ -60,37 +69,14 @@ export default function SellerProfile() {
         Alert.alert("Success", "Avatar updated successfully");
       } catch (err: any) {
         Alert.alert("Error", err.message || "Failed to update avatar");
-        setAvatar(user?.avatar || null); // Revert to previous avatar
+        setAvatar(user?.photo || null); // Revert to previous avatar
       }
     }
   };
 
   const handleAction = async (action: string) => {
     if (action === "logout") {
-      Alert.alert(
-        "Confirm Logout",
-        "Are you sure you want to logout?",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Logout",
-            style: "destructive",
-            onPress: async () => {
-              try {
-                await logout();
-                Alert.alert("Success", "Logout successful", [
-                  {
-                    text: "OK", onPress: () =>
-                      router.replace("/(auth)/sign-in"),
-                  }
-                ]);
-              } catch (err: any) {
-                Alert.alert("Error", err.message || "Logout failed");
-              }
-            }
-          }
-        ]
-      );
+      handleLogout();
       return;
     }
 
@@ -144,6 +130,7 @@ export default function SellerProfile() {
                 role={user?.role || "seller"}
                 name={user?.name || 'User'}
                 email={user?.email || ''}
+                avatarUri={avatar}
                 onAction={handleAction}
                 onEditAvatar={handleEditAvatar}
               />
@@ -174,6 +161,13 @@ export default function SellerProfile() {
           )}
         </>
       )}
+      
+      <LogoutModal
+        visible={showModal}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        isLoading={isLoggingOut}
+      />
     </SafeAreaView>
   );
 }

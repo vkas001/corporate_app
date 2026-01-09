@@ -5,12 +5,14 @@ import UserManagementScreen from "@/app/dashboards/(producer)/profile/users";
 import Loading from "@/components/common/loading";
 import ProfileScreen from "@/components/profile/ProfileScreen";
 import CustomHeader from "@/components/ui/CustomHeader";
-import { logout } from "@/services/authService";
+import { useLogout } from "@/hooks/useLogout";
+import { useUser } from "@/hooks/useUser";
+import { updateUserAvatar } from "@/services/userService";
 import { useTheme } from '@/theme/themeContext';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
-import React, { useState } from "react";
-import { View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InfoScreen from "./info";
 
@@ -18,22 +20,37 @@ type Screen = 'profile' | 'edit' | 'settings' | 'billing' | 'users' | 'info';
 
 export default function ProducerProfile() {
   const { colors } = useTheme();
+  const { user, loading: userLoading } = useUser();
+  const { handleLogout, showModal, handleConfirm, handleCancel, isLoggingOut, LogoutModal } = useLogout();
 
   const handleBack = () => {
     // From profile tab landing, always go back to dashboard
     router.navigate('/dashboards/(producer)');
   };
 
+  const [avatar, setAvatar] = useState<string | null>(
+    user?.photo && user.photo.trim() !== '' ? user.photo : null
+  );
+
   const [isLoading, setIsLoading] = useState(false);
-  const [avatar, setAvatar] = useState<string | null>(null);
   const [currentScreen, setCurrentScreen] = useState<Screen>('profile');
+
+  useEffect(() => {
+    if (user?.photo) {
+      setAvatar(user.photo.trim() !== '' ? user.photo : null);
+    }
+  }, [user]);
   const [profileData, setProfileData] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    address: '123 Main St, New York, NY 10001',
+    name: user?.name || 'User',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    address: user?.address || '',
     company: 'Egg Corporate',
   });
+
+  if (userLoading) {
+    return <Loading message="Loading profile..." />;
+  }
 
   const handleEditAvatar = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -50,21 +67,24 @@ export default function ProducerProfile() {
     });
 
     if (!result.canceled) {
-      setAvatar(result.assets[0].uri);
+      try {
+        const imagePath = result.assets[0].uri;
+        setAvatar(imagePath);
+
+        // Upload to backend
+        const updatedUser = await updateUserAvatar(imagePath);
+        Alert.alert("Success", "Avatar updated successfully");
+      } catch (err: any) {
+        Alert.alert("Error", err.message || "Failed to update avatar");
+        setAvatar(user?.photo || null); // Revert to previous avatar
+      }
     }
   };
 
   const handleAction = async (action: string) => {
-    setIsLoading(true);
-
     if (action === "logout") {
-      try {
-        await logout();
-        router.replace("/(auth)/sign-in");
-        return;
-      } finally {
-        setIsLoading(false);
-      }
+      handleLogout();
+      return;
     }
 
     switch (action) {
@@ -147,6 +167,13 @@ export default function ProducerProfile() {
           <Loading message="Loading profile..." fullscreen={false} />
         </View>
       )}
+      
+      <LogoutModal
+        visible={showModal}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        isLoading={isLoggingOut}
+      />
     </SafeAreaView>
   );
 }

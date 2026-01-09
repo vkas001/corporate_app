@@ -7,7 +7,7 @@ export interface User {
     email: string;
     name: string;
     role: UserRole;
-    avatar?: string;
+    photo?: string;  // Backend uses 'photo' not 'avatar'
     phone?: string;
     address?: string;
     createdAt?: string;
@@ -33,15 +33,15 @@ export const updateUserAvatar = async (imagePath: string): Promise<User> => {
     const formData = new FormData();
     
     // Extract filename from path
-    const filename = imagePath.split('/').pop() || 'avatar.jpg';
+    const filename = imagePath.split('/').pop() || 'photo.jpg';
     
-    formData.append('avatar', {
+    formData.append('photo', {
         uri: imagePath,
         type: 'image/jpeg',
         name: filename,
     } as any);
 
-    const res = await api.post("/user/avatar", formData, {
+    const res = await api.post("/user/photo", formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },

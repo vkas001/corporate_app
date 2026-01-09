@@ -5,6 +5,7 @@ import FinanceOverview from "@/components/dashboard/FinanceOverview";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { DASHBOARD_DATA } from "@/data/dashboardData";
 import { useRoleGuard } from "@/hooks/roleGuard";
+import { useUser } from "@/hooks/useUser";
 import { Period } from "@/types/dashboard";
 import { formatFullDate } from "@/utils/dateFormatter";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,13 +20,16 @@ export default function ProducerDashboard() {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const isChecking = useRoleGuard(['Producer']);
+  const { user, loading: userLoading } = useUser();
   const [period, setPeriod] = React.useState<"Today" | "Week" | "Month">("Today");
   const [selectedCategory, setSelectedCategory] = useState('Chicken');
   const [open, setOpen] = useState(false);
 
-  if (isChecking) {
-    return <Loading message ="Checking access..." />;
+  if (isChecking || userLoading) {
+    return <Loading message ="Loading..." />;
   }
+
+  console.log("Producer Dashboard - User data:", user);
 
   const dashboardData = DASHBOARD_DATA[period.toLowerCase() as Period];
 
@@ -60,7 +64,7 @@ export default function ProducerDashboard() {
         <Text className="text-[18px] font-[600] ml-[3px]"
           style={{ color: colors.textPrimary }}
         >
-          {t('dashboard.producerTitle')}</Text>
+           {user?.name ?? t('dashboard.producerTitle')}</Text>
         <Text className="text-[12px]"
           style={{ color: colors.textSecondary }}
         >
