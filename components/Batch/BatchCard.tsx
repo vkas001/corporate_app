@@ -2,6 +2,7 @@ import { useTheme } from "@/theme";
 import { BatchRecord } from "@/types/batch";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
 
 type Props = {
@@ -10,16 +11,17 @@ type Props = {
 
 const BatchCard = ({ batch }: Props) => {
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   const statusConfig = {
     active: {
-      label: "ACTIVE",
+      label: t("batch.status.active"),
       icon: "checkmark-circle" as const,
       color: "#2E7D32",
       bgColor: withOpacity("#2E7D32", 0.12),
     },
     closed: {
-      label: "CLOSED",
+      label: t("batch.status.closed"),
       icon: "close-circle" as const,
       color: "#616161",
       bgColor: withOpacity("#616161", 0.12),

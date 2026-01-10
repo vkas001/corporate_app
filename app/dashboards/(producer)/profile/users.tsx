@@ -1,4 +1,7 @@
+import { defaultUsers } from '@/data/usersData';
+import { useUserManagement } from '@/hooks/useUserManagement';
 import { useTheme } from '@/theme/themeContext';
+import { User } from '@/types/userManagement';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -8,80 +11,10 @@ type Props = {
   onClose: () => void;
 };
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'manager' | 'staff';
-  status: 'active' | 'inactive';
-  joinDate: string;
-  avatar?: string;
-}
-
 export default function UserManagementScreen({ onClose }: Props) {
   const { colors } = useTheme();
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const [users] = useState<User[]>([
-    {
-      id: '1',
-      name: 'John Doe',
-      email: 'john@example.com',
-      role: 'admin',
-      status: 'active',
-      joinDate: 'Jan 2024',
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      email: 'jane@example.com',
-      role: 'manager',
-      status: 'active',
-      joinDate: 'Feb 2024',
-    },
-    {
-      id: '3',
-      name: 'Bob Johnson',
-      email: 'bob@example.com',
-      role: 'staff',
-      status: 'active',
-      joinDate: 'Mar 2024',
-    },
-    {
-      id: '4',
-      name: 'Alice Brown',
-      email: 'alice@example.com',
-      role: 'staff',
-      status: 'inactive',
-      joinDate: 'Apr 2024',
-    },
-  ]);
-
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return colors.primary;
-      case 'manager':
-        return '#8C5E34';
-      case 'staff':
-        return colors.textSecondary;
-      default:
-        return colors.border;
-    }
-  };
-
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'shield-checkmark-outline';
-      case 'manager':
-        return 'briefcase-outline';
-      case 'staff':
-        return 'person-outline';
-      default:
-        return 'person-outline';
-    }
-  };
+  const { searchQuery, setSearchQuery, getRoleColor, getRoleIcon, getRoleDescription } = useUserManagement();
+  const [users] = useState<User[]>(defaultUsers);
 
   const UserCard = ({ user }: { user: User }) => (
     <View
@@ -124,15 +57,15 @@ export default function UserManagementScreen({ onClose }: Props) {
             <View className="flex-row items-center gap-2">
               <View
                 className="flex-row items-center gap-1 px-2 py-1 rounded-full"
-                style={{ backgroundColor: `${getRoleColor(user.role)}15` }}
+                style={{ backgroundColor: colors.accent }}
               >
                 <Ionicons
                   name={getRoleIcon(user.role) as any}
                   size={11}
-                  color={getRoleColor(user.role)}
+                  color={(user.role)}
                 />
                 <Text className="text-xs font-bold capitalize"
-                  style={{ color: getRoleColor(user.role) }}>
+                  style={{ color: colors.background }}>
                   {user.role}
                 </Text>
               </View>
@@ -315,7 +248,7 @@ export default function UserManagementScreen({ onClose }: Props) {
                   Admin
                 </Text>
                 <Text className="text-xs" style={{ color: colors.textSecondary }}>
-                  Full access to all features
+                  {getRoleDescription('admin')}
                 </Text>
               </View>
             </View>
@@ -337,7 +270,7 @@ export default function UserManagementScreen({ onClose }: Props) {
                 </Text>
                 <Text className="text-xs"
                   style={{ color: colors.textSecondary }}>
-                  Can manage staff and reports
+                  {getRoleDescription('manager')}
                 </Text>
               </View>
             </View>
@@ -359,7 +292,7 @@ export default function UserManagementScreen({ onClose }: Props) {
                 </Text>
                 <Text className="text-xs"
                   style={{ color: colors.textSecondary }}>
-                  Limited access to assigned tasks
+                  {getRoleDescription('staff')}
                 </Text>
               </View>
             </View>

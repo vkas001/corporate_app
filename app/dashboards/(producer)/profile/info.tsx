@@ -186,7 +186,7 @@ export default function InfoScreen({ onClose }: Props) {
                         <TouchableOpacity
                             activeOpacity={0.8}
                             className="flex-row items-center gap-3"
-                            onPress={() => router.push("/dashboards/legal/privacy-policy")}
+                            onPress={() => router.push("/dashboards/(producer)/profile/privacy-policy")}
                         >
                             <Ionicons name="document-text-outline" size={16} color={colors.textPrimary} />
                             <Text style={{ color: colors.textPrimary }}>

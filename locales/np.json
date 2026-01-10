@@ -1,10 +1,10 @@
 {
   "home": {
     "title": "प्रत्यक्ष बजार मूल्य",
-    "subtitle": "अण्डा बजारको प्रत्यक्ष दर",
+    "subtitle": "अण्डा बजारको वास्तविक समय दर",
     "continue": "ड्यासबोर्डमा जानुहोस्",
     "categoriesTitle": "बजार श्रेणीहरू",
-    "categoriesSubtitle": "श्रेणी अनुसार मूल्य हेर्नुहोस्"
+    "categoriesSubtitle": "श्रेणी अनुसार मूल्य ब्राउज गर्नुहोस्"
   },
   "dashboard": {
     "producerTitle": "उत्पादक ड्यासबोर्ड",
@@ -22,17 +22,30 @@
     "categories": {
       "chicken": "कुखुरा",
       "eggs": "अण्डा",
-      "feed": "खाद्य",
+      "feed": "दाना",
       "medicine": "औषधि"
     },
     "stats": {
-      "revenue": "राजस्व",
+      "revenue": "आय",
       "orders": "अर्डरहरू",
       "netProfit": "शुद्ध नाफा",
-      "operatingProfit": "सञ्चालन नाफा",
+      "operatingProfit": "परिचालन लाभ",
       "vsLastWeek": "गत हप्तासँग तुलना",
       "aov": "औसत अर्डर मूल्य",
-      "margin": "मर्जिन"
+      "margin": "मार्जिन"
+    }
+  },
+  "batch": {
+    "status": {
+      "active": "सक्रिय",
+      "closed": "बन्द"
+    },
+    "startedOn": "{{date}} मा सुरु",
+    "stats": {
+      "initialBirds": "प्रारम्भिक चराहरू",
+      "currentBirds": "हालका चराहरू",
+      "mortality": "मृत्यु दर",
+      "totalEggs": "कुल अण्डा"
     }
   }
 }

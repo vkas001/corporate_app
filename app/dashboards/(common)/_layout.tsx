@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-export default function ModalLayout() {
+export default function CommonLayout() {
   return (
     <Stack
       screenOptions={{

@@ -1,0 +1,36 @@
+import { User } from '@/types/userManagement';
+
+export const defaultUsers: User[] = [
+  {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    role: 'admin',
+    status: 'active',
+    joinDate: 'Jan 2024',
+  },
+  {
+    id: '2',
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    role: 'manager',
+    status: 'active',
+    joinDate: 'Feb 2024',
+  },
+  {
+    id: '3',
+    name: 'Bob Johnson',
+    email: 'bob@example.com',
+    role: 'staff',
+    status: 'active',
+    joinDate: 'Mar 2024',
+  },
+  {
+    id: '4',
+    name: 'Alice Brown',
+    email: 'alice@example.com',
+    role: 'staff',
+    status: 'inactive',
+    joinDate: 'Apr 2024',
+  },
+];

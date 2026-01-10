@@ -17,6 +17,8 @@ interface CustomInputProps {
   disabled?: boolean;
   returnKeyType?: 'done' | 'go' | 'next' | 'search' | 'send' | 'default';
   blurOnSubmit?: boolean;
+  icon?: keyof typeof Ionicons.glyphMap;
+  editable?: boolean;
 }
 
 const CustomInput = forwardRef<TextInput, CustomInputProps>(({
@@ -33,6 +35,8 @@ const CustomInput = forwardRef<TextInput, CustomInputProps>(({
   disabled = false,
   returnKeyType = 'default',
   blurOnSubmit,
+  icon,
+  editable = true,
 }, ref) => {
   const { colors } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
@@ -69,6 +73,15 @@ const CustomInput = forwardRef<TextInput, CustomInputProps>(({
               : colors.border,
         }}>
 
+        {icon && (
+          <Ionicons
+            name={icon}
+            size={20}
+            color={isFocused ? colors.primary : colors.textSecondary}
+            style={{ marginRight: 8 }}
+          />
+        )}
+
         <TextInput
           ref={inputRef}
           value={value}
@@ -84,7 +97,7 @@ const CustomInput = forwardRef<TextInput, CustomInputProps>(({
           returnKeyType={returnKeyType}
           blurOnSubmit={blurOnSubmit}
           onChangeText={onChangeText}
-          editable={!disabled}
+          editable={!disabled && editable}
           selectionColor={colors.primary}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}

@@ -34,5 +34,19 @@
       "aov": "AOV",
       "margin": "Margin"
     }
+  },
+  
+    "batch": {
+      "status": {
+        "active": "ACTIVE",
+        "closed": "CLOSED"
+      },
+      "startedOn": "Started on {{date}}",
+      "stats": {
+        "initialBirds": "Initial Birds",
+        "currentBirds": "Current Birds",
+        "mortality": "Mortality",
+        "totalEggs": "Total Eggs"
+      }
+    }
   }
-}
