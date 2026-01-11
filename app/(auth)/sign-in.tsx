@@ -81,17 +81,24 @@ const SignIn = () => {
       await saveAuth(token, roles, permissions, user);
       console.log(" Auth saved to storage");
 
-      console.log(" Checking SuperAdmin:", roles.includes("SuperAdmin"));
-      console.log(" Checking Producer:", roles.includes("Producer"));
-      console.log(" Checking Seller:", roles.includes("Seller"));
+      const normalizeRole = (role: string) => role.toLowerCase().replace(/\s+/g, "");
+      const normalizedRoles = (roles ?? []).map(normalizeRole);
 
-      if (roles.includes("Super Admin")) {
+      const isSuperAdmin = normalizedRoles.includes("superadmin");
+      const isProducer = normalizedRoles.includes("producer");
+      const isSeller = normalizedRoles.includes("seller");
+
+      console.log(" Checking SuperAdmin:", isSuperAdmin);
+      console.log(" Checking Producer:", isProducer);
+      console.log(" Checking Seller:", isSeller);
+
+      if (isSuperAdmin) {
         console.log(" Redirecting to SuperAdmin dashboard");
         router.replace("/dashboards/(superAdmin)");
-      } else if (roles.includes("Producer")) {
+      } else if (isProducer) {
         console.log(" Redirecting to Producer dashboard");
         router.replace("/dashboards/(producer)");
-      } else if (roles.includes("Seller")) {
+      } else if (isSeller) {
         console.log(" Redirecting to Seller dashboard");
         router.replace("/dashboards/(seller)");
       } else {

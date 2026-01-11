@@ -1,11 +1,11 @@
 import { useTheme } from "@/theme";
 import { UserRole } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ProfileMenuItem from "./profileMenuItem";
 import { profileMenus } from "../../config/profileMenus";
+import ProfileMenuItem from "./profileMenuItem";
 
 type Props = {
   role: UserRole;
@@ -26,6 +26,8 @@ export default function ProfileScreen({
 }: Props) {
   const { colors } = useTheme();
   const menus = profileMenus[role];
+  const [imageError, setImageError] = useState(false);
+  const hasAvatar = !!avatarUri && avatarUri.trim() !== "" && !imageError;
 
   return (
     <SafeAreaView className="flex-1 px-4"
@@ -33,10 +35,11 @@ export default function ProfileScreen({
       <View className="w-full max-w-md">
         <View className="items-center">
           <View className="relative mb-4">
-            {avatarUri ? (
+            {hasAvatar ? (
               <Image
                 source={{ uri: avatarUri }}
                 className="w-24 h-24 rounded-full"
+                onError={() => setImageError(true)}
               />
             ) : (
               <Ionicons name="person-circle" size={100} color={colors.primary} />

@@ -42,7 +42,7 @@ const getStatusIcon = (status: string) => {
     case 'paid':
       return 'checkmark-circle';
     case 'pending':
-      return 'clock-outline';
+      return 'time-outline';
     case 'overdue':
       return 'alert-circle';
     default:

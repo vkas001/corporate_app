@@ -29,23 +29,11 @@ export const updateUserProfile = async (updates: Partial<User>): Promise<User> =
     return res.data;
 };
 
-export const updateUserAvatar = async (imagePath: string): Promise<User> => {
-    const formData = new FormData();
-    
-    // Extract filename from path
-    const filename = imagePath.split('/').pop() || 'photo.jpg';
-    
-    formData.append('photo', {
-        uri: imagePath,
-        type: 'image/jpeg',
-        name: filename,
-    } as any);
-
-    const res = await api.post("/user/photo", formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
+export const updateUserAvatar = async (base64Image: string) => {
+    const res = await api.post('/user/photo', {
+        photo: base64Image,
     });
+
     return res.data;
 };
 

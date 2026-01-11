@@ -10,7 +10,7 @@ import { useUser } from "@/hooks/useUser";
 import { updateUserAvatar } from "@/services/userService";
 import { useTheme } from '@/theme/themeContext';
 import * as ImagePicker from 'expo-image-picker';
-import { router } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Alert, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -32,6 +32,8 @@ export default function ProducerProfile() {
     user?.photo && user.photo.trim() !== '' ? user.photo : null
   );
 
+  const navigation = useNavigation<any>();
+
   const [isLoading, setIsLoading] = useState(false);
   const [currentScreen, setCurrentScreen] = useState<Screen>('profile');
 
@@ -40,6 +42,27 @@ export default function ProducerProfile() {
       setAvatar(user.photo.trim() !== '' ? user.photo : null);
     }
   }, [user]);
+
+  useEffect(() => {
+    // Reset profile when tab icon is pressed (handles both Stack screens and conditional renders)
+    const unsubscribe = navigation.addListener('tabPress' as any, (e: any) => {
+      // Only prevent default if we can go back (to allow Stack screens to reset)
+      if (navigation.canGoBack()) {
+        e.preventDefault();
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'index' }],
+        });
+      }
+      // Always reset the conditional render state when on profile tab
+      if (currentScreen !== 'profile') {
+        e.preventDefault();
+        setCurrentScreen('profile');
+      }
+    });
+    return unsubscribe;
+  }, [navigation, currentScreen]);
+  
   const [profileData, setProfileData] = useState({
     name: user?.name || 'User',
     email: user?.email || '',
@@ -64,19 +87,29 @@ export default function ProducerProfile() {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
+      base64: true,
     });
 
     if (!result.canceled) {
       try {
-        const imagePath = result.assets[0].uri;
-        setAvatar(imagePath);
+        console.log("Selected image:", result);
+        const asset = result.assets[0];
 
-        // Upload to backend
-        const updatedUser = await updateUserAvatar(imagePath);
-        Alert.alert("Success", "Avatar updated successfully");
-      } catch (err: any) {
-        Alert.alert("Error", err.message || "Failed to update avatar");
-        setAvatar(user?.photo || null); // Revert to previous avatar
+        if (!asset.base64) {
+          throw new Error("Based64 conversion failed");
+      }
+
+    const base64Image = `data:image/jpeg;base64,${asset.base64}`;
+    setAvatar(asset.uri);
+
+    await updateUserAvatar(base64Image);
+
+    Alert.alert("Success", "Profile picture updated successfully");
+    console.log("Profile picture updated successfully");
+    } catch (err: any) {
+      console.log("Error updating avatar:", err);
+      Alert.alert("Error", err.message || "Failed to update profile picture");
+      setAvatar(user?.photo || null);
       }
     }
   };
