@@ -7,11 +7,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Pressable,
-    ScrollView,
-    Text,
-    View
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  View
 } from "react-native";
 
 const SignIn = () => {
@@ -74,17 +74,27 @@ const SignIn = () => {
       console.log(" Login successful");
       console.log(" User:", user);
       console.log(" Roles:", roles);
+      console.log(" Roles type:", typeof roles, "Is array:", Array.isArray(roles));
+      console.log(" Roles JSON:", JSON.stringify(roles));
+      console.log(" First role if exists:", roles?.[0]);
 
       await saveAuth(token, roles, permissions, user);
       console.log(" Auth saved to storage");
 
-      if (roles.includes("Producer")) {
+      console.log(" Checking SuperAdmin:", roles.includes("SuperAdmin"));
+      console.log(" Checking Producer:", roles.includes("Producer"));
+      console.log(" Checking Seller:", roles.includes("Seller"));
+
+      if (roles.includes("Super Admin")) {
+        console.log(" Redirecting to SuperAdmin dashboard");
+        router.replace("/dashboards/(superAdmin)");
+      } else if (roles.includes("Producer")) {
         console.log(" Redirecting to Producer dashboard");
         router.replace("/dashboards/(producer)");
       } else if (roles.includes("Seller")) {
         console.log(" Redirecting to Seller dashboard");
         router.replace("/dashboards/(seller)");
-      }else {
+      } else {
         console.log(" Redirecting to Auth");
         router.replace("/(auth)/sign-in");
       }

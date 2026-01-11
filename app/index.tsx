@@ -67,7 +67,7 @@ export default function LandingPage() {
     } else if (roleLower === "seller") {
       router.replace("/dashboards/(seller)");
     } else if (roleLower === "super admin") {
-      router.replace("/");
+      router.replace("/dashboards/(superAdmin)");
     } else {
       router.replace("/(auth)/sign-in");
     }
