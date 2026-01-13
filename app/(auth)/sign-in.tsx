@@ -81,24 +81,22 @@ const SignIn = () => {
       await saveAuth(token, roles, permissions, user);
       console.log(" Auth saved to storage");
 
-      const normalizeRole = (role: string) => role.toLowerCase().replace(/\s+/g, "");
-      const normalizedRoles = (roles ?? []).map(normalizeRole);
+      const normalizeRole = (role: string) => role.trim().toLowerCase().replace(/\s+/g, " ");
+      const normalizedRoles = Array.isArray(roles) ? roles.map(normalizeRole) : [];
+      const hasRole = (roleName: string) => normalizedRoles.includes(normalizeRole(roleName));
 
-      const isSuperAdmin = normalizedRoles.includes("superadmin");
-      const isProducer = normalizedRoles.includes("producer");
-      const isSeller = normalizedRoles.includes("seller");
+      console.log(" Checking Super Admin:", hasRole("Super Admin"));
+      console.log(" Checking Producer:", hasRole("Producer"));
+      console.log(" Checking Seller:", hasRole("Seller"));
 
-      console.log(" Checking SuperAdmin:", isSuperAdmin);
-      console.log(" Checking Producer:", isProducer);
-      console.log(" Checking Seller:", isSeller);
-
-      if (isSuperAdmin) {
+      if (hasRole("Super Admin")) {
         console.log(" Redirecting to SuperAdmin dashboard");
         router.replace("/dashboards/(superAdmin)");
-      } else if (isProducer) {
+      } else if (hasRole("Producer")) {
         console.log(" Redirecting to Producer dashboard");
         router.replace("/dashboards/(producer)");
-      } else if (isSeller) {
+      } else if (hasRole("Seller")) {
+
         console.log(" Redirecting to Seller dashboard");
         router.replace("/dashboards/(seller)");
       } else {
