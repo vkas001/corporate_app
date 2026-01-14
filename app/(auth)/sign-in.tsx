@@ -2,7 +2,7 @@ import Loading from "@/components/common/loading";
 import CustomButton from "@/components/ui/CustomButton";
 import CustomInput from "@/components/ui/CustomInput";
 import { useTheme } from "@/theme/themeContext";
-import { saveAuth } from "@/utils/auth";
+import { normalizeRole, saveAuth, seedDevAuth } from "@/utils/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -81,7 +81,6 @@ const SignIn = () => {
       await saveAuth(token, roles, permissions, user);
       console.log(" Auth saved to storage");
 
-      const normalizeRole = (role: string) => role.trim().toLowerCase().replace(/\s+/g, " ");
       const normalizedRoles = Array.isArray(roles) ? roles.map(normalizeRole) : [];
       const hasRole = (roleName: string) => normalizedRoles.includes(normalizeRole(roleName));
 
@@ -210,6 +209,42 @@ const SignIn = () => {
             </View>
 
             <CustomButton title="Sign In" isLoading={isSubmitting} onPress={submit} />
+
+            {__DEV__ && (
+              <View className="mt-3">
+                <Pressable
+                  onPress={async () => {
+                    try {
+                      setIsSubmitting(true);
+                      await seedDevAuth({
+                        roles: ["Super Admin"],
+                        user: {
+                          id: 1,
+                          email: "superadmin@eggadmin.com",
+                          name: null,
+                          roles: ["Super Admin"],
+                          permissions: [],
+                          status: false,
+                          photo: null,
+                          phone: null,
+                          address: null,
+                        },
+                      });
+                      router.replace("/dashboards/(superAdmin)");
+                    } finally {
+                      setIsSubmitting(false);
+                    }
+                  }}
+                >
+                  <Text
+                    className="text-xs font-semibold text-center"
+                    style={{ color: colors.primary }}
+                  >
+                    Dev: Continue as Super Admin
+                  </Text>
+                </Pressable>
+              </View>
+            )}
           </View>
 
           <View className="items-center mt-3">

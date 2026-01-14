@@ -14,5 +14,5 @@ const superAdminTabs: TabConfig[] = [
 
 export default function TabLayout() {
 
-  return <CustomTabLayout tabs={superAdminTabs} hiddenRoutes={[]} resetOnTabPress />;
+  return <CustomTabLayout tabs={superAdminTabs} hiddenRoutes={['add-producer', 'add-seller']} resetOnTabPress />;
 }

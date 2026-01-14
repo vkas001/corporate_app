@@ -1,4 +1,4 @@
-import { getRoles } from "@/utils/auth";
+import { getRoles, normalizeRole } from "@/utils/auth";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 
@@ -11,7 +11,6 @@ export const useRoleGuard = (allowedRoles: string[]) => {
       const roles = await getRoles();
       console.log("🔑 Role guard: user roles", roles);
 
-      const normalizeRole = (role: string) => role.toLowerCase().replace(/\s+/g, "");
       const allowedNormalized = (allowedRoles ?? []).map(normalizeRole);
       const rolesNormalized = (roles ?? []).map(normalizeRole);
 

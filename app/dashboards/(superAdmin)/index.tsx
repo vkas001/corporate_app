@@ -1,13 +1,15 @@
 import { defaultUsers } from '@/data/usersData';
+import Loading from '@/components/common/loading';
+import CustomButton from '@/components/ui/CustomButton';
 import { useLogout } from '@/hooks/useLogout';
+import { useRoleGuard } from '@/hooks/roleGuard';
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { useTheme } from '@/theme/themeContext';
 import { User } from '@/types/userManagement';
-import { getAuth } from '@/utils/auth';
 import { formatFullDate } from '@/utils/dateFormatter';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,20 +17,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function SuperAdminDashboard() {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const isChecking = useRoleGuard(['Super Admin']);
   const { handleLogout, showModal, handleConfirm, handleCancel, isLoggingOut, LogoutModal } = useLogout();
   const { searchQuery, setSearchQuery, getRoleColor, getRoleIcon, getRoleDescription } = useUserManagement();
   const [users, setUsers] = useState<User[]>(defaultUsers);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const isSuperAdmin = true;
 
-  useEffect(() => {
-    const init = async () => {
-      const auth = await getAuth();
-      const roles: string[] = auth?.roles ?? [];
-      const normalized = roles.map(r => r.toLowerCase());
-      setIsSuperAdmin(normalized.includes('super admin'));
-    };
-    init();
-  }, []);
+  if (isChecking) {
+    return <Loading message="Loading..." />;
+  }
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -197,6 +194,20 @@ export default function SuperAdminDashboard() {
       <ScrollView className="px-4 mb-8"
         showsVerticalScrollIndicator={false}>
         <View className="mb-4">
+          <CustomButton
+            title="Add Producer"
+            onPress={() => router.push('/dashboards/(superAdmin)/add-producer')}
+          />
+        </View>
+
+        <View className="mb-4">
+          <CustomButton
+            title="Add Seller"
+            onPress={() => router.push('/dashboards/(superAdmin)/add-seller')}
+          />
+        </View>
+
+        <View className="mb-4">
           <View
             className="flex-row items-center px-4 py-3 rounded-2xl border"
             style={{ backgroundColor: colors.surface, borderColor: colors.border }}
@@ -219,7 +230,7 @@ export default function SuperAdminDashboard() {
         </View>
 
         {/* Summary Stats */}
-        <View className="flex-row gap-3 mb-4">
+        <View className="flex-row gap-3 mb-4"> 
           <View
             className="flex-1 rounded-2xl p-4 border"
             style={{ backgroundColor: colors.surface, borderColor: colors.border }}

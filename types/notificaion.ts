@@ -1,4 +1,4 @@
-export type UserRole = "producer" | "seller" | "all";
+export type UserRole = "producer" | "seller" | "superAdmin" | "all";
 
 export type NotificationType =
   | "payment"
