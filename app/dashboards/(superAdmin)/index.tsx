@@ -193,19 +193,6 @@ export default function SuperAdminDashboard() {
 
       <ScrollView className="px-4 mb-8"
         showsVerticalScrollIndicator={false}>
-        <View className="mb-4">
-          <CustomButton
-            title="Add Producer"
-            onPress={() => router.push('/dashboards/(superAdmin)/add-producer')}
-          />
-        </View>
-
-        <View className="mb-4">
-          <CustomButton
-            title="Add Seller"
-            onPress={() => router.push('/dashboards/(superAdmin)/add-seller')}
-          />
-        </View>
 
         <View className="mb-4">
           <View
@@ -297,7 +284,7 @@ export default function SuperAdminDashboard() {
           className="flex-row items-center justify-center gap-2 py-3.5 rounded-2xl mb-6"
           style={{ backgroundColor: colors.primary }}
           activeOpacity={0.8}
-          onPress={handleInvite}
+          onPress={() => router.push('/dashboards/(superAdmin)/add-user')}
         >
           <Ionicons name="add-circle" size={18} color={colors.surface} />
           <Text className="text-base font-bold"
