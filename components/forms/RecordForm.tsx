@@ -2,10 +2,12 @@ import { useTheme } from '@/theme';
 import { formatFullDate } from '@/utils/dateFormatter';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+    Keyboard,
     KeyboardAvoidingView,
     Modal,
     Platform,
     Pressable,
+    ScrollView,
     Text,
     TouchableOpacity,
     View,
@@ -47,6 +49,7 @@ export default function RecordFormModal({
     const [quantity, setQuantity] = useState('');
     const [quantityError, setQuantityError] = useState<string | undefined>();
     const [isSaving, setIsSaving] = useState(false);
+    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
     const [date] = useState<Date>(new Date());
 
     const unitsForCategory = useMemo(() => unitMap[category] ?? [], [unitMap, category]);
@@ -58,6 +61,16 @@ export default function RecordFormModal({
     useEffect(() => {
         setUnit((unitMap[category] && unitMap[category][0]) || '');
     }, [category, unitMap]);
+
+    useEffect(() => {
+        const showSub = Keyboard.addListener('keyboardDidShow', () => setIsKeyboardVisible(true));
+        const hideSub = Keyboard.addListener('keyboardDidHide', () => setIsKeyboardVisible(false));
+
+        return () => {
+            showSub.remove();
+            hideSub.remove();
+        };
+    }, []);
 
     const renderSegmented = (
         options: string[],
@@ -130,18 +143,26 @@ export default function RecordFormModal({
 
     return (
         <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-            <View className="flex-1 justify-end">
-                {/* Dimmed backdrop that closes on tap */}
-                <Pressable
-                    onPress={isSaving ? undefined : onClose}
-                    className="flex-1"
-                    style={{ backgroundColor: '#00000066' }}
-                />
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 12 : 0}
+            >
+                <View className="flex-1 justify-end">
+                    {/* Dimmed backdrop that closes on tap */}
+                    <Pressable
+                        onPress={() => {
+                            if (isSaving) return;
+                            if (isKeyboardVisible) {
+                                Keyboard.dismiss();
+                                return;
+                            }
+                            onClose();
+                        }}
+                        className="flex-1"
+                        style={{ backgroundColor: '#00000066' }}
+                    />
 
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    keyboardVerticalOffset={Platform.OS === 'ios' ? 12 : 0}
-                >
                     {/* Bottom sheet */}
                     <View
                         className="rounded-t-3xl px-4 pb-4"
@@ -149,84 +170,91 @@ export default function RecordFormModal({
                             backgroundColor: colors.background,
                             paddingTop: 6,
                             paddingBottom: Math.max(12, insets.bottom || 0) + 8,
+                            maxHeight: '85%',
                         }}
                     >
-                        {/* Handle + Header */}
-                        <View className="items-center">
-                            <View
-                                className="w-10 h-1.5 rounded-full my-2"
-                                style={{ backgroundColor: colors.border }}
-                            />
-                        </View>
-                        {/* Date */}
-                        <View className="items-center gap-2 mt-3 mb-4">
-                            <Text className="font-semibold" style={{ color: colors.textSecondary }}>
-                                {formatFullDate(date)}
-                            </Text>
-                        </View>
-
-                        <View className="flex-row items-center justify-between mb-2">
-                            <Text
-                                className="text-lg font-semibold"
-                                style={{ color: colors.textSecondary }}
-                            >
-                                {title}
-                            </Text>
-
-                            <TouchableOpacity
-                                onPress={onClose}
-                                disabled={isSaving}
-                                className="px-3 py-1 -mr-2"
-                                style={{ opacity: isSaving ? 0.6 : 1 }}
-                            >
-                                <Text className="text-sm font-semibold" style={{ color: colors.textSecondary }}>
-                                    Close
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        {/* Category */}
-                        <Text className="mb-2 text-sm" style={{ color: colors.textSecondary }}>
-                            Category
-                        </Text>
-                        {renderSegmented(categories, category, handleCategoryChange)}
-
-                        {/* Quantity */}
-                        <CustomInput
-                            placeholder="Enter quantity"
-                            value={quantity}
-                            onChangeText={(text) => {
-                                setQuantity(text);
-                                if (quantityError) setQuantityError(undefined);
-                            }}
-                            label="Quantity"
-                            keyboardType='numeric'
-                            error={quantityError}
-                        />
-
-                        {/* Actions */}
-                        <View className="flex-row justify-end mt-10 gap-3">
-                            <TouchableOpacity
-                                onPress={onClose}
-                                disabled={isSaving}
-                                className="px-3 py-2 rounded-xl"
-                                style={{ opacity: isSaving ? 0.6 : 1 }}
-                            >
+                        <ScrollView
+                            keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator={false}
+                            contentContainerStyle={{ paddingBottom: 16 }}
+                        >
+                            {/* Handle + Header */}
+                            <View className="items-center">
+                                <View
+                                    className="w-10 h-1.5 rounded-full my-2"
+                                    style={{ backgroundColor: colors.border }}
+                                />
+                            </View>
+                            {/* Date */}
+                            <View className="items-center gap-2 mt-3 mb-4">
                                 <Text className="font-semibold" style={{ color: colors.textSecondary }}>
-                                    Cancel
+                                    {formatFullDate(date)}
                                 </Text>
-                            </TouchableOpacity>
+                            </View>
 
-                            <CustomButton
-                                title={isSaving ? 'Saving...' : 'Save'}
-                                onPress={handleSave}
-                                isLoading={isSaving}
-                                size="small"
+                            <View className="flex-row items-center justify-between mb-2">
+                                <Text
+                                    className="text-lg font-semibold"
+                                    style={{ color: colors.textSecondary }}
+                                >
+                                    {title}
+                                </Text>
+
+                                <TouchableOpacity
+                                    onPress={onClose}
+                                    disabled={isSaving}
+                                    className="px-3 py-1 -mr-2"
+                                    style={{ opacity: isSaving ? 0.6 : 1 }}
+                                >
+                                    <Text className="text-sm font-semibold" style={{ color: colors.textSecondary }}>
+                                        Close
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            {/* Category */}
+                            <Text className="mb-2 text-sm" style={{ color: colors.textSecondary }}>
+                                Category
+                            </Text>
+                            {renderSegmented(categories, category, handleCategoryChange)}
+
+                            {/* Quantity */}
+                            <CustomInput
+                                placeholder="Enter quantity"
+                                value={quantity}
+                                onChangeText={(text) => {
+                                    setQuantity(text);
+                                    if (quantityError) setQuantityError(undefined);
+                                }}
+                                label="Quantity"
+                                keyboardType="numeric"
+                                error={quantityError}
                             />
-                        </View>
+
+                            {/* Actions */}
+                            <View className="flex-row justify-end mt-4 gap-3">
+                                <TouchableOpacity
+                                    onPress={onClose}
+                                    disabled={isSaving}
+                                    className="px-3 py-2 rounded-xl"
+                                    style={{ opacity: isSaving ? 0.6 : 1 }}
+                                >
+                                    <Text className="font-semibold" style={{ color: colors.textSecondary }}>
+                                        Cancel
+                                    </Text>
+                                </TouchableOpacity>
+
+                                <CustomButton
+                                    title={isSaving ? 'Saving...' : 'Save'}
+                                    onPress={handleSave}
+                                    isLoading={isSaving}
+                                    size="small"
+                                />
+                            </View>
+                        </ScrollView>
                     </View>
-                </KeyboardAvoidingView>
-            </View>
+                </View>
+            </KeyboardAvoidingView>
         </Modal>
     );
 }
