@@ -3,7 +3,9 @@ import axios from "axios";
 import { router } from "expo-router";
 
 // Read Expo public env directly (do not wrap in quotes)
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL as string | undefined;
+const API_BASE_URL =
+  (process.env.EXPO_PUBLIC_API_BASE_URL as string | undefined) ??
+  "https://eggadmin.aanshtech.com.np/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -11,12 +13,11 @@ const api = axios.create({
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
+    "X-Requested-With": "XMLHttpRequest",
   },
 });
 
-/**
- * Attach JWT token to every request
- */
+// Attach JWT token to every request
 api.interceptors.request.use(
   async (config) => {
     const auth = await getAuth();
@@ -30,9 +31,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-/**
- * Global response & error handler 
- */
+// Global response & error handler
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -60,13 +59,17 @@ api.interceptors.response.use(
     // Laravel validation error
     if (status === 422 && data?.errors) {
       const firstError = Object.values(data.errors)[0] as string[];
-      return Promise.reject({ message: firstError[0] });
+      return Promise.reject({ message: firstError[0], status, data });
     }
 
     // Default error
-    return Promise.reject({
-      message: data?.message || "Something went wrong",
-    });
+    const message =
+      data?.message ||
+      (status >= 500
+        ? `Server error (${status}). Please try again.`
+        : `Request failed (${status}).`);
+
+    return Promise.reject({ message, status, data });
   }
 );
 

@@ -1,20 +1,20 @@
+import type { CreateProducerInput } from "@/components/forms/ProducerForm";
+import type { CreateSellerInput } from "@/components/forms/SellerForm";
 import api from "@/services/api";
 import type { UserRole } from "@/types/user";
 import { getAuth, type AuthUser } from "@/utils/auth";
-import type { CreateProducerInput } from "@/components/forms/ProducerForm";
-import type { CreateSellerInput } from "@/components/forms/SellerForm";
 
 export interface User {
     id: number | string;
     email: string;
     name: string | null;
-    // Derived single role used in UI menus
+
     role: UserRole;
-    // Backend returns roles array
+
     roles?: string[];
     permissions?: string[];
     status?: boolean;
-    photo?: string | null;  // Backend uses 'photo' not 'avatar'
+    photo?: string | null; 
     phone?: string | null;
     address?: string | null;
     createdAt?: string;
@@ -63,11 +63,61 @@ type CreateUserPayload = {
     phone?: string;
     address?: string;
     roles: string[];
+    permissions?: string[];
+};
+
+type CreateUserRequestBody = {
+    name: string;
+    email: string;
+    password: string;
+    phone?: string;
+    address?: string;
+    roles?: string[];
+    permissions?: string[];
+
+    password_confirmation?: string;
+
+    role?: string;
 };
 
 export const createUser = async (payload: CreateUserPayload): Promise<User> => {
-    const res = await api.post("/users", payload);
-    return res.data;
+    const roleName = Array.isArray(payload.roles) ? payload.roles[0] : undefined;
+    const roleNameLower = roleName ? roleName.toLowerCase() : undefined;
+
+    const baseBody: CreateUserRequestBody = {
+        name: payload.name,
+        email: payload.email,
+        password: payload.password,
+        phone: payload.phone,
+        address: payload.address,
+        roles: payload.roles,
+        permissions: payload.permissions,
+        password_confirmation: payload.password,
+    };
+
+    try {
+        const res = await api.post("/users", baseBody);
+        return res.data;
+    } catch (err: any) {
+    
+        if (err?.status === 500 && roleName) {
+ 
+            const retryBody: CreateUserRequestBody = {
+                ...baseBody,
+                roles: [roleNameLower ?? roleName],
+            };
+
+            try {
+                const res = await api.post("/users", retryBody);
+                return res.data;
+            } catch {
+             
+                throw err;
+            }
+        }
+
+        throw err;
+    }
 };
 
 export const createProducerUser = async (input: CreateProducerInput): Promise<User> => {
@@ -78,6 +128,7 @@ export const createProducerUser = async (input: CreateProducerInput): Promise<Us
         phone: input.phone,
         address: input.address,
         roles: ["Producer"],
+        permissions: input.permissions,
     });
 };
 
@@ -89,5 +140,6 @@ export const createSellerUser = async (input: CreateSellerInput): Promise<User> 
         phone: input.phone,
         address: input.address,
         roles: ["Seller"],
+        permissions: input.permissions,
     });
 };

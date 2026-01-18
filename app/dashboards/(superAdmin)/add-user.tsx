@@ -124,7 +124,15 @@ export default function AddUserScreen() {
                   Alert.alert("Success", "Seller created successfully");
                   router.replace("/dashboards/(superAdmin)");
                 } catch (err: any) {
-                  Alert.alert("Failed", err?.message || "Could not create seller");
+                  const statusSuffix = __DEV__ && err?.status ? ` (HTTP ${err.status})` : "";
+                  const debugSuffix =
+                    __DEV__ && err?.data
+                      ? `\n\nDebug: ${typeof err.data === "string" ? err.data.slice(0, 200) : JSON.stringify(err.data).slice(0, 200)}`
+                      : "";
+                  Alert.alert(
+                    "Failed",
+                    `${err?.message || "Could not create seller"}${statusSuffix}${debugSuffix}`
+                  );
                 } finally {
                   setIsSubmitting(false);
                 }

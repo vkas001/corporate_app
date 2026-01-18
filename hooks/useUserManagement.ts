@@ -6,12 +6,12 @@ export const useUserManagement = () => {
 
   const getRoleColor = (role: string, colors: any) => {
     switch (role) {
-      case 'admin':
+      case 'superAdmin':
         return colors.primary;
-      case 'manager':
-        return '#8C5E34';
-      case 'staff':
-        return colors.textSecondary;
+      case 'producer':
+        return '#2F855A';
+      case 'seller':
+        return '#2B6CB0';
       default:
         return colors.border;
     }
@@ -19,12 +19,12 @@ export const useUserManagement = () => {
 
   const getRoleIcon  = (role: string) => {
     switch (role) {
-      case 'admin':
+      case 'superAdmin':
         return 'shield-checkmark-outline';
-      case 'manager':
-        return 'briefcase-outline';
-      case 'staff':
-        return 'person-outline';
+      case 'producer':
+        return 'leaf-outline';
+      case 'seller':
+        return 'storefront-outline';
       default:
         return 'person-outline';
     }
@@ -32,12 +32,12 @@ export const useUserManagement = () => {
 
   const getRoleDescription = (role: UserRole): string => {
     switch (role) {
-      case 'admin':
+      case 'superAdmin':
         return 'Full access to all features';
-      case 'manager':
-        return 'Can manage staff and reports';
-      case 'staff':
-        return 'Limited access to assigned tasks';
+      case 'producer':
+        return 'Manage production and related records';
+      case 'seller':
+        return 'Manage sales and related records';
       default:
         return '';
     }

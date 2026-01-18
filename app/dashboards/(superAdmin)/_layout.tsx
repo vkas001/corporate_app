@@ -17,7 +17,7 @@ export default function TabLayout() {
   return (
     <CustomTabLayout
       tabs={superAdminTabs}
-      hiddenRoutes={['add-user']}
+      hiddenRoutes={['add-user', 'assign-role']}
       resetOnTabPress
     />
   );

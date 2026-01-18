@@ -1,15 +1,15 @@
-import { defaultUsers } from '@/data/usersData';
 import Loading from '@/components/common/loading';
-import CustomButton from '@/components/ui/CustomButton';
-import { useLogout } from '@/hooks/useLogout';
+import { defaultUsers } from '@/data/usersData';
 import { useRoleGuard } from '@/hooks/roleGuard';
+import { useLogout } from '@/hooks/useLogout';
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { useTheme } from '@/theme/themeContext';
 import { User } from '@/types/userManagement';
 import { formatFullDate } from '@/utils/dateFormatter';
+import { getUserRoleOverrides } from '@/utils/userRoleOverrides';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,8 +20,17 @@ export default function SuperAdminDashboard() {
   const isChecking = useRoleGuard(['Super Admin']);
   const { handleLogout, showModal, handleConfirm, handleCancel, isLoggingOut, LogoutModal } = useLogout();
   const { searchQuery, setSearchQuery, getRoleColor, getRoleIcon, getRoleDescription } = useUserManagement();
-  const [users, setUsers] = useState<User[]>(defaultUsers);
+  const [users, setUsers] = useState<User[]>([]);
   const isSuperAdmin = true;
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      const overrides = await getUserRoleOverrides();
+      setUsers(defaultUsers.map((u) => (overrides[u.id] ? { ...u, role: overrides[u.id] } : u)));
+    };
+
+    loadUsers();
+  }, []);
 
   if (isChecking) {
     return <Loading message="Loading..." />;
@@ -47,6 +56,8 @@ export default function SuperAdminDashboard() {
       Alert.alert('Unauthorized', 'Only Super Admin can edit users');
       return;
     }
+
+    router.push(`/dashboards/(superAdmin)/assign-role?userId=${id}`);
   };
 
   const handleDelete = (id: string) => {
@@ -69,6 +80,7 @@ export default function SuperAdminDashboard() {
   });
 
   const UserCard = ({ user }: { user: User }) => (
+    
     <View
       className="rounded-2xl p-4 mb-3 border"
       style={{
@@ -109,16 +121,18 @@ export default function SuperAdminDashboard() {
             <View className="flex-row items-center gap-2">
               <View
                 className="flex-row items-center gap-1 px-2 py-1 rounded-full"
-                style={{ backgroundColor: colors.accent }}
+                style={{ backgroundColor: `${getRoleColor(user.role, colors)}15` }}
               >
                 <Ionicons
                   name={getRoleIcon(user.role) as any}
                   size={11}
-                  color={(user.role)}
+                  color={getRoleColor(user.role, colors)}
                 />
                 <Text className="text-xs font-bold capitalize"
-                  style={{ color: colors.background }}>
-                  {user.role}
+                  style={{ color: getRoleColor(user.role, colors) }}>
+                  {user.role === 'superAdmin'
+                    ? 'Super Admin'
+                    : user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                 </Text>
               </View>
               <Text className="text-xs"
@@ -134,6 +148,7 @@ export default function SuperAdminDashboard() {
             className="w-9 h-9 rounded-xl items-center justify-center"
             style={{ backgroundColor: colors.background }}
             activeOpacity={0.7}
+            onPress={() => handleEdit(user.id)}
           >
             <Ionicons name="create-outline" size={18} color={colors.primary} />
           </TouchableOpacity>
@@ -324,10 +339,10 @@ export default function SuperAdminDashboard() {
               <View className="flex-1">
                 <Text className="text-sm font-bold mb-0.5"
                   style={{ color: colors.textPrimary }}>
-                  Admin
+                  Super Admin
                 </Text>
                 <Text className="text-xs" style={{ color: colors.textSecondary }}>
-                  {getRoleDescription('admin')}
+                  {getRoleDescription('superAdmin')}
                 </Text>
               </View>
             </View>
@@ -338,18 +353,18 @@ export default function SuperAdminDashboard() {
             <View className="flex-row items-center mb-4">
               <View
                 className="w-10 h-10 rounded-xl items-center justify-center mr-3"
-                style={{ backgroundColor: '#8C5E3415' }}
+                style={{ backgroundColor: '#2F855A15' }}
               >
-                <Ionicons name="briefcase-outline" size={20} color="#8C5E34" />
+                <Ionicons name="leaf-outline" size={20} color="#2F855A" />
               </View>
               <View className="flex-1">
                 <Text className="text-sm font-bold mb-0.5"
                   style={{ color: colors.textPrimary }}>
-                  Manager
+                  Producer
                 </Text>
                 <Text className="text-xs"
                   style={{ color: colors.textSecondary }}>
-                  {getRoleDescription('manager')}
+                  {getRoleDescription('producer')}
                 </Text>
               </View>
             </View>
@@ -360,18 +375,18 @@ export default function SuperAdminDashboard() {
             <View className="flex-row items-center">
               <View
                 className="w-10 h-10 rounded-xl items-center justify-center mr-3"
-                style={{ backgroundColor: `${colors.textSecondary}15` }}
+                style={{ backgroundColor: '#2B6CB015' }}
               >
-                <Ionicons name="person-outline" size={20} color={colors.textSecondary} />
+                <Ionicons name="storefront-outline" size={20} color="#2B6CB0" />
               </View>
               <View className="flex-1">
                 <Text className="text-sm font-bold mb-0.5"
                   style={{ color: colors.textPrimary }}>
-                  Staff
+                  Seller
                 </Text>
                 <Text className="text-xs"
                   style={{ color: colors.textSecondary }}>
-                  {getRoleDescription('staff')}
+                  {getRoleDescription('seller')}
                 </Text>
               </View>
             </View>
