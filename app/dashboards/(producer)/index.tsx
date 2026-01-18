@@ -73,7 +73,7 @@ export default function ProducerDashboard() {
 
       <TouchableOpacity
         className="w-[40px] h-[40px] rounded-[20px] items-center justify-center"
-        onPress={() => router.push('/dashboards/notification')}
+        onPress={() => router.navigate('/dashboards/notification')}
 
       >
         <Ionicons

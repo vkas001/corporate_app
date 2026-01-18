@@ -1,8 +1,10 @@
 import MarginByDayChart from "@/components/charts/MarginByDayChart";
+import Loading from "@/components/common/loading";
 import DashboardOverview from "@/components/dashboard/DashboardOverview";
 import FinanceOverview from "@/components/dashboard/FinanceOverview";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { DASHBOARD_DATA } from "@/data/dashboardData";
+import { useRoleGuard } from "@/hooks/roleGuard";
 import { Period } from "@/types/dashboard";
 import { formatFullDate } from "@/utils/dateFormatter";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,8 +14,6 @@ import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../../theme";
-import Loading from "@/components/common/loading";
-import { useRoleGuard } from "@/hooks/roleGuard";
 
 export default function SellerDashboard() {
   const { colors } = useTheme();
@@ -70,7 +70,7 @@ export default function SellerDashboard() {
 
       <TouchableOpacity
         className="w-[40px] h-[40px] rounded-[20px] items-center justify-center"
-        onPress={() => router.push('/dashboards/notification')}
+        onPress={() => router.navigate('/dashboards/notification')}
       >
         <Ionicons
           name="notifications-outline"

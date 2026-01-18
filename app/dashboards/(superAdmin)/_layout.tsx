@@ -1,24 +1,11 @@
-import { CustomTabLayout, TabConfig } from '@/components/navigation/CustomTabLayout';
-import { Ionicons } from '@expo/vector-icons';
+import { Stack } from 'expo-router';
 
-const superAdminTabs: TabConfig[] = [
-  {
-    name: 'index',
-    label: 'Home',
-    icon: Ionicons,
-    iconName: 'home-outline',
-    iconNameFocused: 'home',
-  },
-  
-];
-
-export default function TabLayout() {
-
+export default function SuperAdminLayout() {
   return (
-    <CustomTabLayout
-      tabs={superAdminTabs}
-      hiddenRoutes={['add-user', 'assign-role']}
-      resetOnTabPress
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}
     />
   );
 }

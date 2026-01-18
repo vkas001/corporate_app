@@ -57,7 +57,8 @@ export default function SuperAdminDashboard() {
       return;
     }
 
-    router.push(`/dashboards/(superAdmin)/assign-role?userId=${id}`);
+
+    router.navigate(`/dashboards/(superAdmin)/assign-role?userId=${id}`);
   };
 
   const handleDelete = (id: string) => {
@@ -80,7 +81,7 @@ export default function SuperAdminDashboard() {
   });
 
   const UserCard = ({ user }: { user: User }) => (
-    
+
     <View
       className="rounded-2xl p-4 mb-3 border"
       style={{
@@ -195,7 +196,7 @@ export default function SuperAdminDashboard() {
 
         <TouchableOpacity
           className="w-[40px] h-[40px] rounded-[20px] items-center justify-center"
-          onPress={() => router.push('/dashboards/notification')}
+          onPress={() => router.navigate('/dashboards/notification')}
 
         >
           <Ionicons
@@ -232,7 +233,7 @@ export default function SuperAdminDashboard() {
         </View>
 
         {/* Summary Stats */}
-        <View className="flex-row gap-3 mb-4"> 
+        <View className="flex-row gap-3 mb-4">
           <View
             className="flex-1 rounded-2xl p-4 border"
             style={{ backgroundColor: colors.surface, borderColor: colors.border }}
@@ -299,7 +300,7 @@ export default function SuperAdminDashboard() {
           className="flex-row items-center justify-center gap-2 py-3.5 rounded-2xl mb-6"
           style={{ backgroundColor: colors.primary }}
           activeOpacity={0.8}
-          onPress={() => router.push('/dashboards/(superAdmin)/add-user')}
+          onPress={() => router.navigate('/dashboards/(superAdmin)/add-user')}
         >
           <Ionicons name="add-circle" size={18} color={colors.surface} />
           <Text className="text-base font-bold"
@@ -312,7 +313,7 @@ export default function SuperAdminDashboard() {
         <View className="mb-6">
           <Text className="text-base font-bold mb-3"
             style={{ color: colors.textSecondary }}>
-            Team Members ({users.length})
+            Members ({users.length})
           </Text>
           {filteredUsers.map(user => (
             <UserCard key={user.id} user={user} />
