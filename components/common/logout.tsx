@@ -56,7 +56,7 @@ export default function LogoutModal({
             className="text-sm text-center mb-6"
             style={{ color: colors.textSecondary }}
           >
-            Are you sure you want to logout? You'll need to sign in again.
+            Are you sure you want to logout? You'll need to log-in again.
           </Text>
 
           {/* Buttons */}

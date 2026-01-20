@@ -1,8 +1,9 @@
 import Loading from '@/components/common/loading';
-import { defaultUsers } from '@/data/usersData';
 import { useRoleGuard } from '@/hooks/roleGuard';
 import { useLogout } from '@/hooks/useLogout';
+import { useUser } from '@/hooks/useUser';
 import { useUserManagement } from '@/hooks/useUserManagement';
+import { getUsers } from '@/services/userService';
 import { useTheme } from '@/theme/themeContext';
 import { User } from '@/types/userManagement';
 import { formatFullDate } from '@/utils/dateFormatter';
@@ -20,19 +21,55 @@ export default function SuperAdminDashboard() {
   const isChecking = useRoleGuard(['Super Admin']);
   const { handleLogout, showModal, handleConfirm, handleCancel, isLoggingOut, LogoutModal } = useLogout();
   const { searchQuery, setSearchQuery, getRoleColor, getRoleIcon, getRoleDescription } = useUserManagement();
+  const { user: currentUser } = useUser();
   const [users, setUsers] = useState<User[]>([]);
+  const [usersLoading, setUsersLoading] = useState(true);
   const isSuperAdmin = true;
+
+  const currentUserId = currentUser?.id != null ? String(currentUser.id) : null;
+
+  const toJoinDate = (iso?: string) => {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  };
 
   useEffect(() => {
     const loadUsers = async () => {
-      const overrides = await getUserRoleOverrides();
-      setUsers(defaultUsers.map((u) => (overrides[u.id] ? { ...u, role: overrides[u.id] } : u)));
+      try {
+        setUsersLoading(true);
+        const overrides = await getUserRoleOverrides();
+        const apiUsers = await getUsers();
+
+        const mapped: User[] = apiUsers.map((u: any) => {
+          const id = String(u.id);
+          const baseRole = (u.role ?? 'seller') as any;
+          const overriddenRole = overrides[id] ?? baseRole;
+
+          return {
+            id,
+            name: u.name ?? 'Unknown',
+            email: u.email ?? '—',
+            role: overriddenRole,
+            status: u.status === false ? 'inactive' : 'active',
+            joinDate: toJoinDate(u.createdAt),
+          };
+        });
+
+        setUsers(mapped);
+      } catch (e: any) {
+        Alert.alert('Failed to load users', e?.message || 'Could not fetch users from API');
+        setUsers([]);
+      } finally {
+        setUsersLoading(false);
+      }
     };
 
     loadUsers();
   }, []);
 
-  if (isChecking) {
+  if (isChecking || usersLoading) {
     return <Loading message="Loading..." />;
   }
 
@@ -57,7 +94,8 @@ export default function SuperAdminDashboard() {
       return;
     }
 
-    router.push(`/dashboards/(superAdmin)/assign-role?userId=${id}`);
+    const returnTo = encodeURIComponent('/dashboards/(superAdmin)');
+    router.push(`/dashboards/(superAdmin)/assign-role?userId=${id}&returnTo=${returnTo}`);
   };
 
   const handleDelete = (id: string) => {
@@ -79,7 +117,10 @@ export default function SuperAdminDashboard() {
     );
   });
 
-  const UserCard = ({ user }: { user: User }) => (
+  const UserCard = ({ user }: { user: User }) => {
+    const isSignedInUser = !!currentUserId && user.id === currentUserId;
+
+    return (
     
     <View
       className="rounded-2xl p-4 mb-3 border"
@@ -101,7 +142,7 @@ export default function SuperAdminDashboard() {
               size={52}
               color={user.status === 'active' ? colors.primary : colors.textSecondary}
             />
-            {user.status === 'active' && (
+            {isSignedInUser && (
               <View
                 className="absolute bottom-1 right-1 w-3 h-3 rounded-full border-2"
                 style={{ backgroundColor: '#1E8E3E', borderColor: colors.surface }}
@@ -162,7 +203,8 @@ export default function SuperAdminDashboard() {
         </View>
       </View>
     </View>
-  );
+    );
+  };
 
   return (
     <SafeAreaView className="flex-1"
@@ -211,7 +253,7 @@ export default function SuperAdminDashboard() {
 
         <View className="mb-4">
           <View
-            className="flex-row items-center px-4 py-3 rounded-2xl border"
+            className="flex-row items-center px-4 rounded-2xl border"
             style={{ backgroundColor: colors.surface, borderColor: colors.border }}
           >
             <Ionicons name="search-outline" size={20} color={colors.textSecondary} />
@@ -312,7 +354,7 @@ export default function SuperAdminDashboard() {
         <View className="mb-6">
           <Text className="text-base font-bold mb-3"
             style={{ color: colors.textSecondary }}>
-            Team Members ({users.length})
+            Users ({users.length})
           </Text>
           {filteredUsers.map(user => (
             <UserCard key={user.id} user={user} />
