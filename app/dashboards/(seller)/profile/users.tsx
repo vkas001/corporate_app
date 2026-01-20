@@ -1,3 +1,4 @@
+import { useUser } from '@/hooks/useUser';
 import { useTheme } from '@/theme/themeContext';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
@@ -20,7 +21,10 @@ interface User {
 
 export default function UserManagementScreen({ onClose }: Props) {
   const { colors } = useTheme();
+  const { user: currentUser } = useUser();
   const [searchQuery, setSearchQuery] = useState('');
+
+  const currentUserId = currentUser?.id != null ? String(currentUser.id) : null;
 
   const [users] = useState<User[]>([
     {
@@ -83,7 +87,10 @@ export default function UserManagementScreen({ onClose }: Props) {
     }
   };
 
-  const UserCard = ({ user }: { user: User }) => (
+  const UserCard = ({ user }: { user: User }) => {
+    const isSignedInUser = !!currentUserId && user.id === currentUserId;
+
+    return (
     <View
       className="rounded-2xl p-4 mb-3 border"
       style={{
@@ -104,7 +111,7 @@ export default function UserManagementScreen({ onClose }: Props) {
               size={52}
               color={user.status === 'active' ? colors.primary : colors.textSecondary}
             />
-            {user.status === 'active' && (
+            {isSignedInUser && (
               <View
                 className="absolute bottom-1 right-1 w-3 h-3 rounded-full border-2"
                 style={{ backgroundColor: '#1E8E3E', borderColor: colors.surface }}
@@ -162,7 +169,8 @@ export default function UserManagementScreen({ onClose }: Props) {
         </View>
       </View>
     </View>
-  );
+    );
+  };
 
   return (
     <SafeAreaView className="flex-1"

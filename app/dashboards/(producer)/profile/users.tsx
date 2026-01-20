@@ -1,9 +1,10 @@
-import { defaultUsers } from '@/data/usersData';
+import { useUser } from '@/hooks/useUser';
 import { useUserManagement } from '@/hooks/useUserManagement';
+import { getUsers } from '@/services/userService';
 import { useTheme } from '@/theme/themeContext';
 import { User } from '@/types/userManagement';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -14,9 +15,54 @@ type Props = {
 export default function UserManagementScreen({ onClose }: Props) {
   const { colors } = useTheme();
   const { searchQuery, setSearchQuery, getRoleColor, getRoleIcon, getRoleDescription } = useUserManagement();
-  const [users] = useState<User[]>(defaultUsers);
+  const { user: currentUser } = useUser();
+  const [users, setUsers] = useState<User[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
 
-  const UserCard = ({ user }: { user: User }) => (
+  const currentUserId = currentUser?.id != null ? String(currentUser.id) : null;
+
+  const toJoinDate = (iso?: string) => {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setLoadingUsers(true);
+        const apiUsers = await getUsers();
+
+        const mapped: User[] = apiUsers.map((u: any) => ({
+          id: String(u.id),
+          name: u.name ?? 'Unknown',
+          email: u.email ?? '—',
+          role: (u.role ?? 'seller') as any,
+          status: u.status === false ? 'inactive' : 'active',
+          joinDate: toJoinDate(u.createdAt),
+          avatar: u.photo ?? undefined,
+        }));
+
+        if (!cancelled) setUsers(mapped);
+      } catch {
+        if (!cancelled) setUsers([]);
+      } finally {
+        if (!cancelled) setLoadingUsers(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const UserCard = ({ user }: { user: User }) => {
+    const isSignedInUser = !!currentUserId && user.id === currentUserId;
+
+    return (
     <View
       className="rounded-2xl p-4 mb-3 border"
       style={{
@@ -37,7 +83,7 @@ export default function UserManagementScreen({ onClose }: Props) {
               size={52}
               color={user.status === 'active' ? colors.primary : colors.textSecondary}
             />
-            {user.status === 'active' && (
+            {isSignedInUser && (
               <View
                 className="absolute bottom-1 right-1 w-3 h-3 rounded-full border-2"
                 style={{ backgroundColor: '#1E8E3E', borderColor: colors.surface }}
@@ -95,7 +141,8 @@ export default function UserManagementScreen({ onClose }: Props) {
         </View>
       </View>
     </View>
-  );
+    );
+  };
 
   return (
     <SafeAreaView className="flex-1"
@@ -220,6 +267,11 @@ export default function UserManagementScreen({ onClose }: Props) {
             style={{ color: colors.textSecondary }}>
             Team Members ({users.length})
           </Text>
+          {loadingUsers && (
+            <Text className="text-sm" style={{ color: colors.textSecondary }}>
+              Loading users...
+            </Text>
+          )}
           {users.map(user => (
             <UserCard key={user.id} user={user} />
           ))}
@@ -245,10 +297,10 @@ export default function UserManagementScreen({ onClose }: Props) {
               <View className="flex-1">
                 <Text className="text-sm font-bold mb-0.5"
                   style={{ color: colors.textPrimary }}>
-                  Admin
+                  Super Admin
                 </Text>
                 <Text className="text-xs" style={{ color: colors.textSecondary }}>
-                  {getRoleDescription('admin')}
+                  {getRoleDescription('superAdmin')}
                 </Text>
               </View>
             </View>
@@ -266,11 +318,11 @@ export default function UserManagementScreen({ onClose }: Props) {
               <View className="flex-1">
                 <Text className="text-sm font-bold mb-0.5"
                   style={{ color: colors.textPrimary }}>
-                  Manager
+                  Producer
                 </Text>
                 <Text className="text-xs"
                   style={{ color: colors.textSecondary }}>
-                  {getRoleDescription('manager')}
+                  {getRoleDescription('producer')}
                 </Text>
               </View>
             </View>
@@ -288,11 +340,11 @@ export default function UserManagementScreen({ onClose }: Props) {
               <View className="flex-1">
                 <Text className="text-sm font-bold mb-0.5"
                   style={{ color: colors.textPrimary }}>
-                  Staff
+                  Seller
                 </Text>
                 <Text className="text-xs"
                   style={{ color: colors.textSecondary }}>
-                  {getRoleDescription('staff')}
+                  {getRoleDescription('seller')}
                 </Text>
               </View>
             </View>

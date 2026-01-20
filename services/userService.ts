@@ -56,6 +56,53 @@ export const getUserById = async (userId: string): Promise<User> => {
     return res.data;
 };
 
+const normalizeRole = (input: unknown): UserRole => {
+    const raw = typeof input === "string" ? input : "";
+    const v = raw.trim().toLowerCase();
+
+    if (v === "superadmin" || v === "super admin" || v === "admin") return "superAdmin";
+    if (v === "producer") return "producer";
+    if (v === "seller") return "seller";
+    return "seller";
+};
+
+const normalizeUser = (u: any): User => {
+    const roleFromTopLevel = normalizeRole(u?.role);
+    const roleFromRolesArray = Array.isArray(u?.roles)
+        ? normalizeRole(u.roles[0])
+        : roleFromTopLevel;
+
+    return {
+        id: u?.id ?? u?.user_id ?? "",
+        email: u?.email ?? "",
+        name: u?.name ?? null,
+        role: roleFromRolesArray,
+        roles: Array.isArray(u?.roles) ? u.roles : undefined,
+        permissions: Array.isArray(u?.permissions) ? u.permissions : undefined,
+        status: typeof u?.status === "boolean" ? u.status : undefined,
+        photo: u?.photo ?? u?.avatar ?? null,
+        phone: u?.phone ?? null,
+        address: u?.address ?? null,
+        createdAt: u?.createdAt ?? u?.created_at,
+        updatedAt: u?.updatedAt ?? u?.updated_at,
+    };
+};
+
+export const getUsers = async (): Promise<User[]> => {
+    const res = await api.get("/users");
+    const body = res.data;
+
+    const rawList = Array.isArray(body)
+        ? body
+        : Array.isArray(body?.data)
+          ? body.data
+          : Array.isArray(body?.users)
+            ? body.users
+            : [];
+
+    return rawList.map(normalizeUser);
+};
+
 type CreateUserPayload = {
     name: string;
     email: string;

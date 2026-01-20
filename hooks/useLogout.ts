@@ -1,4 +1,4 @@
-import LogoutModal from "@/components/common/logou";
+import LogoutModal from "@/components/common/logout";
 import { logout as logoutService } from "@/services/authService";
 import { router } from "expo-router";
 import { useState } from "react";

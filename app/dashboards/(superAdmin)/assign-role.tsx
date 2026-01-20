@@ -1,14 +1,14 @@
 import Loading from "@/components/common/loading";
 import CustomButton from "@/components/ui/CustomButton";
 import CustomHeader from "@/components/ui/CustomHeader";
-import { defaultUsers } from "@/data/usersData";
 import { useRoleGuard } from "@/hooks/roleGuard";
+import { getUserById } from "@/services/userService";
 import { useTheme } from "@/theme/themeContext";
 import type { UserRole } from "@/types/userManagement";
-import { setUserRoleOverride } from "@/utils/userRoleOverrides";
+import { getUserRoleOverrides, setUserRoleOverride } from "@/utils/userRoleOverrides";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -18,27 +18,79 @@ const ROLE_OPTIONS: Array<{ role: UserRole; label: string; icon: any }> = [
   { role: "seller", label: "Seller", icon: "storefront-outline" },
 ];
 
+const SUPER_ADMIN_HOME = "/dashboards/(superAdmin)" as const;
+
 export default function AssignRoleScreen() {
   const { colors } = useTheme();
   const isChecking = useRoleGuard(["Super Admin"]);
-  const { userId } = useLocalSearchParams<{ userId?: string }>();
+  const { userId, returnTo } = useLocalSearchParams<{ userId?: string; returnTo?: string }>();
 
-  const selectedUser = useMemo(
-    () => defaultUsers.find((u) => u.id === userId),
-    [userId]
-  );
+  const resolvedReturnTo = (() => {
+    if (!returnTo) return null;
+    const raw = String(returnTo);
+    let decoded = raw;
+    try {
+      decoded = decodeURIComponent(raw);
+    } catch {
+      // keep raw
+    }
 
-  const [role, setRole] = useState<UserRole>(selectedUser?.role ?? "seller");
+    if (decoded === SUPER_ADMIN_HOME) return SUPER_ADMIN_HOME;
+    return null;
+  })();
+
+  const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [role, setRole] = useState<UserRole>("seller");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      if (!userId) {
+        setIsLoadingUser(false);
+        return;
+      }
+
+      try {
+        setIsLoadingUser(true);
+        const overrides = await getUserRoleOverrides();
+        const apiUser = await getUserById(String(userId));
+
+        if (cancelled) return;
+
+        const id = String(apiUser.id);
+        setUser({ id, name: apiUser.name ?? "Unknown", email: apiUser.email ?? "—" });
+        setRole(overrides[id] ?? (apiUser.role as UserRole) ?? "seller");
+      } catch (err: any) {
+        if (!cancelled) {
+          setUser(null);
+          Alert.alert("Failed", err?.message || "Could not load user");
+        }
+      } finally {
+        if (!cancelled) setIsLoadingUser(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
 
   const handleBack = () => {
+    if (resolvedReturnTo) {
+      router.replace(resolvedReturnTo);
+      return;
+    }
+
     if (router.canGoBack()) return router.back();
     router.replace("/dashboards/(superAdmin)");
   };
 
-  if (isChecking) return <Loading message="Loading..." />;
+  if (isChecking || isLoadingUser) return <Loading message="Loading..." />;
 
-  if (!selectedUser) {
+  if (!user) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
         <CustomHeader title="Assign Role" onBackPress={handleBack} />
@@ -72,10 +124,10 @@ export default function AssignRoleScreen() {
             User
           </Text>
           <Text className="text-base font-bold" style={{ color: colors.textPrimary }}>
-            {selectedUser.name}
+            {user.name}
           </Text>
           <Text className="text-sm" style={{ color: colors.textSecondary }}>
-            {selectedUser.email}
+            {user.email}
           </Text>
         </View>
 
@@ -137,9 +189,9 @@ export default function AssignRoleScreen() {
           onPress={async () => {
             try {
               setIsSubmitting(true);
-              await setUserRoleOverride(selectedUser.id, role);
+              await setUserRoleOverride(user.id, role);
               Alert.alert("Success", "Role updated");
-              router.replace("/dashboards/(superAdmin)");
+              router.replace(resolvedReturnTo ?? SUPER_ADMIN_HOME);
             } catch (err: any) {
               Alert.alert("Failed", err?.message || "Could not update role");
             } finally {
