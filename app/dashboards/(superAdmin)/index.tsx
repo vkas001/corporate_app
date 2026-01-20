@@ -1,4 +1,5 @@
 import Loading from '@/components/common/loading';
+import UserCard from '@/components/users/UserCard';
 import { useRoleGuard } from '@/hooks/roleGuard';
 import { useLogout } from '@/hooks/useLogout';
 import { useUser } from '@/hooks/useUser';
@@ -116,95 +117,6 @@ export default function SuperAdminDashboard() {
       u.status.toLowerCase().includes(q)
     );
   });
-
-  const UserCard = ({ user }: { user: User }) => {
-    const isSignedInUser = !!currentUserId && user.id === currentUserId;
-
-    return (
-    
-    <View
-      className="rounded-2xl p-4 mb-3 border"
-      style={{
-        backgroundColor: colors.surface,
-        borderColor: colors.border,
-        shadowColor: colors.primary,
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 2,
-      }}
-    >
-      <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center flex-1">
-          <View className="relative mr-3">
-            <Ionicons
-              name="person-circle"
-              size={52}
-              color={user.status === 'active' ? colors.primary : colors.textSecondary}
-            />
-            {isSignedInUser && (
-              <View
-                className="absolute bottom-1 right-1 w-3 h-3 rounded-full border-2"
-                style={{ backgroundColor: '#1E8E3E', borderColor: colors.surface }}
-              />
-            )}
-          </View>
-
-          <View className="flex-1">
-            <Text className="text-base font-bold mb-0.5"
-              style={{ color: colors.textPrimary }}>
-              {user.name}
-            </Text>
-            <Text className="text-sm mb-2"
-              style={{ color: colors.textSecondary }}>
-              {user.email}
-            </Text>
-            <View className="flex-row items-center gap-2">
-              <View
-                className="flex-row items-center gap-1 px-2 py-1 rounded-full"
-                style={{ backgroundColor: `${getRoleColor(user.role, colors)}15` }}
-              >
-                <Ionicons
-                  name={getRoleIcon(user.role) as any}
-                  size={11}
-                  color={getRoleColor(user.role, colors)}
-                />
-                <Text className="text-xs font-bold capitalize"
-                  style={{ color: getRoleColor(user.role, colors) }}>
-                  {user.role === 'superAdmin'
-                    ? 'Super Admin'
-                    : user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                </Text>
-              </View>
-              <Text className="text-xs"
-                style={{ color: colors.textSecondary }}>
-                • Joined {user.joinDate}
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        <View className="flex-row gap-2 ml-2">
-          <TouchableOpacity
-            className="w-9 h-9 rounded-xl items-center justify-center"
-            style={{ backgroundColor: colors.background }}
-            activeOpacity={0.7}
-            onPress={() => handleEdit(user.id)}
-          >
-            <Ionicons name="create-outline" size={18} color={colors.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="w-9 h-9 rounded-xl items-center justify-center"
-            style={{ backgroundColor: colors.background }}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="ellipsis-vertical" size={18} color={colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-    );
-  };
 
   return (
     <SafeAreaView className="flex-1"
@@ -357,7 +269,15 @@ export default function SuperAdminDashboard() {
             Users ({users.length})
           </Text>
           {filteredUsers.map(user => (
-            <UserCard key={user.id} user={user} />
+            <UserCard
+              key={user.id}
+              user={user}
+              currentUserId={currentUserId}
+              getRoleColor={getRoleColor}
+              getRoleIcon={getRoleIcon}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           ))}
         </View>
 

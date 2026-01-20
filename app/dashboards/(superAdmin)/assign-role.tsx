@@ -1,8 +1,9 @@
 import Loading from "@/components/common/loading";
 import CustomButton from "@/components/ui/CustomButton";
 import CustomHeader from "@/components/ui/CustomHeader";
+import CustomInput from "@/components/ui/CustomInput";
 import { useRoleGuard } from "@/hooks/roleGuard";
-import { getUserById } from "@/services/userService";
+import { getUserById, updateUserById } from "@/services/userService";
 import { useTheme } from "@/theme/themeContext";
 import type { UserRole } from "@/types/userManagement";
 import { getUserRoleOverrides, setUserRoleOverride } from "@/utils/userRoleOverrides";
@@ -40,8 +41,16 @@ export default function AssignRoleScreen() {
   })();
 
   const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+  });
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [role, setRole] = useState<UserRole>("seller");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUpdatingUser, setIsUpdatingUser] = useState(false);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
 
   useEffect(() => {
@@ -62,6 +71,12 @@ export default function AssignRoleScreen() {
 
         const id = String(apiUser.id);
         setUser({ id, name: apiUser.name ?? "Unknown", email: apiUser.email ?? "—" });
+        setForm({
+          name: (apiUser.name ?? "") as string,
+          email: (apiUser.email ?? "") as string,
+          phone: (apiUser.phone ?? "") as string,
+          address: (apiUser.address ?? "") as string,
+        });
         setRole(overrides[id] ?? (apiUser.role as UserRole) ?? "seller");
       } catch (err: any) {
         if (!cancelled) {
@@ -106,12 +121,27 @@ export default function AssignRoleScreen() {
     );
   }
 
+  const validateUserInfo = () => {
+    const next: Record<string, string | undefined> = {};
+
+    if (!form.name.trim()) next.name = "Name is required";
+    if (!form.email.trim()) {
+      next.email = "Email is required";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(form.email.trim())) next.email = "Enter a valid email";
+    }
+
+    setErrors(next);
+    return Object.values(next).every((v) => !v);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <CustomHeader title="Assign Role" onBackPress={handleBack} />
 
       <ScrollView
-        className="flex-1 px-4"
+        className="flex-1 px-4 mb-12"
         contentContainerStyle={{ paddingBottom: 24, paddingTop: 16 }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -129,6 +159,100 @@ export default function AssignRoleScreen() {
           <Text className="text-sm" style={{ color: colors.textSecondary }}>
             {user.email}
           </Text>
+        </View>
+
+        <View
+          className="rounded-3xl p-5 mb-4 border"
+          style={{ backgroundColor: colors.surface, borderColor: colors.border }}
+        >
+          <Text className="text-base font-bold" style={{ color: colors.textPrimary }}>
+            Update user info
+          </Text>
+          <Text className="text-xs mt-1" style={{ color: colors.textSecondary }}>
+            Update name, email, phone, or address.
+          </Text>
+
+          <CustomInput
+            label="Name"
+            placeholder="Full name"
+            value={form.name}
+            onChangeText={(text) => {
+              setForm((p) => ({ ...p, name: text }));
+              if (errors.name) setErrors((p) => ({ ...p, name: undefined }));
+            }}
+            icon="person-outline"
+            error={errors.name}
+            editable={!isUpdatingUser && !isSubmitting}
+          />
+
+          <CustomInput
+            label="Email"
+            placeholder="user@company.com"
+            value={form.email}
+            onChangeText={(text) => {
+              setForm((p) => ({ ...p, email: text }));
+              if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
+            }}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            icon="mail-outline"
+            error={errors.email}
+            editable={!isUpdatingUser && !isSubmitting}
+          />
+
+          <CustomInput
+            label="Phone"
+            placeholder="98XXXXXXXX"
+            value={form.phone}
+            onChangeText={(text) => setForm((p) => ({ ...p, phone: text }))}
+            keyboardType="phone-pad"
+            icon="call-outline"
+            editable={!isUpdatingUser && !isSubmitting}
+          />
+
+          <CustomInput
+            label="Address"
+            placeholder="Address"
+            value={form.address}
+            onChangeText={(text) => setForm((p) => ({ ...p, address: text }))}
+            icon="location-outline"
+            editable={!isUpdatingUser && !isSubmitting}
+          />
+
+          <View className="mt-6">
+            <CustomButton
+              title={isUpdatingUser ? "Updating..." : "Update Info"}
+              isLoading={isUpdatingUser}
+              onPress={async () => {
+                if (!validateUserInfo()) return;
+
+                try {
+                  setIsUpdatingUser(true);
+                  const updated = await updateUserById(user.id, {
+                    name: form.name.trim(),
+                    email: form.email.trim(),
+                    phone: form.phone.trim() || undefined,
+                    address: form.address.trim() || undefined,
+                  });
+
+                  setUser({
+                    id: String(updated.id),
+                    name: updated.name ?? "Unknown",
+                    email: updated.email ?? "—",
+                  });
+                  Alert.alert("Success", "User info updated");
+                } catch (err: any) {
+                  const statusSuffix = __DEV__ && err?.status ? ` (HTTP ${err.status})` : "";
+                  Alert.alert(
+                    "Failed",
+                    `${err?.message || "Could not update user"}${statusSuffix}`
+                  );
+                } finally {
+                  setIsUpdatingUser(false);
+                }
+              }}
+            />
+          </View>
         </View>
 
         <View

@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { profileMenus } from "../../config/profileMenus";
+import { profileMenus } from "../../config/profileConfig";
 import ProfileMenuItem from "./profileMenuItem";
 
 type Props = {

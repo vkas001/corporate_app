@@ -98,155 +98,158 @@ export default function ProducerForm({ isSubmitting = false, onSubmit }: Props) 
 					Create a new producer account. The role will be Producer.
 				</Text>
 
-			<CustomInput
-				label="Name"
-				placeholder="Full name"
-				value={form.name}
-				onChangeText={(text) => {
-					setForm((p) => ({ ...p, name: text }));
-					if (errors.name) setErrors((p) => ({ ...p, name: undefined }));
-				}}
-				icon="person-outline"
-				error={errors.name}
-				editable={!isSubmitting}
-			/>
-
-			<CustomInput
-				label="Email"
-				placeholder="producer@company.com"
-				value={form.email}
-				onChangeText={(text) => {
-					setForm((p) => ({ ...p, email: text }));
-					if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
-				}}
-				keyboardType="email-address"
-				autoCapitalize="none"
-				icon="mail-outline"
-				error={errors.email}
-				editable={!isSubmitting}
-			/>
-
-			<CustomInput
-				label="Phone (optional)"
-				placeholder="98XXXXXXXX"
-				value={form.phone}
-				onChangeText={(text) => setForm((p) => ({ ...p, phone: text }))}
-				keyboardType="phone-pad"
-				icon="call-outline"
-				editable={!isSubmitting}
-			/>
-
-			<CustomInput
-				label="Address (optional)"
-				placeholder="City, Street"
-				value={form.address}
-				onChangeText={(text) => setForm((p) => ({ ...p, address: text }))}
-				icon="location-outline"
-				editable={!isSubmitting}
-			/>
-
-			<CustomInput
-				label="Password"
-				placeholder="Create a password"
-				value={form.password}
-				onChangeText={(text) => {
-					setForm((p) => ({ ...p, password: text }));
-					if (errors.password) setErrors((p) => ({ ...p, password: undefined }));
-				}}
-				secureTextEntry
-				icon="lock-closed-outline"
-				error={errors.password}
-				editable={!isSubmitting}
-			/>
-
-			<CustomInput
-				label="Confirm Password"
-				placeholder="Re-enter password"
-				value={form.confirmPassword}
-				onChangeText={(text) => {
-					setForm((p) => ({ ...p, confirmPassword: text }));
-					if (errors.confirmPassword)
-						setErrors((p) => ({ ...p, confirmPassword: undefined }));
-				}}
-				secureTextEntry
-				icon="shield-checkmark-outline"
-				error={errors.confirmPassword}
-				editable={!isSubmitting}
-			/>
-
-			<View className="mt-5">
-				<Pressable
-					onPress={() => setPermissionsExpanded((v) => !v)}
-					className="flex-row items-center justify-between"
-					disabled={isSubmitting}
-				>
-					<View>
-						<Text className="text-sm font-bold" style={{ color: colors.textPrimary }}>
-							Permissions (optional)
-						</Text>
-						<Text className="text-xs mt-1" style={{ color: colors.textSecondary }}>
-							{permissions.length ? `${permissions.length} selected` : "None selected"}
-						</Text>
-					</View>
-					<Ionicons
-						name={permissionsExpanded ? "chevron-up" : "chevron-down"}
-						size={18}
-						color={colors.textSecondary}
-					/>
-				</Pressable>
-
-				{permissionsExpanded ? (
-					<>
-						<Text className="text-xs mt-2" style={{ color: colors.textSecondary }}>
-							Select extra permissions for this user.
-						</Text>
-						<View className="mt-3 gap-2">
-							{PERMISSION_OPTIONS.map((opt) => {
-								const selected = permissions.includes(opt.key);
-								return (
-									<Pressable
-										key={opt.key}
-										onPress={() => togglePermission(opt.key)}
-										disabled={isSubmitting}
-										className="rounded-2xl border px-4 py-3"
-										style={{
-											borderColor: selected ? colors.primary : colors.border,
-											backgroundColor: selected ? `${colors.primary}15` : colors.background,
-										}}
-									>
-										<View className="flex-row items-center justify-between">
-											<View style={{ flex: 1, paddingRight: 12 }}>
-												<Text
-													className="text-sm font-semibold"
-													style={{ color: colors.textPrimary }}
-												>
-													{opt.label}
-												</Text>
-												<Text className="text-xs mt-0.5" style={{ color: colors.textSecondary }}>
-													{opt.description}
-												</Text>
-											</View>
-											<Ionicons
-												name={selected ? "checkbox" : "square-outline"}
-												size={18}
-												color={selected ? colors.primary : colors.textSecondary}
-											/>
-										</View>
-									</Pressable>
-								);
-							})}
-						</View>
-					</>
-				) : null}
-			</View>
-
-			<View className="mt-6">
-				<CustomButton
-					title={isSubmitting ? "Creating..." : "Create Producer"}
-					onPress={submit}
-					isLoading={isSubmitting}
+				<CustomInput
+					label="Name"
+					placeholder="Full name"
+					value={form.name}
+					onChangeText={(text) => {
+						setForm((p) => ({ ...p, name: text }));
+						if (errors.name) setErrors((p) => ({ ...p, name: undefined }));
+					}}
+					icon="person-outline"
+					error={errors.name}
+					editable={!isSubmitting}
 				/>
-			</View>
+
+				<CustomInput
+					label="Email"
+					placeholder="producer@company.com"
+					value={form.email}
+					onChangeText={(text) => {
+						setForm((p) => ({ ...p, email: text }));
+						if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
+					}}
+					keyboardType="email-address"
+					autoCapitalize="none"
+					icon="mail-outline"
+					error={errors.email}
+					editable={!isSubmitting}
+				/>
+
+				<CustomInput
+					label="Phone"
+					placeholder="98XXXXXXXX"
+					value={form.phone}
+					onChangeText={(text) => setForm((p) => ({ ...p, phone: text }))}
+					keyboardType="phone-pad"
+					icon="call-outline"
+					editable={!isSubmitting}
+				/>
+
+				<CustomInput
+					label="Address"
+					placeholder="City, Street"
+					value={form.address}
+					onChangeText={(text) => setForm((p) => ({ ...p, address: text }))}
+					icon="location-outline"
+					editable={!isSubmitting}
+				/>
+
+				<CustomInput
+					label="Password"
+					placeholder="Create a password"
+					value={form.password}
+					onChangeText={(text) => {
+						setForm((p) => ({ ...p, password: text }));
+						if (errors.password) setErrors((p) => ({ ...p, password: undefined }));
+					}}
+					secureTextEntry
+					icon="lock-closed-outline"
+					error={errors.password}
+					editable={!isSubmitting}
+				/>
+
+				<CustomInput
+					label="Confirm Password"
+					placeholder="Re-enter password"
+					value={form.confirmPassword}
+					onChangeText={(text) => {
+						setForm((p) => ({ ...p, confirmPassword: text }));
+						if (errors.confirmPassword)
+							setErrors((p) => ({ ...p, confirmPassword: undefined }));
+					}}
+					secureTextEntry
+					icon="shield-checkmark-outline"
+					error={errors.confirmPassword}
+					editable={!isSubmitting}
+				/>
+
+				<View className="mt-5">
+					<Pressable
+						onPress={() => setPermissionsExpanded((v) => !v)}
+						className="flex-row items-center justify-between"
+						disabled={isSubmitting}
+					>
+						<View>
+							<Text className="text-sm font-bold"
+								style={{ color: colors.textPrimary }}>
+								Permissions
+							</Text>
+							<Text className="text-xs mt-1"
+								style={{ color: colors.textSecondary }}>
+								{permissions.length ? `${permissions.length} selected` : "None selected"}
+							</Text>
+						</View>
+						<Ionicons
+							name={permissionsExpanded ? "chevron-up" : "chevron-down"}
+							size={18}
+							color={colors.textSecondary}
+						/>
+					</Pressable>
+
+					{permissionsExpanded ? (
+						<>
+							<Text className="text-xs mt-2"
+								style={{ color: colors.textSecondary }}>
+								Select permissions for this user.
+							</Text>
+							<View className="mt-3 gap-2">
+								{PERMISSION_OPTIONS.map((opt) => {
+									const selected = permissions.includes(opt.key);
+									return (
+										<Pressable
+											key={opt.key}
+											onPress={() => togglePermission(opt.key)}
+											disabled={isSubmitting}
+											className="rounded-2xl border px-4 py-3"
+											style={{
+												borderColor: selected ? colors.primary : colors.border,
+												backgroundColor: selected ? `${colors.primary}15` : colors.background,
+											}}
+										>
+											<View className="flex-row items-center justify-between">
+												<View style={{ flex: 1, paddingRight: 12 }}>
+													<Text
+														className="text-sm font-semibold"
+														style={{ color: colors.textPrimary }}
+													>
+														{opt.label}
+													</Text>
+													<Text className="text-xs mt-0.5" style={{ color: colors.textSecondary }}>
+														{opt.description}
+													</Text>
+												</View>
+												<Ionicons
+													name={selected ? "checkbox" : "square-outline"}
+													size={18}
+													color={selected ? colors.primary : colors.textSecondary}
+												/>
+											</View>
+										</Pressable>
+									);
+								})}
+							</View>
+						</>
+					) : null}
+				</View>
+
+				<View className="mt-6">
+					<CustomButton
+						title={isSubmitting ? "Creating..." : "Create Producer"}
+						onPress={submit}
+						isLoading={isSubmitting}
+					/>
+				</View>
 			</View>
 		</KeyboardAvoidingView>
 	);

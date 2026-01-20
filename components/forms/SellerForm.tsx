@@ -129,7 +129,7 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
       />
 
       <CustomInput
-        label="Phone (optional)"
+        label="Phone"
         placeholder="98XXXXXXXX"
         value={form.phone}
         onChangeText={(text) => setForm((p) => ({ ...p, phone: text }))}
@@ -139,7 +139,7 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
       />
 
       <CustomInput
-        label="Address (optional)"
+        label="Address"
         placeholder="City, Street"
         value={form.address}
         onChangeText={(text) => setForm((p) => ({ ...p, address: text }))}
@@ -184,7 +184,7 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
         >
           <View>
             <Text className="text-sm font-bold" style={{ color: colors.textPrimary }}>
-              Permissions (optional)
+              Permissions
             </Text>
             <Text className="text-xs mt-1" style={{ color: colors.textSecondary }}>
               {permissions.length ? `${permissions.length} selected` : "None selected"}

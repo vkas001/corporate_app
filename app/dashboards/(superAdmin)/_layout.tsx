@@ -1,11 +1,23 @@
-import { Stack } from 'expo-router';
+import { CustomTabLayout, TabConfig } from '@/components/navigation/CustomTabLayout';
+import { Ionicons } from '@expo/vector-icons';
+
+const superAdminTabs: TabConfig[] = [
+  {
+    name: 'index',
+    label: 'Home',
+    icon: Ionicons,
+    iconName: 'home-outline',
+    iconNameFocused: 'home',
+  },
+];
 
 export default function SuperAdminLayout() {
+  // Keep non-tab routes accessible but hidden from the tab bar
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
+    <CustomTabLayout
+      tabs={superAdminTabs}
+      hiddenRoutes={['add-user', 'assign-role']}
+      resetOnTabPress
     />
   );
 }
