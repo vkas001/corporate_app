@@ -1,12 +1,13 @@
 import HistoryCard from "@/components/history/HistoryCard";
 import CustomHeader from "@/components/ui/CustomHeader";
+import HistorySearchDateFilter from "@/components/ui/HistorySearchDateFilter";
 import { useHistory } from "@/hooks/useHistory";
 import { useTheme } from "@/theme/themeContext";
 import { groupByDate } from "@/utils/groupbyDate";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type Category = 'all' | 'production' | 'mortality' | 'batch' | 'feed' | 'payment';
@@ -55,53 +56,18 @@ export default function HistoryScreen() {
   const grouped = groupByDate(filteredHistory);
 
   return (
-    <SafeAreaView className="flex-1" 
+    <SafeAreaView className="flex-1 mb-10" 
       style={{ backgroundColor: colors.background }}
     >
       <CustomHeader title="History" onBackPress={handleBack} />
       
-      <View className="px-4">
-        {/* Search Bar */}
-        <View 
-          className="flex-row items-center px-4 py-3 rounded-2xl mb-3 border"
-          style={{ backgroundColor: colors.surface, borderColor: colors.border }}
-        >
-          <Ionicons name="search-outline" size={20} color={colors.textSecondary} />
-          <TextInput
-            className="flex-1 ml-2"
-            placeholder="Search records..."
-            placeholderTextColor={colors.textSecondary}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            style={{ color: colors.textPrimary }}
-          />
-          {searchQuery.length > 0 && (
-            <Pressable onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
-            </Pressable>
-          )}
-        </View>
-
-        {/* Date Filter */}
-        <View 
-          className="flex-row items-center px-4 py-3 rounded-2xl mb-3 border"
-          style={{ backgroundColor: colors.surface, borderColor: colors.border }}
-        >
-          <Ionicons name="calendar-outline" size={20} color={colors.textSecondary} />
-          <TextInput
-            className="flex-1 ml-2"
-            placeholder="Filter by date (YYYY-MM-DD)"
-            placeholderTextColor={colors.textSecondary}
-            value={dateFilter}
-            onChangeText={setDateFilter}
-            style={{ color: colors.textPrimary }}
-          />
-          {dateFilter.length > 0 && (
-            <Pressable onPress={() => setDateFilter('')}>
-              <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
-            </Pressable>
-          )}
-        </View>
+      <View className="px-4 mt-1.5">
+        <HistorySearchDateFilter
+          searchQuery={searchQuery}
+          onSearchQueryChange={setSearchQuery}
+          dateFilter={dateFilter}
+          onDateFilterChange={setDateFilter}
+        />
 
         {/* Category Filter */}
         <ScrollView 

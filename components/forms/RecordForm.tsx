@@ -199,17 +199,6 @@ export default function RecordFormModal({
                                 >
                                     {title}
                                 </Text>
-
-                                <TouchableOpacity
-                                    onPress={onClose}
-                                    disabled={isSaving}
-                                    className="px-3 py-1 -mr-2"
-                                    style={{ opacity: isSaving ? 0.6 : 1 }}
-                                >
-                                    <Text className="text-sm font-semibold" style={{ color: colors.textSecondary }}>
-                                        Close
-                                    </Text>
-                                </TouchableOpacity>
                             </View>
 
                             {/* Category */}

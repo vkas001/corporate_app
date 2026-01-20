@@ -1,6 +1,7 @@
 import RecordFormModal from '@/components/forms/RecordForm';
 import RecordList from '@/components/records/RecordList';
 import CustomHeader from '@/components/ui/CustomHeader';
+import { useHistory } from '@/hooks/useHistory';
 import { useTheme } from '@/theme/themeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -13,6 +14,7 @@ export default function ProductionRecords() {
   const router = useRouter();
   const { fromDashboard } = useLocalSearchParams<{ fromDashboard?: string }>();
   const [showModal, setShowModal] = useState(false);
+  const { addHistoryItem } = useHistory('seller');
 
   const handleBack = () => {
     if (fromDashboard === 'true') {
@@ -27,8 +29,6 @@ export default function ProductionRecords() {
     unit: string;
     quantity: number;
   }[]>([]);
-
-  const categories = ['Eggs', 'Chicken', 'Chicks'];
   const unitMap: Record<string, string[]> = {
     Eggs: ['pcs', '12pcs', 'crates', 'cartons'],
     Chicken: ['pcs', 'kg', 'per50', 'per100'],
@@ -63,7 +63,18 @@ export default function ProductionRecords() {
         categories={['Eggs', 'Chicken', 'Chicks']}
         unitMap={unitMap}
         onClose={() => setShowModal(false)}
-        onSubmit={(data) => setRecords((prev) => [...prev, data])}
+        onSubmit={(data) => {
+          setRecords((prev) => [...prev, data]);
+          addHistoryItem({
+            type: 'sale',
+            title: data.category,
+            description: 'Sales record',
+            value: data.quantity,
+            unit: data.unit,
+            date: data.date ?? new Date().toISOString().slice(0, 10),
+            meta: { category: data.category, unit: data.unit, quantity: data.quantity },
+          });
+        }}
       />
       <RecordList
         records={records}

@@ -1,45 +1,59 @@
+import { HISTORY_SEED_DATA } from "@/data/historyData";
 import { HistoryItem, HistoryType, UserRole } from "@/types/history";
-import { useMemo, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-const MOCK_DATA: HistoryItem[] = [
-    {
-        id: "1",
-        type: "production",
-        title: "Morning Collection",
-        description: "Daily egg collection from coop A",
-        value: 120,
-        unit: "eggs",
-        date: "2026-01-01",
-        time: "08:30",
-    },
-    {
-        id: "2",
-        type: "payment",
-        title: "Payment Received",
-        description: "Settlement received via bank transfer",
-        value: 300,
-        amount: 4500,
-        date: "2026-01-01",
-        time: "14:10",
-    },
-    {
-        id: "3",
-        type: "sale",
-        title: "Market Sale",
-        description: "Sold at local market stall #12",
-        value: 200,
-        unit: "eggs",
-        amount: 3200,
-        date: "2025-12-31",
-        time: "17:00",
-    },
-];
+const STORAGE_PREFIX = "egg_corporate:history:";
+
+function formatTimeHHMM(d: Date) {
+    return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+}
 
 export function useHistory(role: UserRole) {
     const [activeTypes, setActiveTypes] = useState<HistoryType[]>([]);
+    const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+    const storageKey = `${STORAGE_PREFIX}${role}`;
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        (async () => {
+            try {
+                const raw = await AsyncStorage.getItem(storageKey);
+                const stored = raw ? (JSON.parse(raw) as HistoryItem[]) : [];
+
+                const next = stored.length > 0 ? stored : HISTORY_SEED_DATA;
+                if (!isCancelled) setHistoryItems(next);
+            } catch {
+                if (!isCancelled) setHistoryItems(HISTORY_SEED_DATA);
+            }
+        })();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [storageKey]);
+
+    const addHistoryItem = useCallback(
+        (item: Omit<HistoryItem, "id" | "time"> & { id?: string; time?: string }) => {
+            const now = new Date();
+            const fullItem: HistoryItem = {
+                id: item.id ?? `${now.getTime()}_${Math.random().toString(16).slice(2)}`,
+                time: item.time ?? formatTimeHHMM(now),
+                ...item,
+            };
+
+            setHistoryItems((prev) => {
+                const next = [fullItem, ...prev];
+                AsyncStorage.setItem(storageKey, JSON.stringify(next)).catch(() => {});
+                return next;
+            });
+        },
+        [storageKey]
+    );
 
     const filteredData = useMemo(() => {
-        let data = MOCK_DATA;
+        let data = historyItems;
 
         // Apply role-based filtering first
         if (role === "seller") {
@@ -54,11 +68,12 @@ export function useHistory(role: UserRole) {
         }
 
         return data;
-    }, [role, activeTypes]);
+    }, [role, activeTypes, historyItems]);
 
     return {
         history: filteredData,
         activeTypes,
         setActiveTypes,
+        addHistoryItem,
     };
 }

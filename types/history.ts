@@ -8,12 +8,12 @@ export type HistoryType =
 export type UserRole = "producer" | "seller" | "superAdmin";
 
 export type HistoryItem = {
-  description: any;
   id: string;
   type: HistoryType;
   date: string; 
   time: string; 
   title: string;
+  description?: string;
   value: number;
   unit?: string;
   amount?: number; 
