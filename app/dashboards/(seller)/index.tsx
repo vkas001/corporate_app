@@ -5,6 +5,7 @@ import FinanceOverview from "@/components/dashboard/FinanceOverview";
 import LanguageToggle from "@/components/ui/LanguageToggle";
 import { DASHBOARD_DATA } from "@/data/dashboardData";
 import { useRoleGuard } from "@/hooks/roleGuard";
+import { useUser } from "@/hooks/useUser";
 import { Period } from "@/types/dashboard";
 import { formatFullDate } from "@/utils/dateFormatter";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,13 +20,14 @@ export default function SellerDashboard() {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const isChecking = useRoleGuard(['Seller']);
+  const { user, loading: userLoading, refetch } = useUser();
   const [period, setPeriod] = useState<"Today" | "Week" | "Month">("Today");
   const [selectedCategory, setSelectedCategory] = useState('Chicken');
   const [open, setOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  if (isChecking) {
-    return <Loading message="Checking access..." />;
+  if (isChecking || userLoading) {
+    return <Loading message="Loading..." />;
   }
 
   const dashboardData = DASHBOARD_DATA[period.toLowerCase() as Period];
@@ -33,12 +35,13 @@ export default function SellerDashboard() {
   const onRefresh = async () => {
     try {
       setRefreshing(true);
-      // Data is currently local/static, so just a short refresh cycle.
-      await new Promise((r) => setTimeout(r, 600));
+      await refetch({ forceRemote: true });
     } finally {
       setRefreshing(false);
     }
   };
+
+  console.log("Seller Dashboard - User data:", user);
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -70,7 +73,7 @@ export default function SellerDashboard() {
         <Text className="text-[18px] font-[600] ml-[3px]"
           style={{ color: colors.textPrimary }}
         >
-          {t('dashboard.sellerTitle')}
+          {user?.name ?? t('dashboard.sellerTitle')}
         </Text>
         <Text className="text-[12px]"
           style={{ color: colors.textSecondary }}

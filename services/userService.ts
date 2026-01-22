@@ -18,7 +18,7 @@ export type {
 } from "@/types/userService";
 
 export const getUserProfile = async (): Promise<User> => {
-    const res = await api.get("/user/profile");
+    const res = await api.get("/user");
     return res.data;
 };
 

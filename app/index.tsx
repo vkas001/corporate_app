@@ -16,7 +16,6 @@ export default function LandingPage() {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -24,14 +23,13 @@ export default function LandingPage() {
     const checkAuth = async () => {
       const auth = await getAuth();
       const token = auth?.token;
-      const saveRole = auth?.roles?.[0] ?? null;
+      const savedAppRole = auth?.user?.role ?? null;
 
-      if (!token || !saveRole ) {
+      if (!token || !savedAppRole) {
         setIsAuthenticated(false);
         setLoading(false);
         return;
       }
-      setRole(saveRole);
       setIsAuthenticated(true);
       setLoading(false);
     };
@@ -52,7 +50,7 @@ export default function LandingPage() {
 
     const auth = await getAuth();
     const token = auth?.token;
-    const role = auth?.roles?.[0] ?? null;
+    const role = auth?.user?.role ?? null;
 
     if (!token || !role) {
       router.replace("/(auth)/sign-in");
@@ -60,13 +58,11 @@ export default function LandingPage() {
       return;
     }
 
-    const roleLower = role.toLowerCase();
-
-    if (roleLower === "producer") {
+    if (role === "producer") {
       router.replace("/dashboards/(producer)");
-    } else if (roleLower === "seller") {
+    } else if (role === "seller") {
       router.replace("/dashboards/(seller)");
-    } else if (roleLower === "super admin") {
+    } else if (role === "superAdmin") {
       router.replace("/dashboards/(superAdmin)");
     } else {
       router.replace("/(auth)/sign-in");

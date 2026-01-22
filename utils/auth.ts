@@ -1,5 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { UserRole } from "@/types/user";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AUTH_KEY = "auth";
 
@@ -29,6 +29,12 @@ export type AuthState = {
 
 export const SUPER_ADMIN_ROLE_LABEL = "Super Admin";
 
+export const roleToRoleLabel = (role: UserRole): string => {
+  if (role === "superAdmin") return SUPER_ADMIN_ROLE_LABEL;
+  if (role === "producer") return "Producer";
+  return "Seller";
+};
+
 export const saveAuth = async (
   token: string,
   roles: string[],
@@ -47,16 +53,18 @@ export const saveAuth = async (
     return "seller";
   })();
 
+  const ensuredRoles = (effectiveRoles ?? []).length ? (effectiveRoles ?? []) : [roleToRoleLabel(role)];
+
   const enrichedUser: AuthUser = {
     ...user,
-    roles: effectiveRoles ?? [],
+    roles: ensuredRoles,
     permissions: effectivePermissions ?? [],
     role,
   };
 
   await AsyncStorage.setItem(
     AUTH_KEY,
-    JSON.stringify({ token, roles: effectiveRoles ?? [], permissions: effectivePermissions ?? [], user: enrichedUser } satisfies AuthState)
+    JSON.stringify({ token, roles: ensuredRoles, permissions: effectivePermissions ?? [], user: enrichedUser } satisfies AuthState)
   );
 };
 
@@ -72,7 +80,11 @@ export const getToken = async () => {
 
 export const getRoles = async () => {
   const auth = await getAuth();
-  return auth?.roles ?? [];
+  const storedRoles = auth?.roles ?? [];
+  if (storedRoles.length) return storedRoles;
+
+  const derived = auth?.user?.role;
+  return derived ? [roleToRoleLabel(derived)] : [];
 };
 
 export const getUser = async () => {

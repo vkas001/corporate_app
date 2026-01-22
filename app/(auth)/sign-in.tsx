@@ -73,15 +73,29 @@ const SignIn = () => {
       const { token, roles, permissions, user } = data;
       console.log(" Login successful");
       console.log(" User:", user);
-      console.log(" Roles:", roles);
-      console.log(" Roles type:", typeof roles, "Is array:", Array.isArray(roles));
-      console.log(" Roles JSON:", JSON.stringify(roles));
-      console.log(" First role if exists:", roles?.[0]);
 
-      await saveAuth(token, roles, permissions, user);
+      const effectiveRoles =
+        Array.isArray(user?.roles) && user.roles.length
+          ? user.roles
+          : Array.isArray(roles) && roles.length
+            ? roles
+            : ["Seller"];
+      const effectivePermissions =
+        Array.isArray(user?.permissions) && user.permissions.length
+          ? user.permissions
+          : Array.isArray(permissions)
+            ? permissions
+            : [];
+
+      console.log(" Roles:", effectiveRoles);
+      console.log(" Roles type:", typeof effectiveRoles, "Is array:", Array.isArray(effectiveRoles));
+      console.log(" Roles JSON:", JSON.stringify(effectiveRoles));
+      console.log(" First role if exists:", effectiveRoles?.[0]);
+
+      await saveAuth(token, effectiveRoles, effectivePermissions, user);
       console.log(" Auth saved to storage");
 
-      const normalizedRoles = Array.isArray(roles) ? roles.map(normalizeRole) : [];
+      const normalizedRoles = Array.isArray(effectiveRoles) ? effectiveRoles.map(normalizeRole) : [];
       const hasRole = (roleName: string) => normalizedRoles.includes(normalizeRole(roleName));
 
       console.log(" Checking Super Admin:", hasRole("Super Admin"));

@@ -48,7 +48,7 @@ export default function AddUserScreen() {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <ScrollView
             className="flex-1 px-4"
-            contentContainerStyle={{ paddingBottom: 10, paddingTop: 16, flexGrow: 1 }}
+            contentContainerStyle={{ paddingBottom: 24, paddingTop: 16, flexGrow: 1 }}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
             showsVerticalScrollIndicator={false}
