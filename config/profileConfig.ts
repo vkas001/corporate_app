@@ -30,4 +30,11 @@ export const profileMenus: Record<UserRole, ProfileMenuItem[]> = {
     { icon: "information-circle-outline", label: "Information", action: "info" },
     { icon: "log-out-outline", label: "Logout", action: "logout", danger: true },
   ],
+
+  admin: [
+    { icon: "people-outline", label: "User Management", action: "users" },
+    { icon: "settings-outline", label: "Settings", action: "settings" },
+    { icon: "information-circle-outline", label: "Information", action: "info" },
+    { icon: "log-out-outline", label: "Logout", action: "logout", danger: true },
+  ],
 };

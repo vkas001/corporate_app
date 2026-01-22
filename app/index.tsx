@@ -2,7 +2,7 @@ import Loading from "@/components/common/loading";
 import LiveMarketCategory from "@/components/market/MarketCategory";
 import CustomButton from "@/components/ui/CustomButton";
 import { useTheme } from "@/theme";
-import { getAuth } from "@/utils/auth";
+import { getAuth, getEffectiveUserRole } from "@/utils/auth";
 import { formatFullDate } from "@/utils/dateFormatter";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, router } from "expo-router";
@@ -50,7 +50,7 @@ export default function LandingPage() {
 
     const auth = await getAuth();
     const token = auth?.token;
-    const role = auth?.user?.role ?? null;
+  const role = await getEffectiveUserRole();
 
     if (!token || !role) {
       router.replace("/(auth)/sign-in");
@@ -62,6 +62,8 @@ export default function LandingPage() {
       router.replace("/dashboards/(producer)");
     } else if (role === "seller") {
       router.replace("/dashboards/(seller)");
+    } else if (role === "admin") {
+      router.replace("/dashboards/(admin)");
     } else if (role === "superAdmin") {
       router.replace("/dashboards/(superAdmin)");
     } else {

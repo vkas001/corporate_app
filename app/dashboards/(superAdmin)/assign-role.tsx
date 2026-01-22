@@ -6,6 +6,7 @@ import { useRoleGuard } from "@/hooks/roleGuard";
 import { getUserById, updateUserById } from "@/services/userService";
 import { useTheme } from "@/theme/themeContext";
 import type { UserRole } from "@/types/userManagement";
+import { getAuth, setAuthUserRole, updateAuthUser } from "@/utils/auth";
 import { getUserRoleOverrides, setUserRoleOverride } from "@/utils/userRoleOverrides";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -15,11 +16,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const ROLE_OPTIONS: Array<{ role: UserRole; label: string; icon: any }> = [
   { role: "superAdmin", label: "Super Admin", icon: "shield-checkmark-outline" },
+  { role: "admin", label: "Admin", icon: "shield-outline" },
   { role: "producer", label: "Producer", icon: "leaf-outline" },
   { role: "seller", label: "Seller", icon: "storefront-outline" },
 ];
 
 const SUPER_ADMIN_HOME = "/dashboards/(superAdmin)" as const;
+
+const roleToDashboardRoute = (role: UserRole) => {
+  if (role === "superAdmin") return "/dashboards/(superAdmin)";
+  if (role === "admin") return "/dashboards/(admin)";
+  if (role === "producer") return "/dashboards/(producer)";
+  return "/dashboards/(seller)";
+};
 
 export default function AssignRoleScreen() {
   const { colors } = useTheme();
@@ -240,6 +249,23 @@ export default function AssignRoleScreen() {
                     name: updated.name ?? "Unknown",
                     email: updated.email ?? "—",
                   });
+
+                  // If the Super Admin updated the currently logged-in user, update local auth too
+                  try {
+                    const auth = await getAuth();
+                    const currentId = auth?.user?.id != null ? String(auth.user.id) : null;
+                    if (currentId && currentId === String(updated.id)) {
+                      await updateAuthUser({
+                        name: updated.name ?? null,
+                        email: updated.email,
+                        phone: updated.phone ?? null,
+                        address: updated.address ?? null,
+                      });
+                    }
+                  } catch {
+                    // ignore local sync failures
+                  }
+
                   Alert.alert("Success", "User info updated");
                 } catch (err: any) {
                   const statusSuffix = __DEV__ && err?.status ? ` (HTTP ${err.status})` : "";
@@ -308,13 +334,27 @@ export default function AssignRoleScreen() {
         </View>
 
         <CustomButton
-          title={isSubmitting ? "Saving..." : "Save Role"}
+          title={isSubmitting ? "Assigning..." : "Assign Role"}
           isLoading={isSubmitting}
           onPress={async () => {
             try {
               setIsSubmitting(true);
               await setUserRoleOverride(user.id, role);
               Alert.alert("Success", "Role updated");
+
+              // If the updated user is the currently logged in user, update auth role and redirect
+              try {
+                const auth = await getAuth();
+                const currentId = auth?.user?.id != null ? String(auth.user.id) : null;
+                if (currentId && currentId === String(user.id)) {
+                  await setAuthUserRole(role as any);
+                  router.replace(roleToDashboardRoute(role));
+                  return;
+                }
+              } catch {
+                // ignore local sync failures
+              }
+
               router.replace(resolvedReturnTo ?? SUPER_ADMIN_HOME);
             } catch (err: any) {
               Alert.alert("Failed", err?.message || "Could not update role");

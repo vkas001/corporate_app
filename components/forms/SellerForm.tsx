@@ -4,7 +4,7 @@ import { PERMISSION_OPTIONS } from "@/config/permissionConfig";
 import { useTheme } from "@/theme/themeContext";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useRef, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Keyboard, Pressable, Text, TextInput, View } from "react-native";
 
 export type CreateSellerInput = {
   name: string;
@@ -211,7 +211,10 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
         editable={!isSubmitting}
         returnKeyType="done"
         blurOnSubmit
-        onSubmitEditing={submit}
+        onSubmitEditing={() => {
+          confirmPasswordRef.current?.blur();
+          Keyboard.dismiss();
+        }}
       />
 
       <View className="mt-5">

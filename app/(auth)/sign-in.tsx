@@ -2,7 +2,7 @@ import Loading from "@/components/common/loading";
 import CustomButton from "@/components/ui/CustomButton";
 import CustomInput from "@/components/ui/CustomInput";
 import { useTheme } from "@/theme/themeContext";
-import { normalizeRole, saveAuth, seedDevAuth } from "@/utils/auth";
+import { getEffectiveUserRole, normalizeRole, saveAuth, seedDevAuth } from "@/utils/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -94,6 +94,28 @@ const SignIn = () => {
 
       await saveAuth(token, effectiveRoles, effectivePermissions, user);
       console.log(" Auth saved to storage");
+
+      const effectiveUserRole = await getEffectiveUserRole();
+      if (effectiveUserRole === "superAdmin") {
+        console.log(" Redirecting to SuperAdmin dashboard");
+        router.replace("/dashboards/(superAdmin)");
+        return;
+      }
+      if (effectiveUserRole === "admin") {
+        console.log(" Redirecting to Admin dashboard");
+        router.replace("/dashboards/(admin)");
+        return;
+      }
+      if (effectiveUserRole === "producer") {
+        console.log(" Redirecting to Producer dashboard");
+        router.replace("/dashboards/(producer)");
+        return;
+      }
+      if (effectiveUserRole === "seller") {
+        console.log(" Redirecting to Seller dashboard");
+        router.replace("/dashboards/(seller)");
+        return;
+      }
 
       const normalizedRoles = Array.isArray(effectiveRoles) ? effectiveRoles.map(normalizeRole) : [];
       const hasRole = (roleName: string) => normalizedRoles.includes(normalizeRole(roleName));

@@ -8,6 +8,8 @@ export const useUserManagement = () => {
     switch (role) {
       case 'superAdmin':
         return colors.primary;
+      case 'admin':
+        return '#7C3AED';
       case 'producer':
         return '#2F855A';
       case 'seller':
@@ -21,6 +23,8 @@ export const useUserManagement = () => {
     switch (role) {
       case 'superAdmin':
         return 'shield-checkmark-outline';
+      case 'admin':
+        return 'shield-outline';
       case 'producer':
         return 'leaf-outline';
       case 'seller':
@@ -34,6 +38,8 @@ export const useUserManagement = () => {
     switch (role) {
       case 'superAdmin':
         return 'Full access to all features';
+      case 'admin':
+        return 'Manage users and settings';
       case 'producer':
         return 'Manage production and related records';
       case 'seller':

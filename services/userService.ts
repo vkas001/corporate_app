@@ -58,7 +58,8 @@ const normalizeRole = (input: unknown): UserRole => {
     const raw = typeof input === "string" ? input : "";
     const v = raw.trim().toLowerCase();
 
-    if (v.includes("admin") || v.includes("super")) return "superAdmin";
+    if (v.includes("super")) return "superAdmin";
+    if (v.includes("admin")) return "admin";
     if (v.includes("producer")) return "producer";
     if (v.includes("seller")) return "seller";
     return "seller";
@@ -72,7 +73,8 @@ const toApiRoleSlug = (role: string | undefined): string | undefined => {
 
     if (v.includes("producer")) return "producer";
     if (v.includes("seller")) return "seller";
-    if (v.includes("admin") || v.includes("super")) return "admin";
+    if (v.includes("super")) return "admin";
+    if (v.includes("admin")) return "admin";
 
     return v;
 };

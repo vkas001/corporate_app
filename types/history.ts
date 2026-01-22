@@ -5,7 +5,7 @@ export type HistoryType =
   | "payment"
   | "sale";
 
-export type UserRole = "producer" | "seller" | "superAdmin";
+export type UserRole = "producer" | "seller" | "admin" | "superAdmin";
 
 export type HistoryItem = {
   id: string;

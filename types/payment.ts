@@ -1,6 +1,6 @@
 export type PaymentRecord = {
   id: string;
-  role: "producer" | "seller" | "superAdmin";
+  role: "producer" | "seller" | "admin" | "superAdmin";
 
   periodStart: string;
   periodEnd: string;

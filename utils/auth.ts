@@ -1,4 +1,5 @@
 import type { UserRole } from "@/types/user";
+import { getUserRoleOverrides } from "@/utils/userRoleOverrides";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AUTH_KEY = "auth";
@@ -28,9 +29,16 @@ export type AuthState = {
 };
 
 export const SUPER_ADMIN_ROLE_LABEL = "Super Admin";
+export const ADMIN_ROLE_LABEL = "Admin";
+
+const coerceUserRole = (role: unknown): UserRole | null => {
+  if (role === "superAdmin" || role === "admin" || role === "producer" || role === "seller") return role;
+  return null;
+};
 
 export const roleToRoleLabel = (role: UserRole): string => {
   if (role === "superAdmin") return SUPER_ADMIN_ROLE_LABEL;
+  if (role === "admin") return ADMIN_ROLE_LABEL;
   if (role === "producer") return "Producer";
   return "Seller";
 };
@@ -47,6 +55,7 @@ export const saveAuth = async (
   const role: UserRole = (() => {
     const normalized = (effectiveRoles ?? []).map(normalizeRole);
     if (normalized.includes(normalizeRole(SUPER_ADMIN_ROLE_LABEL))) return "superAdmin";
+    if (normalized.includes(normalizeRole(ADMIN_ROLE_LABEL))) return "admin";
     if (normalized.includes(normalizeRole("Producer"))) return "producer";
     if (normalized.includes(normalizeRole("Seller"))) return "seller";
     // Fallback keeps UI stable even if backend returns an unexpected role label
@@ -80,6 +89,17 @@ export const getToken = async () => {
 
 export const getRoles = async () => {
   const auth = await getAuth();
+  if (!auth) return [];
+
+  // Apply local override if present (set by Super Admin in this app)
+  try {
+    const overrides = await getUserRoleOverrides();
+    const overrideRole = coerceUserRole(overrides[String(auth.user?.id)]);
+    if (overrideRole) return [roleToRoleLabel(overrideRole)];
+  } catch {
+    // ignore overrides failures
+  }
+
   const storedRoles = auth?.roles ?? [];
   if (storedRoles.length) return storedRoles;
 
@@ -89,7 +109,68 @@ export const getRoles = async () => {
 
 export const getUser = async () => {
   const auth = await getAuth();
-  return auth?.user ?? null;
+  if (!auth?.user) return null;
+
+  try {
+    const overrides = await getUserRoleOverrides();
+    const overrideRole = coerceUserRole(overrides[String(auth.user.id)]);
+    if (overrideRole) {
+      return {
+        ...auth.user,
+        role: overrideRole,
+        roles: [roleToRoleLabel(overrideRole)],
+      };
+    }
+  } catch {
+    // ignore overrides failures
+  }
+
+  return auth.user;
+};
+
+export const getEffectiveUserRole = async (): Promise<UserRole | null> => {
+  const user = await getUser();
+  return user?.role ?? null;
+};
+
+export const updateAuthUser = async (
+  updates: Partial<Pick<BackendUser, "name" | "email" | "phone" | "address" | "photo" | "status">> & {
+    role?: UserRole;
+    roles?: string[];
+    permissions?: string[];
+  }
+) => {
+  const auth = await getAuth();
+  if (!auth?.user) return;
+
+  const nextRole = updates.role ?? auth.user.role;
+  const nextRoles =
+    updates.roles ??
+    (updates.role ? [roleToRoleLabel(nextRole)] : auth.user.roles) ??
+    auth.roles;
+
+  const ensuredRoles = (nextRoles ?? []).length ? (nextRoles ?? []) : [roleToRoleLabel(nextRole)];
+
+  const nextUser: AuthUser = {
+    ...auth.user,
+    ...updates,
+    role: nextRole,
+    roles: ensuredRoles,
+    permissions: updates.permissions ?? auth.user.permissions,
+  };
+
+  const nextAuth: AuthState = {
+    ...auth,
+    roles: ensuredRoles,
+    permissions: updates.permissions ?? auth.permissions,
+    user: nextUser,
+  };
+
+  await AsyncStorage.setItem(AUTH_KEY, JSON.stringify(nextAuth));
+};
+
+export const setAuthUserRole = async (role: UserRole) => {
+  await updateAuthUser({ role, roles: [roleToRoleLabel(role)] });
 };
 
 export const normalizeRole = (role: string) =>

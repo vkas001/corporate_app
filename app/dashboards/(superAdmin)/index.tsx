@@ -99,9 +99,7 @@ export default function SuperAdminDashboard() {
       setRefreshing(false);
     }
   }, [loadUsers]);
-
-  // Only block the whole screen on the very first load.
-  // During deletes/refreshes we keep the UI mounted so toast can show.
+  
   if (isChecking || (!hasLoadedOnce && usersLoading)) {
     return <Loading message="Loading..." />;
   }
@@ -432,15 +430,15 @@ export default function SuperAdminDashboard() {
         />
       </ScrollView>
 
+      {/* Toast Message */}
+
       {toastMessage ? (
         <View
           pointerEvents="none"
-          // Keep it above bottom tab bar / safe-area
           style={{
             position: 'absolute',
             left: 16,
             right: 16,
-            // CustomTabLayout default tab bar height is 70
             bottom: insets.bottom + 70 + 10,
             zIndex: 9999,
             elevation: 9999,
