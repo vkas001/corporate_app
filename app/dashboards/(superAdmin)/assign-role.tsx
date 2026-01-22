@@ -15,7 +15,6 @@ import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const ROLE_OPTIONS: Array<{ role: UserRole; label: string; icon: any }> = [
-  { role: "superAdmin", label: "Super Admin", icon: "shield-checkmark-outline" },
   { role: "admin", label: "Admin", icon: "shield-outline" },
   { role: "producer", label: "Producer", icon: "leaf-outline" },
   { role: "seller", label: "Seller", icon: "storefront-outline" },

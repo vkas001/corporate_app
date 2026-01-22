@@ -2,7 +2,6 @@ import { clearAuth, getAuth } from "@/utils/auth";
 import axios from "axios";
 import { router } from "expo-router";
 
-// Read Expo public env directly (do not wrap in quotes)
 const API_BASE_URL =
   (process.env.EXPO_PUBLIC_API_BASE_URL as string | undefined) ??
   "https://eggadmin.aanshtech.com.np/api";

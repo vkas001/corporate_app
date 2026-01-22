@@ -1,4 +1,5 @@
 import Loading from '@/components/common/loading';
+import RoleCard from '@/components/users/RoleCard';
 import UserCard from '@/components/users/UserCard';
 import { useRoleGuard } from '@/hooks/roleGuard';
 import { useLogout } from '@/hooks/useLogout';
@@ -161,6 +162,11 @@ export default function SuperAdminDashboard() {
       u.status.toLowerCase().includes(q)
     );
   });
+
+  const roleCounts = users.reduce<Record<string, number>>((acc, u) => {
+    acc[u.role] = (acc[u.role] ?? 0) + 1;
+    return acc;
+  }, {});
 
   return (
     <SafeAreaView className="flex-1"
@@ -341,70 +347,46 @@ export default function SuperAdminDashboard() {
             style={{ color: colors.textSecondary }}>
             User Roles
           </Text>
-          <View
-            className="rounded-2xl p-4 border"
-            style={{ backgroundColor: colors.surface, borderColor: colors.border }}
-          >
-            <View className="flex-row items-center mb-4">
-              <View
-                className="w-10 h-10 rounded-xl items-center justify-center mr-3"
-                style={{ backgroundColor: `${colors.primary}15` }}
-              >
-                <Ionicons name="shield-checkmark-outline" size={20} color={colors.primary} />
-              </View>
-              <View className="flex-1">
-                <Text className="text-sm font-bold mb-0.5"
-                  style={{ color: colors.textPrimary }}>
-                  Super Admin
-                </Text>
-                <Text className="text-xs" style={{ color: colors.textSecondary }}>
-                  {getRoleDescription('superAdmin')}
-                </Text>
-              </View>
+
+          <View className="flex-row flex-wrap gap-3">
+            <View className="w-[48%]">
+              <RoleCard
+                role="superAdmin"
+                getRoleColor={getRoleColor}
+                getRoleIcon={getRoleIcon}
+                getRoleDescription={getRoleDescription}
+                count={roleCounts.superAdmin ?? 0}
+              />
             </View>
 
-            <View className="h-px mb-4"
-              style={{ backgroundColor: colors.border }} />
-
-            <View className="flex-row items-center mb-4">
-              <View
-                className="w-10 h-10 rounded-xl items-center justify-center mr-3"
-                style={{ backgroundColor: '#2F855A15' }}
-              >
-                <Ionicons name="leaf-outline" size={20} color="#2F855A" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-sm font-bold mb-0.5"
-                  style={{ color: colors.textPrimary }}>
-                  Producer
-                </Text>
-                <Text className="text-xs"
-                  style={{ color: colors.textSecondary }}>
-                  {getRoleDescription('producer')}
-                </Text>
-              </View>
+            <View className="w-[48%]">
+              <RoleCard
+                role="admin"
+                getRoleColor={getRoleColor}
+                getRoleIcon={getRoleIcon}
+                getRoleDescription={getRoleDescription}
+                count={roleCounts.admin ?? 0}
+              />
             </View>
 
-            <View className="h-px mb-4"
-              style={{ backgroundColor: colors.border }} />
+            <View className="w-[48%]">
+              <RoleCard
+                role="producer"
+                getRoleColor={getRoleColor}
+                getRoleIcon={getRoleIcon}
+                getRoleDescription={getRoleDescription}
+                count={roleCounts.producer ?? 0}
+              />
+            </View>
 
-            <View className="flex-row items-center">
-              <View
-                className="w-10 h-10 rounded-xl items-center justify-center mr-3"
-                style={{ backgroundColor: '#2B6CB015' }}
-              >
-                <Ionicons name="storefront-outline" size={20} color="#2B6CB0" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-sm font-bold mb-0.5"
-                  style={{ color: colors.textPrimary }}>
-                  Seller
-                </Text>
-                <Text className="text-xs"
-                  style={{ color: colors.textSecondary }}>
-                  {getRoleDescription('seller')}
-                </Text>
-              </View>
+            <View className="w-[48%]">
+              <RoleCard
+                role="seller"
+                getRoleColor={getRoleColor}
+                getRoleIcon={getRoleIcon}
+                getRoleDescription={getRoleDescription}
+                count={roleCounts.seller ?? 0}
+              />
             </View>
           </View>
         </View>
