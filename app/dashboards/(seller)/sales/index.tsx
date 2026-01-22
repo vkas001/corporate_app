@@ -3,11 +3,12 @@ import { useTheme } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Sales() {
   const { colors } = useTheme();
+  const [refreshing, setRefreshing] = React.useState(false);
 
   const handleBack = () => {
     // From sales tab landing, always go back to dashboard
@@ -54,7 +55,26 @@ export default function Sales() {
       }}>
       <CustomHeader title="Records" onBackPress={handleBack} />
 
-      <View className="px-4 mt-3">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 24 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={async () => {
+              try {
+                setRefreshing(true);
+                await new Promise((r) => setTimeout(r, 600));
+              } finally {
+                setRefreshing(false);
+              }
+            }}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+      >
         {records.map((item, index) => (
           <TouchableOpacity
             key={index}
@@ -64,24 +84,15 @@ export default function Sales() {
             activeOpacity={0.7}
           >
             <View className="flex-row items-center gap-3">
-              <Ionicons
-                name={item.icon}
-                size={24}
-                color={colors.textPrimary}
-              />
-              <Text className="text-base font-semibold"
-                style={{ color: colors.textPrimary }}>
+              <Ionicons name={item.icon} size={24} color={colors.textPrimary} />
+              <Text className="text-base font-semibold" style={{ color: colors.textPrimary }}>
                 {item.title}
               </Text>
             </View>
-            <Ionicons
-              name="chevron-forward"
-              size={24}
-              color={colors.textPrimary}
-            />
+            <Ionicons name="chevron-forward" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

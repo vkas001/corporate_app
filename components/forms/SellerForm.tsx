@@ -3,8 +3,8 @@ import CustomInput from "@/components/ui/CustomInput";
 import { PERMISSION_OPTIONS } from "@/config/permissionConfig";
 import { useTheme } from "@/theme/themeContext";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useMemo, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, Text, View } from "react-native";
+import React, { useMemo, useRef, useState } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 
 export type CreateSellerInput = {
   name: string;
@@ -38,6 +38,13 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
 
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
+  const nameRef = useRef<TextInput>(null);
+  const emailRef = useRef<TextInput>(null);
+  const phoneRef = useRef<TextInput>(null);
+  const addressRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const confirmPasswordRef = useRef<TextInput>(null);
+
   const emailTrimmed = useMemo(() => form.email.trim(), [form.email]);
 
   const validate = () => {
@@ -65,11 +72,22 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
     }
 
     setErrors(nextErrors);
-    return Object.values(nextErrors).every((v) => !v);
+    return nextErrors;
+  };
+
+  const focusFirstInvalid = (nextErrors: Record<string, string | undefined>) => {
+    if (nextErrors.name) return nameRef.current?.focus();
+    if (nextErrors.email) return emailRef.current?.focus();
+    if (nextErrors.password) return passwordRef.current?.focus();
+    if (nextErrors.confirmPassword) return confirmPasswordRef.current?.focus();
   };
 
   const submit = async () => {
-    if (!validate()) return;
+    const nextErrors = validate();
+    if (Object.values(nextErrors).some(Boolean)) {
+      focusFirstInvalid(nextErrors);
+      return;
+    }
     await onSubmit({
       name: form.name.trim(),
       email: emailTrimmed,
@@ -85,14 +103,10 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 24 : 0}
+    <View
+      className="rounded-3xl p-5 mb-10 border"
+      style={{ backgroundColor: colors.surface, borderColor: colors.border }}
     >
-      <View
-        className="rounded-3xl p-5 mb-10 border"
-        style={{ backgroundColor: colors.surface, borderColor: colors.border }}
-      >
         <Text className="text-lg font-bold" style={{ color: colors.textPrimary }}>
           Seller Details
         </Text>
@@ -101,6 +115,7 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
         </Text>
 
       <CustomInput
+        ref={nameRef}
         label="Name"
         placeholder="Full name"
         value={form.name}
@@ -111,9 +126,13 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
         icon="person-outline"
         error={errors.name}
         editable={!isSubmitting}
+        returnKeyType="next"
+        blurOnSubmit={false}
+        onSubmitEditing={() => emailRef.current?.focus()}
       />
 
       <CustomInput
+        ref={emailRef}
         label="Email"
         placeholder="seller@company.com"
         value={form.email}
@@ -126,9 +145,13 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
         icon="mail-outline"
         error={errors.email}
         editable={!isSubmitting}
+        returnKeyType="next"
+        blurOnSubmit={false}
+        onSubmitEditing={() => phoneRef.current?.focus()}
       />
 
       <CustomInput
+        ref={phoneRef}
         label="Phone"
         placeholder="98XXXXXXXX"
         value={form.phone}
@@ -136,18 +159,26 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
         keyboardType="phone-pad"
         icon="call-outline"
         editable={!isSubmitting}
+        returnKeyType="next"
+        blurOnSubmit={false}
+        onSubmitEditing={() => addressRef.current?.focus()}
       />
 
       <CustomInput
+        ref={addressRef}
         label="Address"
         placeholder="City, Street"
         value={form.address}
         onChangeText={(text) => setForm((p) => ({ ...p, address: text }))}
         icon="location-outline"
         editable={!isSubmitting}
+        returnKeyType="next"
+        blurOnSubmit={false}
+        onSubmitEditing={() => passwordRef.current?.focus()}
       />
 
       <CustomInput
+        ref={passwordRef}
         label="Password"
         placeholder="Create a password"
         value={form.password}
@@ -159,9 +190,13 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
         icon="lock-closed-outline"
         error={errors.password}
         editable={!isSubmitting}
+        returnKeyType="next"
+        blurOnSubmit={false}
+        onSubmitEditing={() => confirmPasswordRef.current?.focus()}
       />
 
       <CustomInput
+        ref={confirmPasswordRef}
         label="Confirm Password"
         placeholder="Re-enter password"
         value={form.confirmPassword}
@@ -174,6 +209,9 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
         icon="shield-checkmark-outline"
         error={errors.confirmPassword}
         editable={!isSubmitting}
+        returnKeyType="done"
+        blurOnSubmit
+        onSubmitEditing={submit}
       />
 
       <View className="mt-5">
@@ -247,7 +285,6 @@ export default function SellerForm({ isSubmitting = false, onSubmit }: Props) {
             isLoading={isSubmitting}
           />
         </View>
-      </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }

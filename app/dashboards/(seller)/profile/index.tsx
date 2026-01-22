@@ -19,8 +19,9 @@ type Screen = 'profile' | 'edit' | 'settings' | 'billing' | 'users' | 'info';
 
 export default function SellerProfile() {
   const { colors } = useTheme();
-  const { user, loading, error } = useUser();
+  const { user, loading, error, refetch } = useUser();
   const { handleLogout, showModal, handleConfirm, handleCancel, isLoggingOut, LogoutModal } = useLogout();
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleBack = () => {
     // From profile tab landing, always go back to dashboard
@@ -131,6 +132,15 @@ export default function SellerProfile() {
                 name={user?.name || 'User'}
                 email={user?.email || ''}
                 avatarUri={avatar}
+                refreshing={refreshing}
+                onRefresh={async () => {
+                  try {
+                    setRefreshing(true);
+                    await refetch({ forceRemote: true });
+                  } finally {
+                    setRefreshing(false);
+                  }
+                }}
                 onAction={handleAction}
                 onEditAvatar={handleEditAvatar}
               />

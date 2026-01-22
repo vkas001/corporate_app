@@ -2,24 +2,20 @@ import type { CreateProducerInput } from "@/components/forms/ProducerForm";
 import type { CreateSellerInput } from "@/components/forms/SellerForm";
 import api from "@/services/api";
 import type { UserRole } from "@/types/user";
+import type {
+    CreateUserPayload,
+    CreateUserRequestBody,
+    UpdateUserByIdInput,
+    User,
+} from "@/types/userService";
 import { getAuth, type AuthUser } from "@/utils/auth";
 
-export interface User {
-    id: number | string;
-    email: string;
-    name: string | null;
-
-    role: UserRole;
-
-    roles?: string[];
-    permissions?: string[];
-    status?: boolean;
-    photo?: string | null; 
-    phone?: string | null;
-    address?: string | null;
-    createdAt?: string;
-    updatedAt?: string;
-}
+export type {
+    CreateUserPayload,
+    CreateUserRequestBody,
+    UpdateUserByIdInput,
+    User
+} from "@/types/userService";
 
 export const getUserProfile = async (): Promise<User> => {
     const res = await api.get("/user/profile");
@@ -58,18 +54,10 @@ export const getUserById = async (userId: string): Promise<User> => {
     return normalizeUser(raw);
 };
 
-export type UpdateUserByIdInput = {
-    name?: string;
-    email?: string;
-    phone?: string;
-    address?: string;
-};
-
 const normalizeRole = (input: unknown): UserRole => {
     const raw = typeof input === "string" ? input : "";
     const v = raw.trim().toLowerCase();
 
-    // Be forgiving: APIs sometimes return labels like "Producer User".
     if (v.includes("admin") || v.includes("super")) return "superAdmin";
     if (v.includes("producer")) return "producer";
     if (v.includes("seller")) return "seller";
@@ -84,7 +72,7 @@ const toApiRoleSlug = (role: string | undefined): string | undefined => {
 
     if (v.includes("producer")) return "producer";
     if (v.includes("seller")) return "seller";
-    if (v.includes("admin") || v.includes("super")) return "superAdmin";
+    if (v.includes("admin") || v.includes("super")) return "admin";
 
     return v;
 };
@@ -140,6 +128,20 @@ export const updateUserById = async (
     }
 };
 
+export const deleteUserById = async (userId: string): Promise<void> => {
+    try {
+        await api.delete(`/users/${userId}`);
+        return;
+    } catch (err: any) {
+        // Some APIs use a different route or method
+        if (err?.status === 405 || err?.status === 404) {
+            await api.delete(`/user/${userId}`);
+            return;
+        }
+        throw err;
+    }
+};
+
 export const getUsers = async (): Promise<User[]> => {
     const res = await api.get("/users");
     const body = res.data;
@@ -155,40 +157,19 @@ export const getUsers = async (): Promise<User[]> => {
     return rawList.map(normalizeUser);
 };
 
-type CreateUserPayload = {
-    name: string;
-    email: string;
-    password: string;
-    phone?: string;
-    address?: string;
-    roles: string[];
-    permissions?: string[];
-};
-
-type CreateUserRequestBody = {
-    name: string;
-    email: string;
-    password: string;
-    phone?: string;
-    address?: string;
-    roles?: string[];
-    permissions?: string[];
-
-    password_confirmation?: string;
-
-    role?: string;
-};
-
 export const createUser = async (payload: CreateUserPayload): Promise<User> => {
     const roleName = Array.isArray(payload.roles) ? payload.roles[0] : undefined;
     const roleSlug = toApiRoleSlug(roleName);
 
+    const emailNormalized = payload.email.trim().toLowerCase();
+
     const common: CreateUserRequestBody = {
         name: payload.name,
-        email: payload.email,
+        email: emailNormalized,
         password: payload.password,
         phone: payload.phone,
         address: payload.address,
+        status: payload.status ?? true,
         permissions: payload.permissions,
         password_confirmation: payload.password,
     };
@@ -197,15 +178,14 @@ export const createUser = async (payload: CreateUserPayload): Promise<User> => {
     const attempts: CreateUserRequestBody[] = [];
 
     if (roleSlug) {
-        attempts.push({ ...common, roles: [roleSlug], role: roleSlug });
+        // Prefer the backend-expected shape: `roles: ["seller"]` etc.
+        attempts.push({ ...common, roles: [roleSlug] });
     }
 
-    // If caller passes a label like "Producer", try it too.
     if (roleName && roleName !== roleSlug) {
-        attempts.push({ ...common, roles: [roleName], role: roleName });
+        attempts.push({ ...common, roles: [roleName] });
     }
 
-    // Some backends accept only `role` (string)
     if (roleSlug) {
         attempts.push({ ...common, role: roleSlug });
     }
@@ -216,12 +196,84 @@ export const createUser = async (payload: CreateUserPayload): Promise<User> => {
     let lastErr: any;
     for (const body of attempts) {
         try {
+            if (__DEV__) {
+                console.log("[createUser] attempt payload", {
+                    email: body.email,
+                    status: body.status,
+                    role: body.role,
+                    roles: body.roles,
+                    permissionsCount: Array.isArray(body.permissions) ? body.permissions.length : 0,
+                });
+            }
+
             const res = await api.post("/users", body);
-            return res.data;
+
+            const raw = res.data?.data ?? res.data?.user ?? res.data;
+            const normalized = normalizeUser(raw);
+
+            if (__DEV__) {
+                console.log("[createUser] created user response", {
+                    hasData: !!res.data,
+                    rawType: typeof raw,
+                    normalizedId: normalized.id,
+                    normalizedEmail: normalized.email,
+                    normalizedRole: normalized.role,
+                });
+            }
+
+            return normalized;
         } catch (err: any) {
             lastErr = err;
             const status = err?.status;
-            if (status !== 422 && status !== 500) throw err;
+
+            if (__DEV__) {
+                console.log("[createUser] attempt failed", {
+                    status,
+                    message: err?.message,
+                    errors: err?.data?.errors,
+                    dataMessage: err?.data?.message,
+                });
+            }
+
+            if (status === 422) continue;
+
+            if (status === 500) {
+                try {
+                    const users = await getUsers();
+                    const found = users.find(
+                        (u) => (u.email ?? "").trim().toLowerCase() === emailNormalized
+                    );
+                    if (found) return found;
+                } catch {
+                    // ignore lookup failure and surface original error
+                }
+
+                throw err;
+            }
+
+            throw err;
+        }
+    }
+
+    // If all role variants failed with 422, optionally fall back to `role` field.
+    // This keeps compatibility with backends that accept only `role: "seller"`.
+    if (roleSlug) {
+        try {
+            const res = await api.post("/users", { ...common, role: roleSlug });
+            const raw = res.data?.data ?? res.data?.user ?? res.data;
+            return normalizeUser(raw);
+        } catch (err: any) {
+            lastErr = err;
+        }
+    }
+
+    if (roleName && roleName !== roleSlug) {
+        try {
+            const res = await api.post("/users", { ...common, role: roleName });
+            const raw = res.data?.data ?? res.data?.user ?? res.data;
+            return normalizeUser(raw);
+        } catch (err: any) {
+            lastErr = err;
         }
     }
 
@@ -245,7 +297,8 @@ export const createProducerUser = async (input: CreateProducerInput): Promise<Us
         password: input.password,
         phone: input.phone,
         address: input.address,
-        roles: ["Producer"],
+        status: true,
+        roles: ["producer"],
         permissions: input.permissions,
     });
 
@@ -278,7 +331,8 @@ export const createSellerUser = async (input: CreateSellerInput): Promise<User> 
         password: input.password,
         phone: input.phone,
         address: input.address,
-        roles: ["Seller"],
+        status: true,
+        roles: ["seller"],
         permissions: input.permissions,
     });
 

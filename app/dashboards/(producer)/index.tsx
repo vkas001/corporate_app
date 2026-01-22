@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../../theme";
 
@@ -20,7 +20,8 @@ export default function ProducerDashboard() {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const isChecking = useRoleGuard(['Producer']);
-  const { user, loading: userLoading } = useUser();
+  const { user, loading: userLoading, refetch } = useUser();
+  const [refreshing, setRefreshing] = useState(false);
   const [period, setPeriod] = React.useState<"Today" | "Week" | "Month">("Today");
   const [selectedCategory, setSelectedCategory] = useState('Chicken');
   const [open, setOpen] = useState(false);
@@ -28,6 +29,15 @@ export default function ProducerDashboard() {
   if (isChecking || userLoading) {
     return <Loading message ="Loading..." />;
   }
+
+  const onRefresh = async () => {
+    try {
+      setRefreshing(true);
+      await refetch({ forceRemote: true });
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   console.log("Producer Dashboard - User data:", user);
 
@@ -86,7 +96,15 @@ export default function ProducerDashboard() {
 
     <ScrollView
       className="px-5 pt-2.5 pb-10 mb-8"
-
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={colors.primary}
+          colors={[colors.primary]}
+        />
+      }
+      showsVerticalScrollIndicator={false}
     >
       <LanguageToggle />
 

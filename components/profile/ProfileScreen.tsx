@@ -2,7 +2,7 @@ import { useTheme } from "@/theme";
 import { UserRole } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { profileMenus } from "../../config/profileConfig";
 import ProfileMenuItem from "./profileMenuItem";
@@ -14,6 +14,8 @@ type Props = {
   avatarUri?: string | null;
   onAction: (action: string) => void;
   onEditAvatar?: () => void;
+  refreshing?: boolean;
+  onRefresh?: () => void | Promise<void>;
 };
 
 export default function ProfileScreen({
@@ -23,6 +25,8 @@ export default function ProfileScreen({
   avatarUri,
   onAction,
   onEditAvatar,
+  refreshing = false,
+  onRefresh,
 }: Props) {
   const { colors } = useTheme();
   const menus = profileMenus[role];
@@ -30,8 +34,25 @@ export default function ProfileScreen({
   const hasAvatar = !!avatarUri && avatarUri.trim() !== "" && !imageError;
 
   return (
-    <SafeAreaView className="flex-1 px-4"
+    <SafeAreaView className="flex-1"
       style={{ backgroundColor: colors.background }}>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
+        refreshControl={
+          onRefresh
+            ? (
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={colors.primary}
+                colors={[colors.primary]}
+              />
+            )
+            : undefined
+        }
+        showsVerticalScrollIndicator={false}
+      >
       <View className="w-full max-w-md">
         <View className="items-center">
           <View className="relative mb-4">
@@ -91,6 +112,7 @@ export default function ProfileScreen({
           ))}
         </View>
       </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../../theme";
 
@@ -22,12 +22,23 @@ export default function SellerDashboard() {
   const [period, setPeriod] = useState<"Today" | "Week" | "Month">("Today");
   const [selectedCategory, setSelectedCategory] = useState('Chicken');
   const [open, setOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   if (isChecking) {
     return <Loading message="Checking access..." />;
   }
 
   const dashboardData = DASHBOARD_DATA[period.toLowerCase() as Period];
+
+  const onRefresh = async () => {
+    try {
+      setRefreshing(true);
+      // Data is currently local/static, so just a short refresh cycle.
+      await new Promise((r) => setTimeout(r, 600));
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -82,7 +93,15 @@ export default function SellerDashboard() {
 
     <ScrollView
       className="px-5 pt-2.5 pb-10"
-
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={colors.primary}
+          colors={[colors.primary]}
+        />
+      }
+      showsVerticalScrollIndicator={false}
     >
       <LanguageToggle />
 

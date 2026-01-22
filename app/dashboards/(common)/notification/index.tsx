@@ -7,7 +7,7 @@ import { useTheme } from '@/theme/themeContext';
 import { AppNotification } from '@/types/notificaion';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const filters: {
@@ -25,6 +25,19 @@ export default function Notification() {
     const { colors } = useTheme();
     const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
     const [notifications, setNotifications] = useState<AppNotification[]>(notificationData);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = async () => {
+        try {
+            setRefreshing(true);
+            // Replace this with an API call when notifications become server-driven.
+            await new Promise((r) => setTimeout(r, 600));
+            setNotifications(notificationData);
+            setActiveFilter('all');
+        } finally {
+            setRefreshing(false);
+        }
+    };
 
     const filteredNotifications = useMemo(() => {
         const selected = filters.find(f => f.key === activeFilter);
@@ -64,6 +77,14 @@ export default function Notification() {
             <ScrollView
                 contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
                 showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor={colors.primary}
+                        colors={[colors.primary]}
+                    />
+                }
             >
                 {/* Header with Mark All Read */}
                 <View className="mt-5 flex-row items-center justify-between pb-4 border-b"

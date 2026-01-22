@@ -4,20 +4,21 @@ import { useRoleGuard } from '@/hooks/roleGuard';
 import { useLogout } from '@/hooks/useLogout';
 import { useUser } from '@/hooks/useUser';
 import { useUserManagement } from '@/hooks/useUserManagement';
-import { getUsers } from '@/services/userService';
+import { deleteUserById, getUsers } from '@/services/userService';
 import { useTheme } from '@/theme/themeContext';
 import { User } from '@/types/userManagement';
 import { formatFullDate } from '@/utils/dateFormatter';
 import { getUserRoleOverrides } from '@/utils/userRoleOverrides';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SuperAdminDashboard() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const isChecking = useRoleGuard(['Super Admin']);
   const { handleLogout, showModal, handleConfirm, handleCancel, isLoggingOut, LogoutModal } = useLogout();
@@ -25,6 +26,10 @@ export default function SuperAdminDashboard() {
   const { user: currentUser } = useUser();
   const [users, setUsers] = useState<User[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isSuperAdmin = true;
 
   const currentUserId = currentUser?.id != null ? String(currentUser.id) : null;
@@ -36,41 +41,68 @@ export default function SuperAdminDashboard() {
     return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   };
 
-  useEffect(() => {
-    const loadUsers = async () => {
-      try {
-        setUsersLoading(true);
-        const overrides = await getUserRoleOverrides();
-        const apiUsers = await getUsers();
+  const loadUsers = useCallback(async () => {
+    try {
+      setUsersLoading(true);
+      const overrides = await getUserRoleOverrides();
+      const apiUsers = await getUsers();
 
-        const mapped: User[] = apiUsers.map((u: any) => {
-          const id = String(u.id);
-          const baseRole = (u.role ?? 'seller') as any;
-          const overriddenRole = overrides[id] ?? baseRole;
+      const mapped: User[] = apiUsers.map((u: any) => {
+        const id = String(u.id);
+        const baseRole = (u.role ?? 'seller') as any;
+        const overriddenRole = overrides[id] ?? baseRole;
 
-          return {
-            id,
-            name: u.name ?? 'Unknown',
-            email: u.email ?? '—',
-            role: overriddenRole,
-            status: u.status === false ? 'inactive' : 'active',
-            joinDate: toJoinDate(u.createdAt),
-          };
-        });
+        return {
+          id,
+          name: u.name ?? 'Unknown',
+          email: u.email ?? '—',
+          role: overriddenRole,
+          status: u.status === false ? 'inactive' : 'active',
+          joinDate: toJoinDate(u.createdAt),
+        };
+      });
 
-        setUsers(mapped);
-      } catch (e: any) {
-        Alert.alert('Failed to load users', e?.message || 'Could not fetch users from API');
-        setUsers([]);
-      } finally {
-        setUsersLoading(false);
-      }
-    };
-
-    loadUsers();
+      setUsers(mapped);
+    } catch (e: any) {
+      Alert.alert('Failed to load users', e?.message || 'Could not fetch users from API');
+      setUsers([]);
+    } finally {
+      setUsersLoading(false);
+      setHasLoadedOnce(true);
+    }
   }, []);
 
-  if (isChecking || usersLoading) {
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
+
+  const showToast = useCallback((message: string) => {
+    setToastMessage(message);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => {
+      setToastMessage(null);
+      toastTimerRef.current = null;
+    }, 3200);
+  }, []);
+
+  const onRefresh = useCallback(async () => {
+    try {
+      setRefreshing(true);
+      await loadUsers();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadUsers]);
+
+  // Only block the whole screen on the very first load.
+  // During deletes/refreshes we keep the UI mounted so toast can show.
+  if (isChecking || (!hasLoadedOnce && usersLoading)) {
     return <Loading message="Loading..." />;
   }
 
@@ -99,12 +131,26 @@ export default function SuperAdminDashboard() {
     router.push(`/dashboards/(superAdmin)/assign-role?userId=${id}&returnTo=${returnTo}`);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!isSuperAdmin) {
       Alert.alert('Unauthorized', 'Only Super Admin can delete users');
       return;
     }
-    setUsers(prev => prev.filter(u => u.id !== id));
+
+    try {
+      setUsersLoading(true);
+      await deleteUserById(id);
+      await loadUsers();
+      showToast('User deleted successfully');
+    } catch (e: any) {
+      // Reload anyway to avoid UI drift if backend deleted but response failed
+      try {
+        await loadUsers();
+      } catch {}
+
+      const statusSuffix = __DEV__ && e?.status ? ` (HTTP ${e.status})` : '';
+      Alert.alert('Failed', `${e?.message || 'Could not delete user'}${statusSuffix}`);
+    }
   };
 
   const filteredUsers = users.filter(u => {
@@ -160,8 +206,18 @@ export default function SuperAdminDashboard() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView className="px-4 mb-8"
-        showsVerticalScrollIndicator={false}>
+      <ScrollView
+        className="px-4 mb-8"
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
+      >
 
         <View className="mb-4">
           <View
@@ -375,6 +431,37 @@ export default function SuperAdminDashboard() {
           isLoading={isLoggingOut}
         />
       </ScrollView>
+
+      {toastMessage ? (
+        <View
+          pointerEvents="none"
+          // Keep it above bottom tab bar / safe-area
+          style={{
+            position: 'absolute',
+            left: 16,
+            right: 16,
+            // CustomTabLayout default tab bar height is 70
+            bottom: insets.bottom + 70 + 10,
+            zIndex: 9999,
+            elevation: 9999,
+          }}
+        >
+          <View
+            className="rounded-2xl border px-4 py-3 flex-row items-center"
+            style={{ backgroundColor: colors.surface, borderColor: colors.border }}
+          >
+            <View
+              className="w-9 h-9 rounded-xl items-center justify-center mr-3"
+              style={{ backgroundColor: '#22C55E15' }}
+            >
+              <Ionicons name="checkmark-circle-outline" size={20} color="#22C55E" />
+            </View>
+            <Text className="flex-1 text-sm font-semibold" style={{ color: colors.textPrimary }}>
+              {toastMessage}
+            </Text>
+          </View>
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 }
