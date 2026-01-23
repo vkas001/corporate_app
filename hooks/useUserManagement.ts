@@ -7,9 +7,9 @@ export const useUserManagement = () => {
   const getRoleColor = (role: string, colors: any) => {
     switch (role) {
       case 'superAdmin':
-        return colors.primary;
+        return colors.primaryDark;
       case 'admin':
-        return '#7C3AED';
+        return colors.primary;
       case 'producer':
         return '#2F855A';
       case 'seller':

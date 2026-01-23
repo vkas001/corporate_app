@@ -2,6 +2,8 @@ import type { UserRole } from "@/types/user";
 import { getUserRoleOverrides } from "@/utils/userRoleOverrides";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+
 const AUTH_KEY = "auth";
 
 export type BackendUser = {
@@ -232,7 +234,7 @@ export const validateToken = async () => {
       return false;
     }
 
-    const res = await fetch("https://eggadmin.aanshtech.com.np/api/validate-token", {
+    const res = await fetch(`${API_BASE_URL}/validate-token`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
