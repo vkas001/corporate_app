@@ -44,10 +44,6 @@ export default function ProducerDashboard() {
   const dashboardData = DASHBOARD_DATA[period.toLowerCase() as Period];
 
   const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-      return;
-    }
     router.replace('/');
   };
 

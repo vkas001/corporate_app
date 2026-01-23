@@ -2,7 +2,7 @@ import Loading from "@/components/common/loading";
 import CustomButton from "@/components/ui/CustomButton";
 import CustomInput from "@/components/ui/CustomInput";
 import { useTheme } from "@/theme/themeContext";
-import { getEffectiveUserRole, normalizeRole, saveAuth, seedDevAuth } from "@/utils/auth";
+import { normalizeRole, saveAuth, seedDevAuth } from "@/utils/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -13,6 +13,7 @@ import {
   Text,
   View
 } from "react-native";
+import { getDashboardRoute } from "@/utils/dashboardRouter";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 
@@ -97,49 +98,21 @@ const SignIn = () => {
       await saveAuth(token, effectiveRoles, effectivePermissions, user);
       console.log(" Auth saved to storage");
 
-      const effectiveUserRole = await getEffectiveUserRole();
-      if (effectiveUserRole === "superAdmin") {
-        console.log(" Redirecting to SuperAdmin dashboard");
-        router.replace("/dashboards/(superAdmin)");
-        return;
-      }
-      if (effectiveUserRole === "admin") {
-        console.log(" Redirecting to Admin dashboard");
-        router.replace("/dashboards/(admin)");
-        return;
-      }
-      if (effectiveUserRole === "producer") {
-        console.log(" Redirecting to Producer dashboard");
-        router.replace("/dashboards/(producer)");
-        return;
-      }
-      if (effectiveUserRole === "seller") {
-        console.log(" Redirecting to Seller dashboard");
-        router.replace("/dashboards/(seller)");
-        return;
-      }
+      const normalizedRoles = (user?.roles?.length ? user.roles : roles)
+        .map(normalizeRole);
 
-      const normalizedRoles = Array.isArray(effectiveRoles) ? effectiveRoles.map(normalizeRole) : [];
-      const hasRole = (roleName: string) => normalizedRoles.includes(normalizeRole(roleName));
+      const role =
+        normalizedRoles.includes("superadmin")
+          ? "superAdmin"
+          : normalizedRoles.includes("admin")
+            ? "admin"
+            : normalizedRoles.includes("producer")
+              ? "producer"
+              : "seller";
 
-      console.log(" Checking Super Admin:", hasRole("Super Admin"));
-      console.log(" Checking Producer:", hasRole("Producer"));
-      console.log(" Checking Seller:", hasRole("Seller"));
+      router.replace(getDashboardRoute(role));
 
-      if (hasRole("Super Admin")) {
-        console.log(" Redirecting to SuperAdmin dashboard");
-        router.replace("/dashboards/(superAdmin)");
-      } else if (hasRole("Producer")) {
-        console.log(" Redirecting to Producer dashboard");
-        router.replace("/dashboards/(producer)");
-      } else if (hasRole("Seller")) {
 
-        console.log(" Redirecting to Seller dashboard");
-        router.replace("/dashboards/(seller)");
-      } else {
-        console.log(" Redirecting to Auth");
-        router.replace("/(auth)/sign-in");
-      }
     } catch (err: any) {
       console.error(" Login error:", err);
       Alert.alert("Login Failed", err.message || "Unauthorized");

@@ -4,23 +4,25 @@ import { useEffect, useState } from "react";
 
 export const useRoleGuard = (allowedRoles: string[]) => {
   const [checking, setChecking] = useState(true);
+  const [hasAccess, setHasAccess] = useState(false);
 
   useEffect(() => {
     const checkRole = async () => {
-      console.log("🔍 Role guard: checking roles", { allowedRoles });
+      console.log(" Role guard: checking roles", { allowedRoles });
       const roles = await getRoles();
-      console.log("🔑 Role guard: user roles", roles);
+      console.log(" Role guard: user roles", roles);
 
       const allowedNormalized = (allowedRoles ?? []).map(normalizeRole);
       const rolesNormalized = (roles ?? []).map(normalizeRole);
 
       if (!rolesNormalized.some((r: string) => allowedNormalized.includes(r))) {
-        console.warn("🚫 Role guard: access denied", { roles, allowedRoles });
+        console.warn(" Role guard: access denied", { roles, allowedRoles });
+        setHasAccess(false);
         router.replace("/(auth)/sign-in");
         return;
       }
 
-      console.log("✅ Role guard: access granted", { roles, allowedRoles });
+      console.log(" Role guard: access granted", { roles, allowedRoles });
       setChecking(false);
     };
 

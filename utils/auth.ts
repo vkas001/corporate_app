@@ -226,7 +226,7 @@ export const clearAuth = async () => {
 
 export const validateToken = async () => {
   try {
-    console.log("🔐 Validating token...");
+    console.log(" Validating token...");
     const token = await getToken();
 
     if (!token) {
@@ -242,7 +242,7 @@ export const validateToken = async () => {
       },
     });
 
-    console.log("📡 Validation response status:", res.status);
+    console.log(" Validation response status:", res.status);
 
     if (!res.ok) {
       console.log(" Token is invalid or expired");

@@ -21,7 +21,7 @@ export default function SuperAdminDashboard() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const isChecking = useRoleGuard(['Super Admin']);
+  const isChecking = useRoleGuard(['Super Admin', 'Admin']);
   const { handleLogout, showModal, handleConfirm, handleCancel, isLoggingOut, LogoutModal } = useLogout();
   const { searchQuery, setSearchQuery, getRoleColor, getRoleIcon, getRoleDescription } = useUserManagement();
   const { user: currentUser } = useUser();
@@ -100,16 +100,12 @@ export default function SuperAdminDashboard() {
       setRefreshing(false);
     }
   }, [loadUsers]);
-  
+
   if (isChecking || (!hasLoadedOnce && usersLoading)) {
     return <Loading message="Loading..." />;
   }
 
   const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-      return;
-    }
     router.replace('/');
   };
 
@@ -145,7 +141,7 @@ export default function SuperAdminDashboard() {
       // Reload anyway to avoid UI drift if backend deleted but response failed
       try {
         await loadUsers();
-      } catch {}
+      } catch { }
 
       const statusSuffix = __DEV__ && e?.status ? ` (HTTP ${e.status})` : '';
       Alert.alert('Failed', `${e?.message || 'Could not delete user'}${statusSuffix}`);
@@ -313,7 +309,7 @@ export default function SuperAdminDashboard() {
           className="flex-row items-center justify-center gap-2 py-3.5 rounded-2xl mb-6"
           style={{ backgroundColor: colors.primary }}
           activeOpacity={0.8}
-          onPress={() => router.navigate('/dashboards/(superAdmin)/add-user')}
+          onPress={() => router.push('/dashboards/(superAdmin)/add-user')}
         >
           <Ionicons name="add-circle" size={18} color={colors.surface} />
           <Text className="text-base font-bold"

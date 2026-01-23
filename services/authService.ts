@@ -12,18 +12,18 @@ export const signIn = async (email: string, password: string) => {
 };
 
 export const logout = async () => {
-  console.log("🔓 Logout initiated");
+  console.log(" Logout initiated");
   try {
-    console.log("⏳ Sending logout request...");
+    console.log(" Sending logout request...");
     const res = await api.post("/logout");
-    console.log("📡 Logout response status:", res.status);
-    console.log("📦 Response data:", res.data);
+    console.log(" Logout response status:", res.status);
+    console.log(" Response data:", res.data);
   } catch (err: any) {
-    console.warn("❌ Logout request failed:", err?.message || err);
+    console.warn(" Logout request failed:", err?.message || err);
   } finally {
-    console.log("🗑️ Clearing authentication data from storage");
+    console.log(" Clearing authentication data from storage");
     await clearAuth();
-    console.log("✅ Logout complete");
+    console.log(" Logout complete");
 
   }
 };

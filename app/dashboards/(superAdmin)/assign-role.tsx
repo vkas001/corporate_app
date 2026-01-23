@@ -25,7 +25,7 @@ const SUPER_ADMIN_HOME = "/dashboards/(superAdmin)" as const;
 
 export default function AssignRoleScreen() {
   const { colors } = useTheme();
-  const isChecking = useRoleGuard(["Super Admin"]);
+  const isChecking = useRoleGuard(["Super Admin", "Admin"]);
   const { userId, returnTo } = useLocalSearchParams<{ userId?: string; returnTo?: string }>();
 
   const resolvedReturnTo = (() => {
@@ -101,7 +101,6 @@ export default function AssignRoleScreen() {
       return;
     }
 
-    if (router.canGoBack()) return router.back();
     router.replace("/dashboards/(superAdmin)");
   };
 

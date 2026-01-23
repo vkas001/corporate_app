@@ -44,10 +44,6 @@ export default function SellerDashboard() {
   console.log("Seller Dashboard - User data:", user);
 
   const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-      return;
-    }
     router.replace('/');
   };
   return <SafeAreaView

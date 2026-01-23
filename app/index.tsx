@@ -2,7 +2,7 @@ import Loading from "@/components/common/loading";
 import LiveMarketCategory from "@/components/market/MarketCategory";
 import CustomButton from "@/components/ui/CustomButton";
 import { useTheme } from "@/theme";
-import { getAuth, getEffectiveUserRole } from "@/utils/auth";
+import { getAuth } from "@/utils/auth";
 import { formatFullDate } from "@/utils/dateFormatter";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, router } from "expo-router";
@@ -50,7 +50,7 @@ export default function LandingPage() {
 
     const auth = await getAuth();
     const token = auth?.token;
-  const role = await getEffectiveUserRole();
+    const role = auth?.user?.role;
 
     if (!token || !role) {
       router.replace("/(auth)/sign-in");
@@ -58,16 +58,25 @@ export default function LandingPage() {
       return;
     }
 
-    if (role === "producer") {
-      router.replace("/dashboards/(producer)");
-    } else if (role === "seller") {
-      router.replace("/dashboards/(seller)");
-    } else if (role === "admin") {
-      router.replace("/dashboards/(admin)");
-    } else if (role === "superAdmin") {
-      router.replace("/dashboards/(superAdmin)");
-    } else {
-      router.replace("/(auth)/sign-in");
+    switch (role) {
+      case "producer":
+        router.replace("/dashboards/(producer)");
+        break;
+
+      case "seller":
+        router.replace("/dashboards/(seller)");
+        break;
+
+      case "admin":
+        router.replace("/dashboards/(superAdmin)");
+        break;
+
+      case "superAdmin":
+        router.replace("/dashboards/(superAdmin)");
+        break;
+
+      default:
+        router.replace("/(auth)/sign-in");
     }
     setIsSubmitting(false);
   };

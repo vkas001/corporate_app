@@ -25,12 +25,11 @@ type UserType = "PRODUCER" | "SELLER";
 
 export default function AddUserScreen() {
   const { colors } = useTheme();
-  const isChecking = useRoleGuard(["Super Admin"]);
+  const isChecking = useRoleGuard(["Super Admin", "Admin"]);
   const [userType, setUserType] = useState<UserType>("PRODUCER");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleBack = () => {
-    if (router.canGoBack()) return router.back();
     router.replace("/dashboards/(superAdmin)");
   };
 
