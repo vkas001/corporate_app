@@ -7,6 +7,7 @@ import { getUserById, updateUserById } from "@/services/userService";
 import { useTheme } from "@/theme/themeContext";
 import type { UserRole } from "@/types/userManagement";
 import { getAuth, setAuthUserRole, updateAuthUser } from "@/utils/auth";
+import { getDashboardRoute } from "@/utils/dashboardRouter";
 import { getUserRoleOverrides, setUserRoleOverride } from "@/utils/userRoleOverrides";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -21,13 +22,6 @@ const ROLE_OPTIONS: Array<{ role: UserRole; label: string; icon: any }> = [
 ];
 
 const SUPER_ADMIN_HOME = "/dashboards/(superAdmin)" as const;
-
-const roleToDashboardRoute = (role: UserRole) => {
-  if (role === "superAdmin") return "/dashboards/(superAdmin)";
-  if (role === "admin") return "/dashboards/(admin)";
-  if (role === "producer") return "/dashboards/(producer)";
-  return "/dashboards/(seller)";
-};
 
 export default function AssignRoleScreen() {
   const { colors } = useTheme();
@@ -347,7 +341,7 @@ export default function AssignRoleScreen() {
                 const currentId = auth?.user?.id != null ? String(auth.user.id) : null;
                 if (currentId && currentId === String(user.id)) {
                   await setAuthUserRole(role as any);
-                  router.replace(roleToDashboardRoute(role));
+                  router.replace(getDashboardRoute(role));
                   return;
                 }
               } catch {
