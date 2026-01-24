@@ -7,7 +7,8 @@ import { useUser } from '@/hooks/useUser';
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { deleteUserById, getUsers } from '@/services/userService';
 import { useTheme } from '@/theme/themeContext';
-import { User } from '@/types/userManagement';
+import { User, type UserRole } from '@/types/userManagement';
+import { roleToRoleLabel } from '@/utils/auth';
 import { formatFullDate } from '@/utils/dateFormatter';
 import { getUserRoleOverrides } from '@/utils/userRoleOverrides';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,7 +32,9 @@ export default function SuperAdminDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isSuperAdmin = true;
+  const userRole: UserRole = currentUser?.role ?? 'admin';
+  const isSuperAdmin = userRole === 'superAdmin';
+  const dashboardTitle = t(roleToRoleLabel(userRole));
 
   const currentUserId = currentUser?.id != null ? String(currentUser.id) : null;
 
@@ -186,7 +189,7 @@ export default function SuperAdminDashboard() {
           <Text className="text-[18px] font-[600] ml-[3px]"
             style={{ color: colors.textPrimary }}
           >
-            {t('Super Admin')}</Text>
+            {dashboardTitle}</Text>
           <Text className="text-[12px]"
             style={{ color: colors.textSecondary }}
           >
@@ -386,20 +389,18 @@ export default function SuperAdminDashboard() {
             </View>
           </View>
         </View>
-        {isSuperAdmin && (
-          <TouchableOpacity
-            className="flex-row items-center justify-center gap-2 py-3.5 rounded-2xl mb-10"
-            style={{ backgroundColor: colors.primaryDark, borderColor: colors.border, borderWidth: 1 }}
-            activeOpacity={0.8}
-            onPress={handleLogout}
-          >
-            <Ionicons name="log-out-outline" size={18} color={colors.textPrimary} />
-            <Text className="text-base font-bold"
-              style={{ color: colors.textPrimary }}>
-              Log Out
-            </Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          className="flex-row items-center justify-center gap-2 py-3.5 rounded-2xl mb-10"
+          style={{ backgroundColor: colors.primaryDark, borderColor: colors.border, borderWidth: 1 }}
+          activeOpacity={0.8}
+          onPress={handleLogout}
+        >
+          <Ionicons name="log-out-outline" size={18} color={colors.textPrimary} />
+          <Text className="text-base font-bold"
+            style={{ color: colors.textPrimary }}>
+            Log Out
+          </Text>
+        </TouchableOpacity>
         <LogoutModal
           visible={showModal}
           onConfirm={handleConfirm}
