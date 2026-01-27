@@ -1,8 +1,11 @@
 import Loading from '@/components/common/loading';
+import MarketCard from '@/components/market/marketCard';
+import MarkertCard from '@/components/market/marketCard';
 import RoleCard from '@/components/users/RoleCard';
 import UserCard from '@/components/users/UserCard';
 import { useRoleGuard } from '@/hooks/roleGuard';
 import { useLogout } from '@/hooks/useLogout';
+import { useMarket } from '@/hooks/useMarket';
 import { useUser } from '@/hooks/useUser';
 import { useUserManagement } from '@/hooks/useUserManagement';
 import { deleteUserById, getUsers } from '@/services/userService';
@@ -18,8 +21,10 @@ import { useTranslation } from 'react-i18next';
 import { Alert, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+
 export default function SuperAdminDashboard() {
   const { colors } = useTheme();
+  const { eggTypes, loading, deleteEggType } = useMarket();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const isChecking = useRoleGuard(['Super Admin', 'Admin']);
@@ -166,6 +171,7 @@ export default function SuperAdminDashboard() {
     acc[u.role] = (acc[u.role] ?? 0) + 1;
     return acc;
   }, {});
+
 
   return (
     <SafeAreaView className="flex-1"
@@ -389,6 +395,7 @@ export default function SuperAdminDashboard() {
             </View>
           </View>
         </View>
+
         <TouchableOpacity
           className="flex-row items-center justify-center gap-2 py-3.5 rounded-2xl mb-10"
           style={{ backgroundColor: colors.primaryDark, borderColor: colors.border, borderWidth: 1 }}
@@ -433,7 +440,9 @@ export default function SuperAdminDashboard() {
             >
               <Ionicons name="checkmark-circle-outline" size={20} color="#22C55E" />
             </View>
-            <Text className="flex-1 text-sm font-semibold" style={{ color: colors.textPrimary }}>
+            <Text className="flex-1 text-sm font-semibold" 
+              style={{ color: colors.textPrimary }}
+            >
               {toastMessage}
             </Text>
           </View>
