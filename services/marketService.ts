@@ -23,7 +23,11 @@ export const EggTypesService = {
       const normalized = normalize(res.data);
       // Ensure we always return an array
       return Array.isArray(normalized) ? normalized : [];
-    } catch (error) {
+    } catch (error: any) {
+      // Let authentication errors propagate to the API interceptor
+      if (error?.message === "Session expired") {
+        throw error;
+      }
       console.error('Error fetching egg types:', error);
       return [];
     }
@@ -54,7 +58,11 @@ export const EggTypesService = {
       const res = await api.get(`/egg-types/${eggType}/units`, withAuth(token));
       const normalized = normalize(res.data);
       return Array.isArray(normalized) ? normalized : [];
-    } catch (error) {
+    } catch (error: any) {
+      // Let authentication errors propagate to the API interceptor
+      if (error?.message === "Session expired") {
+        throw error;
+      }
       console.error(`Error fetching units for ${eggType}:`, error);
       return [];
     }

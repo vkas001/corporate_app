@@ -8,17 +8,35 @@ export function useMarket(token?: string) {
   const [loading, setLoading] = useState(false);
 
   const fetchEggTypes = async () => {
-    setLoading(true);
-    const data = await EggTypesService.getAll(token);
-    setEggTypes(data);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const data = await EggTypesService.getAll(token);
+      setEggTypes(data);
+    } catch (error: any) {
+      // Let session expired errors propagate to trigger redirect
+      if (error?.message === "Session expired") {
+        throw error;
+      }
+      console.error("Failed to fetch egg types:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchUnits = async (eggType: string) => {
-    setLoading(true);
-    const data = await EggTypesService.getUnits(eggType, token);
-    setUnits(data);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const data = await EggTypesService.getUnits(eggType, token);
+      setUnits(data);
+    } catch (error: any) {
+      // Let session expired errors propagate to trigger redirect
+      if (error?.message === "Session expired") {
+        throw error;
+      }
+      console.error(`Failed to fetch units for ${eggType}:`, error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const createEggType = async (data: Partial<EggType>) => {
