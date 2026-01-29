@@ -113,8 +113,14 @@ export default function Notification() {
                 </View>
 
                 {/* Filter Pills */}
-                <View className="flex-row flex-wrap gap-2 mt-5 mb-4 pb-4 border-b"
-                    style={{ borderBottomColor: colors.border }}>
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    scrollEventThrottle={16}
+                    className="mt-5 mb-4 pb-4 border-b -mx-4 px-4"
+                    style={{ borderBottomColor: colors.border }}
+                    contentContainerStyle={{ gap: 8, paddingRight: 20 }}
+                >
                     {Object.entries(FILTER_MAP).map(([key]) => {
                         const filterKey = key as FilterKey;
                         const isActive = filterKey === activeFilter;
@@ -159,7 +165,7 @@ export default function Notification() {
                             </TouchableOpacity>
                         );
                     })}
-                </View>
+                </ScrollView>
 
                 {/* Notification List or Empty State */}
                 {filteredNotifications.length > 0 ? (
