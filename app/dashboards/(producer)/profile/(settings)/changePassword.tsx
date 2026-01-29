@@ -63,7 +63,7 @@ export default function ChangePassword() {
           <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
         </TouchableOpacity>
         <Text className="text-lg font-bold"
-          style={{ color: colors.textPrimary }}>Edit Profile
+          style={{ color: colors.textPrimary }}>Change Password
         </Text>
         <View style={{ width: 40 }} />
       </View>
