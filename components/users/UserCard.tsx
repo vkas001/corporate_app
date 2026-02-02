@@ -34,6 +34,25 @@ export default function UserCard({
     return e || "User";
   }, [user.email, user.name]);
 
+  const formatJoinDate = useMemo(() => {
+    const date = (user as any)?.created_at || (user as any)?.joinDate;
+    if (!date) return "";
+    try {
+      // Parse ISO format date like "2026-01-07T10:00:00.000000Z"
+      const dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) {
+        return "Unknown";
+      }
+      // Format as "Jan 07, 2026"
+      const month = dateObj.toLocaleDateString("en-US", { month: "short" });
+      const day = String(dateObj.getDate()).padStart(2, "0");
+      const year = dateObj.getFullYear();
+      return `${month} ${day}, ${year}`;
+    } catch (e) {
+      return "Unknown";
+    }
+  }, [(user as any)?.created_at, (user as any)?.joinDate]);
+
   const danger = "#EF4444";
 
   return (
@@ -66,10 +85,12 @@ export default function UserCard({
           </View>
 
           <View className="flex-1">
-            <Text className="text-base font-bold mb-0.5" style={{ color: colors.textPrimary }}>
+            <Text className="text-base font-bold mb-0.5"
+              style={{ color: colors.textPrimary }}>
               {user.name}
             </Text>
-            <Text className="text-sm mb-2" style={{ color: colors.textSecondary }}>
+            <Text className="text-sm mb-2"
+              style={{ color: colors.textSecondary }}>
               {user.email}
             </Text>
             <View className="flex-row items-center gap-2">
@@ -92,8 +113,9 @@ export default function UserCard({
                 </Text>
               </View>
 
-              <Text className="text-xs" style={{ color: colors.textSecondary }}>
-                • Joined {user.joinDate}
+              <Text className="text-xs"
+                style={{ color: colors.textSecondary }}>
+                • Joined {formatJoinDate}
               </Text>
             </View>
           </View>
@@ -141,15 +163,18 @@ export default function UserCard({
             onPress={(e) => e.stopPropagation()}
           >
             <View className="items-center mb-3">
-              <View className="w-12 h-1.5 rounded-full" style={{ backgroundColor: colors.border }} />
+              <View className="w-12 h-1.5 rounded-full"
+                style={{ backgroundColor: colors.border }} />
             </View>
 
             <View className="flex-row items-start justify-between">
               <View className="flex-1 pr-3">
-                <Text className="text-base font-bold" style={{ color: colors.textPrimary }}>
+                <Text className="text-base font-bold"
+                  style={{ color: colors.textPrimary }}>
                   {displayName}
                 </Text>
-                <Text className="text-xs mt-1" style={{ color: colors.textSecondary }}>
+                <Text className="text-xs mt-1"
+                  style={{ color: colors.textSecondary }}>
                   User options
                 </Text>
               </View>
@@ -185,17 +210,20 @@ export default function UserCard({
                     <Ionicons name="trash-outline" size={18} color={danger} />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-sm font-semibold" style={{ color: danger }}>
+                    <Text className="text-sm font-semibold"
+                      style={{ color: danger }}>
                       Delete user
                     </Text>
-                    <Text className="text-xs mt-1" style={{ color: colors.textSecondary }}>
+                    <Text className="text-xs mt-1"
+                      style={{ color: colors.textSecondary }}>
                       Remove this account from the app.
                     </Text>
                   </View>
                 </View>
 
                 {isSignedInUser ? (
-                  <Text className="text-xs mt-2" style={{ color: colors.textSecondary }}>
+                  <Text className="text-xs mt-2"
+                    style={{ color: colors.textSecondary }}>
                     You can’t delete your own account.
                   </Text>
                 ) : null}
@@ -206,7 +234,8 @@ export default function UserCard({
                 style={{ borderColor: colors.border, backgroundColor: colors.surface }}
                 onPress={() => setMenuVisible(false)}
               >
-                <Text className="text-sm font-semibold text-center" style={{ color: colors.textPrimary }}>
+                <Text className="text-sm font-semibold text-center"
+                  style={{ color: colors.textPrimary }}>
                   Cancel
                 </Text>
               </Pressable>
@@ -241,10 +270,12 @@ export default function UserCard({
                   <Ionicons name="warning-outline" size={20} color={danger} />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-base font-bold" style={{ color: colors.textPrimary }}>
+                  <Text className="text-base font-bold"
+                    style={{ color: colors.textPrimary }}>
                     Delete account?
                   </Text>
-                  <Text className="text-xs mt-1" style={{ color: colors.textSecondary }}>
+                  <Text className="text-xs mt-1"
+                    style={{ color: colors.textSecondary }}>
                     This action can’t be undone.
                   </Text>
                 </View>
@@ -260,7 +291,8 @@ export default function UserCard({
             </View>
 
             <View className="mt-4">
-              <Text className="text-sm" style={{ color: colors.textSecondary }}>
+              <Text className="text-sm"
+                style={{ color: colors.textSecondary }}>
                 You are about to delete {displayName}.
               </Text>
             </View>
@@ -271,7 +303,8 @@ export default function UserCard({
                 style={{ borderColor: colors.border, backgroundColor: colors.surface }}
                 onPress={() => setConfirmVisible(false)}
               >
-                <Text className="text-sm font-semibold" style={{ color: colors.textPrimary }}>
+                <Text className="text-sm font-semibold"
+                  style={{ color: colors.textPrimary }}>
                   Cancel
                 </Text>
               </Pressable>
@@ -284,7 +317,8 @@ export default function UserCard({
                   onDelete?.(user.id);
                 }}
               >
-                <Text className="text-sm font-semibold" style={{ color: "#FFFFFF" }}>
+                <Text className="text-sm font-semibold"
+                  style={{ color: "#FFFFFF" }}>
                   Delete
                 </Text>
               </Pressable>
