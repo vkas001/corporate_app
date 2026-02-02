@@ -212,7 +212,7 @@ export default function EggUnitsScreen() {
                         <Text className="text-base font-bold" style={{ color: colors.textPrimary }}>
                           {unit.name}
                         </Text>
-                        {unit.is_base_unit && (
+                        {Boolean(unit.is_base_unit) && (
                           <View 
                             className="px-2 py-0.5 rounded-full"
                             style={{ backgroundColor: colors.primary + '20' }}
@@ -223,7 +223,7 @@ export default function EggUnitsScreen() {
                           </View>
                         )}
                       </View>
-                      {unit.abbreviation && (
+                      {Boolean(unit.abbreviation) && (
                         <Text className="text-xs ml-6" style={{ color: colors.textSecondary }}>
                           {unit.abbreviation}
                         </Text>
