@@ -7,14 +7,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    RefreshControl,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -69,7 +69,7 @@ export default function EggTypesScreen() {
 
   const handleManageUnits = (id: string, name: string) => {
     router.push({
-      pathname: '/dashboards/(superAdmin)/egg-units' as any,
+      pathname: '/dashboards/(superAdmin)/eggTypes/egg-units' as any,
       params: { eggTypeId: id, eggTypeName: name },
     });
   };
@@ -88,7 +88,7 @@ export default function EggTypesScreen() {
       >
         <TouchableOpacity
           className="w-[40px] h-[40px] rounded-[20px] items-center justify-center"
-          onPress={() => router.back()}
+          onPress={() => router.push('/dashboards/(superAdmin)')}
         >
           <Ionicons name="chevron-back-outline" size={28} color={colors.textPrimary} />
         </TouchableOpacity>

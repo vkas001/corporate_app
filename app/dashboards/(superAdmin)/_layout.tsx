@@ -11,14 +11,14 @@ const superAdminTabs: TabConfig[] = [
   },
 
   {
-    name: 'egg-types',
+    name: 'eggTypes',
     label: 'Egg Types',
     icon: Ionicons,
     iconName: 'egg-outline',
     iconNameFocused: 'egg',
   },
 
-   {
+  {
     name: 'price-update',
     label: 'Prices',
     icon: Ionicons,
@@ -32,7 +32,7 @@ export default function SuperAdminLayout() {
   return (
     <CustomTabLayout
       tabs={superAdminTabs}
-      hiddenRoutes={['add-user', 'assign-role', 'egg-units']}
+      hiddenRoutes={['add-user', 'assign-role']}
       resetOnTabPress
     />
   );
