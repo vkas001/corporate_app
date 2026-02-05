@@ -36,6 +36,9 @@ export default function SellerDashboard() {
     try {
       setRefreshing(true);
       await refetch({ forceRemote: true });
+    } catch (err) {
+      console.warn("Refresh failed:", err);
+      // Session errors will be handled by API interceptor
     } finally {
       setRefreshing(false);
     }

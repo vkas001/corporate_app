@@ -23,8 +23,14 @@ export const useUser = () => {
       setUser(profileData);
       return profileData;
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("Failed to fetch user"));
+      const error = err instanceof Error ? err : new Error("Failed to fetch user");
+      setError(error);
       setUser(null);
+      // Don't rethrow in initial fetch to avoid uncaught promise rejection
+      if (!options?.forceRemote) {
+        console.warn("Failed to fetch user profile:", error.message);
+        return null;
+      }
       throw err;
     } finally {
       setLoading(false);
@@ -32,7 +38,15 @@ export const useUser = () => {
   }, []);
 
   useEffect(() => {
-    refetch();
+    // Wrap in async IIFE to handle promise rejection
+    (async () => {
+      try {
+        await refetch();
+      } catch (err) {
+        // Error already handled in refetch, just log
+        console.warn("Initial user fetch failed:", err);
+      }
+    })();
   }, [refetch]);
 
   return { user, loading, error, refetch };

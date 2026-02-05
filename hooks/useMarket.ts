@@ -13,11 +13,9 @@ export function useMarket(token?: string) {
       const data = await EggTypesService.getAll(token);
       setEggTypes(data);
     } catch (error: any) {
-      // Let session expired errors propagate to trigger redirect
-      if (error?.message === "Session expired") {
-        throw error;
-      }
       console.error("Failed to fetch egg types:", error);
+      // Session expired errors will be handled by the API interceptor
+      // which redirects to login, so we just log here
     } finally {
       setLoading(false);
     }
@@ -29,11 +27,8 @@ export function useMarket(token?: string) {
       const data = await EggTypesService.getUnits(eggType, token);
       setUnits(data);
     } catch (error: any) {
-      // Let session expired errors propagate to trigger redirect
-      if (error?.message === "Session expired") {
-        throw error;
-      }
       console.error(`Failed to fetch units for ${eggType}:`, error);
+      // Session expired errors will be handled by the API interceptor
     } finally {
       setLoading(false);
     }
@@ -67,7 +62,15 @@ export function useMarket(token?: string) {
   };
 
   useEffect(() => {
-    fetchEggTypes();
+    // Wrap in async IIFE to handle promise rejection
+    (async () => {
+      try {
+        await fetchEggTypes();
+      } catch (err) {
+        // Error already logged in fetchEggTypes
+        console.warn("Initial egg types fetch failed:", err);
+      }
+    })();
   }, []);
 
   return {

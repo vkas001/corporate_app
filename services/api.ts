@@ -47,8 +47,15 @@ api.interceptors.response.use(
 
     // Unauthorized / token expired
     if (status === 401) {
-      await clearAuth();
-      router.replace("/(auth)/sign-in");
+      try {
+        await clearAuth();
+        // Use a small timeout to ensure auth is cleared before navigation
+        setTimeout(() => {
+          router.replace("/(auth)/sign-in");
+        }, 100);
+      } catch (clearError) {
+        console.error("Error clearing auth:", clearError);
+      }
       return Promise.reject({ message: "Session expired" });
     }
 
