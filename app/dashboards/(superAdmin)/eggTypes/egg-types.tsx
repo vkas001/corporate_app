@@ -135,6 +135,20 @@ export default function EggTypesScreen() {
             </TouchableOpacity>
           )}
 
+          {!editingEggType && (
+            <TouchableOpacity
+              className="flex-row items-center justify-center gap-2 py-3.5 rounded-2xl mb-4"
+              style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }}
+              activeOpacity={0.8}
+              onPress={() => router.push('/dashboards/(superAdmin)/eggTypes/price-update')}
+            >
+              <Ionicons name="pricetag-outline" size={20} color={colors.primary} />
+              <Text className="text-base font-bold" style={{ color: colors.primary }}>
+                Update Prices
+              </Text>
+            </TouchableOpacity>
+          )}
+
           {showAddForm && (
             <EggTypeForm
               mode="create"
