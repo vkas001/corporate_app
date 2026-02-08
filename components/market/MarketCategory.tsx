@@ -1,25 +1,20 @@
-import { marketPrices } from "@/data/marketPriceData";
+import { useMarket } from "@/hooks/useMarket";
 import { useTheme } from "@/theme/themeContext";
-import { formatCurrency } from "@/utils/currencyFormatter";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
-import { FlatList, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { FlatList, ScrollView, Text, View } from "react-native";
 
 const ROW_HEIGHT = 46;
+const PRICE_COLUMNS = ["Per Piece", "Per Crate", "Per Carton"];
 
 export default function LiveMarket() {
   const { colors } = useTheme();
-
-  const [open, setOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState("eggs");
-
-  const activeCategory = marketPrices.find(
-    (cat) => cat.id === selectedId
-  );
+  const { eggTypes, loading } = useMarket();
+  const hasEggTypes = eggTypes.length > 0;
 
   return (
     <View className="relative mx-1.5">
-      <TouchableOpacity
+      <View
         className="px-4 py-3 rounded-xl flex-row items-center justify-between border"
         style={{
           backgroundColor: colors.surface,
@@ -30,8 +25,6 @@ export default function LiveMarket() {
           shadowOffset: { width: 0, height: 2 },
           elevation: 3,
         }}
-        onPress={() => setOpen(!open)}
-        activeOpacity={0.8}
       >
         <View className="flex-row items-center gap-2 flex-1">
           <View
@@ -39,63 +32,37 @@ export default function LiveMarket() {
             style={{ backgroundColor: colors.primary + "15" }}
           >
             <Ionicons
-              name="pricetag"
+              name="egg-outline"
               size={18}
               color={colors.primary}
             />
           </View>
-          <Text className="text-lg font-bold" style={{ color: colors.textPrimary }}>{activeCategory?.name}</Text>
+          <Text className="text-lg font-bold"
+            style={{ color: colors.textPrimary }}>Egg Types
+          </Text>
         </View>
+      </View>
 
-        <Ionicons
-          name={open ? "chevron-up" : "chevron-down"}
-          size={24}
-          color={colors.primaryDark}
-        />
-      </TouchableOpacity>
-
-      {open && (
+      {loading && !hasEggTypes ? (
         <View
-          className="absolute top-16 left-0 right-0 z-10 border rounded-xl overflow-hidden"
-          style={{
-            backgroundColor: colors.surface,
-            borderColor: colors.border,
-            shadowColor: "#000",
-            shadowOpacity: 0.15,
-            shadowRadius: 8,
-            shadowOffset: { width: 0, height: 4 },
-            elevation: 8,
-          }}
+          className="mt-4 border rounded-xl p-6 items-center"
+          style={{ backgroundColor: colors.surface, borderColor: colors.border }}
         >
-          {marketPrices
-            .filter((cat) => cat.id !== selectedId)
-            .map((cat, index) => (
-              <TouchableOpacity
-                key={cat.id}
-                className={`flex-row items-center px-4.5 py-3.5 gap-3 ${index < marketPrices.filter((c) => c.id !== selectedId).length - 1 ? 'border-b' : ''}`}
-                style={{ borderBottomColor: colors.border }}
-                onPress={() => {
-                  setSelectedId(cat.id);
-                  setOpen(false);
-                }}
-                activeOpacity={0.7}
-              >
-                <View
-                  className="w-7 h-7 rounded items-center justify-center"
-                  style={{ backgroundColor: colors.background }}
-                >
-                  <Ionicons
-                    name="pricetag-outline"
-                    size={16}
-                    color={colors.textSecondary}
-                  />
-                </View>
-                <Text className="text-base font-medium" style={{ color: colors.textPrimary }}>{cat.name}</Text>
-              </TouchableOpacity>
-            ))}
+          <Text className="text-sm" style={{ color: colors.textSecondary }}>
+            Loading egg types...
+          </Text>
         </View>
-      )}
-      {activeCategory && (
+      ) : !hasEggTypes ? (
+        <View
+          className="mt-4 border rounded-xl p-6 items-center"
+          style={{ backgroundColor: colors.surface, borderColor: colors.border }}
+        >
+          <Ionicons name="egg-outline" size={36} color={colors.textSecondary} />
+          <Text className="text-sm mt-2" style={{ color: colors.textSecondary }}>
+            No egg types available yet.
+          </Text>
+        </View>
+      ) : (
         <View
           className="mt-4 border rounded-xl overflow-hidden"
           style={{
@@ -108,7 +75,6 @@ export default function LiveMarket() {
           }}
         >
           <View className="flex-row">
-
             <View>
               <View
                 className="items-center justify-center border-r border-b flex-row"
@@ -125,8 +91,8 @@ export default function LiveMarket() {
               </View>
 
               <FlatList
-                data={activeCategory.items}
-                keyExtractor={(item, index) => item.type + index}
+                data={eggTypes}
+                keyExtractor={(item) => item.id}
                 renderItem={({ item, index }) => (
                   <View
                     className="items-center justify-center border-r border-b"
@@ -138,20 +104,17 @@ export default function LiveMarket() {
                       borderBottomColor: colors.border,
                     }}
                   >
-                    <Text className="text-sm font-medium" style={{ color: colors.textPrimary }}>{item.type}</Text>
+                    <Text className="text-sm font-medium" style={{ color: colors.textPrimary }}>{item.name}</Text>
                   </View>
                 )}
                 scrollEnabled={false}
               />
             </View>
 
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-            >
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View>
                 <View className="flex-row">
-                  {activeCategory.columns.map((column, colIndex) => (
+                  {PRICE_COLUMNS.map((column, colIndex) => (
                     <View
                       key={colIndex}
                       className="items-center justify-center border-r border-b flex-row"
@@ -168,11 +131,11 @@ export default function LiveMarket() {
                   ))}
                 </View>
                 <FlatList
-                  data={activeCategory.items}
-                  keyExtractor={(item, index) => item.type + index}
-                  renderItem={({ item, index }) => (
+                  data={eggTypes}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ index }) => (
                     <View className="flex-row">
-                      {item.prices.map((priceCell, priceIndex) => (
+                      {PRICE_COLUMNS.map((_, priceIndex) => (
                         <View
                           key={priceIndex}
                           className="items-center justify-center border-r border-b"
@@ -184,8 +147,8 @@ export default function LiveMarket() {
                             borderBottomColor: colors.border,
                           }}
                         >
-                          <Text className="text-base font-semibold" style={{ color: colors.primary }}>
-                            {formatCurrency(priceCell.price)}
+                          <Text className="text-base font-semibold" style={{ color: colors.textSecondary }}>
+                            —
                           </Text>
                         </View>
                       ))}
@@ -193,10 +156,8 @@ export default function LiveMarket() {
                   )}
                   scrollEnabled={false}
                 />
-
               </View>
             </ScrollView>
-
           </View>
         </View>
       )}
