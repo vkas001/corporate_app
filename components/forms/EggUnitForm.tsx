@@ -12,11 +12,11 @@ interface EggUnitFormProps {
   mode?: 'create' | 'edit';
 }
 
-export default function EggUnitForm({ 
-  onClose, 
-  onSubmit, 
+export default function EggUnitForm({
+  onClose,
+  onSubmit,
   initialData,
-  mode = 'create' 
+  mode = 'create'
 }: EggUnitFormProps) {
   const { colors } = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,7 +63,7 @@ export default function EggUnitForm({
 
     try {
       setIsSubmitting(true);
-      
+
       const data: Partial<EggUnit> = {
         name: form.name.trim(),
         abbreviation: form.abbreviation.trim() || undefined,
@@ -80,12 +80,12 @@ export default function EggUnitForm({
 
       await onSubmit(data);
 
-      setForm({ 
-        name: '', 
-        abbreviation: '', 
-        conversion_factor: '', 
+      setForm({
+        name: '',
+        abbreviation: '',
+        conversion_factor: '',
         price: '',
-        is_base_unit: false 
+        is_base_unit: false
       });
       setErrors({});
       Alert.alert('Success', `Unit ${mode === 'create' ? 'created' : 'updated'} successfully`);
@@ -102,7 +102,8 @@ export default function EggUnitForm({
       style={{ backgroundColor: colors.surface, borderColor: colors.border }}
     >
       <View className="flex-row items-center justify-between mb-4">
-        <Text className="text-lg font-bold" style={{ color: colors.textPrimary }}>
+        <Text className="text-lg font-bold"
+          style={{ color: colors.textPrimary }}>
           {mode === 'create' ? 'Add New Unit' : 'Edit Unit'}
         </Text>
       </View>
@@ -160,10 +161,12 @@ export default function EggUnitForm({
       <View className="mb-4">
         <View className="flex-row items-center justify-between py-3 px-1">
           <View className="flex-1">
-            <Text className="text-sm font-semibold" style={{ color: colors.textPrimary }}>
+            <Text className="text-sm font-semibold"
+              style={{ color: colors.textPrimary }}>
               Base Unit
             </Text>
-            <Text className="text-xs mt-1" style={{ color: colors.textSecondary }}>
+            <Text className="text-xs mt-1"
+              style={{ color: colors.textSecondary }}>
               Mark as the base unit for this egg type
             </Text>
           </View>
@@ -182,12 +185,12 @@ export default function EggUnitForm({
             title="Cancel"
             onPress={() => {
               onClose();
-              setForm({ 
-                name: '', 
-                abbreviation: '', 
-                conversion_factor: '', 
+              setForm({
+                name: '',
+                abbreviation: '',
+                conversion_factor: '',
                 price: '',
-                is_base_unit: false 
+                is_base_unit: false
               });
               setErrors({});
             }}

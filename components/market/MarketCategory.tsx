@@ -87,7 +87,9 @@ export default function LiveMarket() {
                 }}
               >
                 <Ionicons name="list" size={14} color={colors.textPrimary} className="mr-1.5" />
-                <Text className="text-xs font-bold uppercase" style={{ color: colors.textPrimary }}>Type</Text>
+                <Text className="text-xs font-bold uppercase"
+                  style={{ color: colors.textPrimary }}>Type
+                </Text>
               </View>
 
               <FlatList
@@ -104,7 +106,9 @@ export default function LiveMarket() {
                       borderBottomColor: colors.border,
                     }}
                   >
-                    <Text className="text-sm font-medium" style={{ color: colors.textPrimary }}>{item.name}</Text>
+                    <Text className="text-sm font-medium"
+                      style={{ color: colors.textPrimary }}>{item.name}
+                    </Text>
                   </View>
                 )}
                 scrollEnabled={false}
@@ -147,7 +151,8 @@ export default function LiveMarket() {
                             borderBottomColor: colors.border,
                           }}
                         >
-                          <Text className="text-base font-semibold" style={{ color: colors.textSecondary }}>
+                          <Text className="text-base font-semibold"
+                            style={{ color: colors.textSecondary }}>
                             —
                           </Text>
                         </View>
